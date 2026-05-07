@@ -2,516 +2,330 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>اختبار طبيب الأسنان | 80 سؤالاً فريداً</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>اختبار طبيب الأسنان | د. زكريا عطوني</title>
+    
+    <link rel="apple-touch-icon" href="image_0.png">
+    <link rel="icon" type="image/png" href="image_0.png">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
+        :root { --primary: #2c7be5; --bg: #fff7e5; --dark: #1e3a5f; --accent: #f4c542; --success: #28a745; --danger: #e63946; }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', 'Cairo', sans-serif; }
+        
+        body { 
+            background-color: var(--bg); 
+            min-height: 100vh; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            padding: 15px;
         }
 
-        body {
-            background-color: #fff7e5;
-            font-family: 'Segoe UI', 'Tahoma', 'Cairo', 'Rubik', system-ui, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            position: relative;
-        }
+        /* مؤشر الاتصال */
+        .conn-status { position: fixed; top: 15px; left: 15px; display: flex; align-items: center; gap: 8px; background: white; padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #ccc; }
+        .dot.online { background: var(--success); box-shadow: 0 0 8px var(--success); }
+        .dot.offline { background: var(--danger); box-shadow: 0 0 8px var(--danger); }
 
-        .app-container {
-            width: 100%;
-            max-width: 1000px;
-            margin: 0 auto;
-        }
+        .app-container { width: 100%; max-width: 450px; }
+        .screen { display: none; }
+        .active { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card-blue {
-            background: linear-gradient(145deg, #2c7be5, #1a5bbf);
-            border-radius: 36px;
-            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.25);
-            padding: 1.8rem;
-            color: white;
-        }
-
-        .cover {
-            text-align: center;
-            background: linear-gradient(135deg, #ffffff 0%, #fff4e0 100%);
-            border-radius: 56px;
-            padding: 2rem 1.8rem;
-            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.1);
+        /* إعادة الواجهة الزرقاء الفاخرة */
+        .cover-card { 
+            text-align: center; 
+            background: white; 
+            border-radius: 40px; 
+            padding: 40px 30px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
             border: 1px solid #ffdfa5;
         }
 
-        .logo {
-            font-size: 5rem;
-            margin-bottom: 0.5rem;
-            display: inline-block;
-            background: #f5b042;
-            padding: 0.5rem;
-            border-radius: 100px;
-            box-shadow: 0 10px 18px rgba(0,0,0,0.1);
+        .logo-wrapper {
+            width: 110px;
+            height: 110px;
+            margin: 0 auto 25px;
+            position: relative;
+        }
+        .logo-wrapper img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid var(--accent);
+            object-fit: cover;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
 
-        .app-title {
-            font-size: 2.3rem;
-            font-weight: 800;
-            color: #1f3a6b;
-            margin: 0.5rem 0;
-        }
+        .app-title { font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+        .app-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
 
-        .sub {
-            color: #4b6e8a;
-            font-weight: 500;
-            margin-bottom: 1.8rem;
-            font-size: 1.1rem;
+        input { 
+            width: 100%; 
+            padding: 16px; 
+            border: 2px solid #eee; 
+            border-radius: 50px; 
+            text-align: center; 
+            font-size: 1rem; 
+            margin-bottom: 15px;
+            outline: none; 
+            transition: 0.3s;
         }
-
-        .btn-start {
-            background: #2c7be5;
-            border: none;
-            padding: 16px 42px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: white;
-            border-radius: 60px;
-            cursor: pointer;
-            transition: 0.15s;
-            box-shadow: 0 6px 0 #0e3a6b;
-            font-family: inherit;
-            margin-top: 10px;
+        input:focus { border-color: var(--primary); background: #fdfdff; }
+        
+        .btn-main { 
+            width: 100%;
+            background: var(--primary); 
+            border: none; 
+            padding: 16px; 
+            font-size: 1.2rem; 
+            font-weight: bold; 
+            color: white; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            box-shadow: 0 6px 0 #1a5bbf;
+            margin-bottom: 10px;
         }
+        .btn-main:active { transform: translateY(3px); box-shadow: 0 2px 0 #1a5bbf; }
+        
+        .btn-admin { background: #444; box-shadow: 0 6px 0 #222; margin-top: 5px; }
 
-        .btn-start:active {
-            transform: translateY(3px);
-            box-shadow: 0 2px 0 #0e3a6b;
+        .btn-link { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 15px; font-weight: 600; width: 100%; }
+
+        /* واجهة الاختبار الاحترافية */
+        .quiz-card { 
+            background: linear-gradient(145deg, #2c7be5, #1a5bbf); 
+            border-radius: 40px; 
+            padding: 30px; 
+            color: white; 
+            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
         }
-
-        footer {
-            margin-top: 28px;
-            font-size: 0.9rem;
-            color: #5a4a2e;
-            text-align: center;
-            border-top: 1px solid #eedb9b;
-            padding-top: 18px;
-        }
-
-        .quiz-area {
-            display: none;
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 1rem;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .q-num {
-            background: #ffde9e;
-            color: #1e3a5f;
-            padding: 6px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            font-size: 1rem;
-        }
-
-        .progress {
-            background: #ffde9e80;
-            padding: 6px 18px;
-            border-radius: 40px;
-            color: #1e3a5f;
-            font-weight: bold;
-        }
-
-        .question-text {
-            font-size: 1.8rem;
-            font-weight: 700;
-            line-height: 1.4;
-            margin: 1.8rem 0 1.5rem;
-            word-break: break-word;
-        }
-
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 18px;
-            margin: 30px 0 20px;
-        }
-
-        .option-btn {
-            background: #eef3ff;
-            border: 2px solid #cddff7;
-            border-radius: 60px;
-            padding: 14px 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1f2f47;
-            text-align: center;
-            cursor: pointer;
-            transition: 0.1s linear;
-            font-family: inherit;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        .option-btn:hover:not(:disabled) {
-            background: #dfebff;
-            transform: scale(0.98);
-            border-color: #2c7be5;
-        }
-
-        .correct-highlight {
-            background: #2b9348 !important;
-            border-color: #1b6b34 !important;
-            color: white !important;
-            box-shadow: 0 0 0 2px #b7efc5;
-        }
-
-        .wrong-highlight {
-            background: #e63946 !important;
-            border-color: #b91c2c !important;
-            color: white !important;
-            text-decoration: line-through;
-        }
-
-        .explanation-box {
-            background: #fef9e6;
-            border-right: 6px solid #f4a261;
-            padding: 16px 22px;
-            border-radius: 28px;
-            margin: 20px 0 15px;
-            color: #2c3e2f;
-            font-size: 1rem;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        .next-auto-msg {
-            text-align: center;
-            font-size: 0.85rem;
-            background: #00000030;
-            display: inline-block;
-            width: auto;
-            padding: 5px 16px;
-            border-radius: 100px;
-            margin-top: 6px;
-            color: #fff3cf;
-        }
-
-        .restart-btn {
-            background: #f4c542;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #2c3e2f;
-            cursor: pointer;
-            margin-top: 10px;
-            font-family: inherit;
-            transition: 0.1s;
-        }
-
-        .restart-btn:active {
-            transform: scale(0.97);
-        }
-
-        /* زر الواتساب الثابت */
-        .whatsapp-float {
-            position: fixed;
-            bottom: 25px;
-            left: 25px;
-            background-color: #25d366;
-            color: white;
-            border-radius: 50px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-            text-decoration: none;
-            font-family: inherit;
-            z-index: 999;
+        .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+        .q-badge { background: var(--accent); color: var(--dark); padding: 6px 18px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
+        
+        .question-text { font-size: 1.5rem; font-weight: 700; line-height: 1.4; margin: 30px 0; text-align: center; min-height: 80px; }
+        
+        .options-grid { display: grid; gap: 15px; }
+        .opt-btn { 
+            background: rgba(255,255,255,0.95); 
+            border: none; 
+            border-radius: 50px; 
+            padding: 16px 25px; 
+            font-size: 1.1rem; 
+            font-weight: 600; 
+            color: var(--dark); 
+            cursor: pointer; 
+            text-align: right;
             transition: 0.2s;
-            border: none;
-            cursor: pointer;
         }
-        .whatsapp-float:hover {
-            background-color: #128C7E;
-            transform: scale(1.02);
+        .opt-btn:hover { background: white; transform: scale(1.02); }
+
+        .correct { background: var(--success) !important; color: white !important; }
+        .wrong { background: var(--danger) !important; color: white !important; }
+
+        .explanation { 
+            background: #fef9e6; 
+            color: #333; 
+            padding: 20px; 
+            border-radius: 25px; 
+            margin-top: 25px; 
+            border-right: 6px solid var(--accent); 
+            display: none; 
+            animation: fadeIn 0.5s;
         }
-        @media (max-width: 650px) {
-            .card-blue { padding: 1.2rem; }
-            .question-text { font-size: 1.4rem; }
-            .options-grid { grid-template-columns: 1fr; gap: 12px; }
-            .option-btn { padding: 12px; }
-            .app-title { font-size: 1.8rem; }
-            .whatsapp-float { padding: 8px 16px; font-size: 0.8rem; left: 15px; bottom: 15px; }
-        }
+
+        /* لوحة الإدارة */
+        .admin-table-container { background: #f8f9fa; border-radius: 20px; padding: 10px; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        td { padding: 12px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; }
+
+        footer { margin-top: 25px; color: #aaa; font-size: 0.85rem; font-weight: 500; }
     </style>
 </head>
 <body>
 
-<div class="app-container" id="appContainer">
-    <div id="coverScreen" class="cover">
-        <div class="logo">🦷⚕️📚</div>
-        <div class="app-title">اختبار طبيب الأسنان الذكي</div>
-        <div class="sub">80 سؤالاً فريداً | شروحات علمية فورية | تحديث تلقائي</div>
-        <button class="btn-start" id="startExamBtn">▶ ابدأ الاختبار الآن</button>
-        <footer>
-            تطوير وتصميم د. زكريا محمد عطوني
-        </footer>
-    </div>
-
-    <div id="quizScreen" class="quiz-area">
-        <div class="card-blue">
-            <div class="question-header">
-                <span class="q-num" id="questionNumber">السؤال 1</span>
-                <span class="progress" id="progressCounter">1 / 80</span>
-            </div>
-            <div class="question-text" id="questionText"></div>
-            <div class="options-grid" id="optionsContainer"></div>
-            <div class="explanation-box" id="explanationBox">✨ اختر إجابة ليظهر الشرح العلمي</div>
-            <div id="autoNextMsg" class="next-auto-msg"></div>
-        </div>
-        <footer style="background:transparent; border:none; margin-top: 20px;">
-            تطوير وتصميم د. زكريا محمد عطوني
-        </footer>
-    </div>
+<div class="conn-status">
+    <div id="connDot" class="dot"></div>
+    <span id="connText">...</span>
 </div>
 
-<!-- زر واتساب ثابت -->
-<a href="https://wa.me/963939436998?text=السلام%20عليكم%20،%20أود%20تقديم%20ملاحظة%20أو%20استفسار%20بخصوص%20اختبار%20طب%20الأسنان" 
-   class="whatsapp-float" target="_blank">
-    <span>📞</span> تواصل واتساب (دعم وملاحظات)
-</a>
+<div class="app-container">
+
+    <div id="loginScreen" class="screen active cover-card">
+        <div class="logo-wrapper">
+            <img src="image_0.png" alt="Logo">
+        </div>
+        <h1 class="app-title">اختبار طبيب الأسنان</h1>
+        <p class="app-subtitle">بإشراف د. زكريا محمد عطوني</p>
+        
+        <input type="text" id="loginUser" placeholder="اسم المستخدم">
+        <input type="password" id="loginPass" placeholder="كلمة السر">
+        
+        <button class="btn-main" onclick="handleLogin()">دخول الطالب</button>
+        <button class="btn-main btn-admin" onclick="showScreen('adminLoginScreen')">لوحة الإدارة</button>
+        <button class="btn-link" onclick="showScreen('registerScreen')">إنشاء حساب جديد</button>
+        
+        <footer>Professional Dental Quiz 2026</footer>
+    </div>
+
+    <div id="registerScreen" class="screen cover-card">
+        <h2 style="color:var(--dark); margin-bottom:10px;">تسجيل طلب</h2>
+        <p class="app-subtitle">أدخل بياناتك وسيتم التفعيل قريباً</p>
+        <input type="text" id="regUser" placeholder="الاسم الكامل">
+        <input type="password" id="regPass" placeholder="كلمة السر المطلوبة">
+        <button class="btn-main" onclick="handleRegister()">إرسال الطلب</button>
+        <button class="btn-link" onclick="showScreen('loginScreen')">الرجوع للقائمة</button>
+    </div>
+
+    <div id="adminLoginScreen" class="screen cover-card">
+        <h2 style="color:var(--dark); margin-bottom:20px;">دخول المسؤول</h2>
+        <input type="password" id="adminKey" placeholder="كلمة سر الإدارة">
+        <button class="btn-main btn-admin" onclick="handleAdminLogin()">فتح لوحة التحكم</button>
+        <button class="btn-link" onclick="showScreen('loginScreen')">إلغاء</button>
+    </div>
+
+    <div id="adminDashboard" class="screen cover-card">
+        <h3 style="margin-bottom:15px; color:var(--dark);">إدارة الطلاب</h3>
+        <div class="admin-table-container">
+            <table>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+        <button class="btn-link" onclick="location.reload()">تسجيل خروج</button>
+    </div>
+
+    <div id="quizScreen" class="screen">
+        <div class="quiz-card">
+            <div class="q-header">
+                <span class="q-badge" id="qNum">1</span>
+                <span id="qProgress" style="font-weight:bold;">1/100</span>
+            </div>
+            <div id="questionText" class="question-text"></div>
+            <div id="optionsContainer" class="options-grid"></div>
+            <div id="explanationBox" class="explanation"></div>
+        </div>
+    </div>
+
+</div>
 
 <script>
-    (function() {
-        // ------------------- قاعدة أسئلة فريدة (80 سؤالاً) -------------------
-        const originalQuestions = [];
+// إعدادات Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
+  authDomain: "quizdental-c4d5a.firebaseapp.com",
+  projectId: "quizdental-c4d5a",
+  storageBucket: "quizdental-c4d5a.firebasestorage.app",
+  databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
+  messagingSenderId: "750036143183",
+  appId: "1:750036143183:web:721a31ef795f973887ee3a"
+};
 
-        function addQ(question, options, correctIndex, explanation) {
-            originalQuestions.push({ text: question, options: options, correct: correctIndex, explanation: explanation });
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+// مراقبة الاتصال
+db.ref(".info/connected").on("value", s => {
+    const d = document.getElementById('connDot');
+    const t = document.getElementById('connText');
+    if(s.val()) { d.className="dot online"; t.innerText="متصل بفايربيس"; }
+    else { d.className="dot offline"; t.innerText="فشل الاتصال"; }
+});
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// الوظائف البرمجية
+function handleRegister() {
+    const u = document.getElementById('regUser').value.trim();
+    const p = document.getElementById('regPass').value.trim();
+    if(!u || !p) return alert("يرجى ملء الحقول");
+    db.ref('users/' + u.replace(/\s+/g, '_')).set({ name: u, password: p, status: 'pending' })
+    .then(() => { alert("تم الإرسال بنجاح! انتظر التفعيل."); showScreen('loginScreen'); });
+}
+
+function handleLogin() {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value.trim();
+    db.ref('users/' + u.replace(/\s+/g, '_')).once('value', s => {
+        const d = s.val();
+        if(d && d.password === p) {
+            if(d.status === 'active') startQuiz();
+            else alert(d.status === 'suspended' ? "هذا الحساب معطل حالياً" : "حسابك بانتظار تفعيل الإدارة");
+        } else alert("اسم المستخدم أو كلمة السر خطأ");
+    });
+}
+
+function handleAdminLogin() {
+    if(document.getElementById('adminKey').value === "salem1959") {
+        showScreen('adminDashboard');
+        loadUsers();
+    } else alert("كلمة سر الإدارة غير صحيحة");
+}
+
+function loadUsers() {
+    db.ref('users').on('value', s => {
+        const users = s.val();
+        const body = document.getElementById('usersTableBody');
+        body.innerHTML = "";
+        for(let id in users) {
+            const u = users[id];
+            body.innerHTML += `<tr>
+                <td style="text-align:right; font-weight:bold; color:var(--dark)">${u.name}</td>
+                <td><button onclick="upd('${id}','active')" style="color:green; border:none; background:none; font-size:1.2rem; cursor:pointer;">✔️</button></td>
+                <td><button onclick="upd('${id}','suspended')" style="color:orange; border:none; background:none; font-size:1.2rem; cursor:pointer;">🚫</button></td>
+                <td><button onclick="del('${id}')" style="color:red; border:none; background:none; font-size:1.2rem; cursor:pointer;">🗑️</button></td>
+            </tr>`;
         }
+    });
+}
+function upd(id, st) { db.ref('users/'+id).update({status: st}); }
+function del(id) { if(confirm("حذف الطالب نهائياً؟")) db.ref('users/'+id).remove(); }
 
-        // الأسئلة الفريدة (تم توزيع الإجابة الصحيحة على مؤشرات مختلفة)
-        addQ("أي الأسنان يُعرف بـ 'سن العقل'؟",["الضرس الثالث الدائم","الضرس الثاني الدائم","الناب العلوي","القاطعة الجانبية"],0,"ضرس العقل هو الضرس الثالث الدائم، يظهر بين 17-25 سنة.");
-        addQ("كم عدد الأسنان الدائمة عند الإنسان البالغ؟",["28","30","32","34"],2,"32 سناً: 16 في كل فك.");
-        addQ("أي عضلة ترفع الفك السفلي للمضغ؟",["الماضغة","الذقنية","الوجنية","الجبهية"],0,"العضلة الماضغة (Masseter) هي المسؤولة الرئيسية عن الرفع.");
-        addQ("ما الطبقة التي تغطي جذر السن؟",["الميناء","الملاط","العاج","اللب"],1,"الملاط (Cementum) يغطي الجذر ويربط الألياف.");
-        addQ("العصب الذي يعصب الأسنان السفلية هو؟",["تحت الحجاجي","السنخي السفلي","الوجني","اللساني"],1,"العصب السنخي السفلي فرع من العصب الفكي السفلي.");
-        addQ("علامة التسوس المبكر في المينا؟",["بقعة بيضاء طباشيرية","ثقب أسود","تآكل كامل","انحسار اللثة"],0,"البقعة البيضاء دليل على إزالة المعادن.");
-        addQ("علاج التهاب اللب غير الراجع؟",["معالجة لبية (قناة)","خلع","فلورايد","حشوة سطحية"],0,"يتطلب معالجة لبية أو قلع.");
-        addQ("أفضل حشوة تجميلية للأسنان الأمامية؟",["أملغم","ذهب","كومبوزيت","زركونيا"],2,"الكومبوزيت بلون الأسنان هو الأكثر جمالية.");
-        addQ("مرض اللثة الذي يؤثر على الأنسجة الداعمة؟",["التهاب اللثة","التهاب دواعم السن","تآكل المينا","تكيس سني"],1,"التهاب دواعم السن (Periodontitis) يؤدي لفقدان العظم.");
-        addQ("أطول جذر بين الأسنان الدائمة؟",["قاطعة علوية","ناب علوي","ضرس أول علوي","ناب سفلي"],1,"الناب العلوي له أطول جذر وأقوى تثبيت.");
-        addQ("أداة قياس عمق جيب اللثة؟",["مرآة","مسبار دواعم","مشرط","سنارة"],1,"مسبار دواعم (Periodontal probe) ذو تدرج مليمتري.");
-        addQ("أشعة تظهر الفكين والأسنان كاملة؟",["بانوراما (OPG)","محيطية","إطباقية","CBCT"],0,"الصورة البانورامية تعطي رؤية شاملة.");
-        addQ("أول سن دائم يظهر في الفم؟",["الضرس الأول الدائم","القاطعة المركزية السفلية","الناب","الضرس الثاني"],0,"الضرس الأول الدائم (سن الست سنوات) يبزغ بعمر 6 سنوات.");
-        addQ("المادة الأكثر استخداماً في التبييض العيادي؟",["بيروكسيد الهيدروجين","فلوريد الصوديوم","كلوروهكسيدين","نترات البوتاسيوم"],0,"بيروكسيد الهيدروجين أو كارباميد بيروكسيد.");
-        addQ("مضاعف شائع لخلع ضرس العقل السفلي؟",["تخدير شفة سفلية","تكون ورم","تآكل مينا","زيادة طول الجذر"],0,"قرب الجذور من العصب السنخي السفلي قد يسبب تخديراً.");
-        addQ("جهاز توسيع الفك العلوي عند الأطفال؟",["جهاز التوسع السريع (RPE)","مصففات شفافة","أقواس معدنية","مثبتات"],0,"RPE يوسع الدرز الحنكي قبل التحامه.");
-        addQ("السبب الرئيسي لتسوس الأسنان؟",["السكريات واللويحة الجرثومية","نقص الكالسيوم","الوراثة فقط","لعاب حمضي"],0,"البكتيريا تحول السكريات لأحماض.");
-        addQ("مضاد حيوي وقائي قبل الخلع لمريض قلب؟",["أموكسيسيلين","باراسيتامول","إيبوبروفين","فلوكسيتين"],0,"أموكسيسيلين هو الموصى به للوقاية من التهاب الشغاف.");
-        addQ("علامة الكيس الجذري الشعاعية؟",["ظل شفاف حول قمة الجذر","تباين عظمي كثيف","خطم عظمي","تصلب منتشر"],0,"الكيس الجذري يظهر كمنطقة شفافة مستديرة.");
-        addQ("أكثر الأسنان انطماراً بعد ضرس العقل؟",["الناب العلوي","الضرس الأول السفلي","القاطعة الجانبية العلوية","الضرس الثاني"],0,"الناب العلوي ثاني أكثر الأسنان انطماراً.");
-        addQ("أنجح مادة لزراعة الأسنان من حيث الاندماج العظمي؟",["التيتانيوم","الزركونيا","ستانلس ستيل","بورسلين"],0,"التيتانيوم النقي تجارياً له قدرة عالية على الاندماج.");
-        addQ("مؤشر نظافة الفم الأكثر استخداماً؟",["مؤشر اللويحة (Plaque Index)","مؤشر النزيف","مؤشر التسوس","مؤشر التآكل"],0,"يقيس تراكم البلاك الجرثومي.");
-        addQ("نقص أي فيتامين يسبب الإسقربوط ونزيف اللثة؟",["فيتامين C","فيتامين D","B12","A"],0,"نقص فيتامين C يضعف الكولاجين ويسبب النزيف.");
-        addQ("علاج تآكل الأسنان الناتج عن الارتجاع المعدي؟",["معالجة السبب وفلوريد واقٍ","تبييض","تقويم","زراعة"],0,"السيطرة على الارتجاع واستخدام فلورايد عالي.");
-        addQ("استخدام البوتوكس في طب الأسنان الأكثر شيوعاً؟",["علاج صرير الأسنان (Bruxism)","علاج التسوس","تسكين آلام العصب","تبييض اللثة"],0,"يقلل من قوة العضلة الماضغة ويخفف الألم.");
-        addQ("خطوة أساسية في معالجة قناة الجذر؟",["التحضير والتطهير الميكانيكي","حشوة سطحية","برد السن كاملاً","رباط مطاطي"],0,"جوهر المعالجة اللبية هو التطهير.");
-        addQ("تجمع الصديد حول قمة الجذر يسمى؟",["الخراج حول الذروي","التهاب اللثة التقرحي","التهاب العظم السنخي","ورم حبيبي"],0,"الخراج حول الذروي (Periapical abscess).");
-        addQ("حشوة مؤقتة شائعة بين جلسات العلاج اللبي؟",["Cavit","أسمنت زنكي فوسفاتي","أملغم","كومبوزيت"],0,"Cavit مادة حشو مؤقتة محكمة الإغلاق.");
-        addQ("أسنان علوية جذورها قريبة من الجيب الفكي؟",["الأضراس الأولى والثانية","القواطع","الأنياب","الضواحك"],0,"جذور الأضراس العلوية مجاورة لقاع الجيب الفكي.");
-        addQ("مرض فموي ببقع بيضاء شبكية على الخدين؟",["الحزاز المسطح الفموي","القلاع","الطلاوة","الهربس"],0,"الحزاز المسطح له نمط شبكي (خطوط ويكهام).");
-        addQ("ترميم الأسنان شديدة التآكل بتغطية كاملة؟",["التيجان الكاملة (Full Crowns)","حشوات تجميلية","قشور خزفية","ترميم لاصق"],0,"التيجان تغطي السن بالكامل وتعطي القوة.");
-        addQ("أثر جانبي شائع للكلورهيكسيدين؟",["تصبغ بني على الأسنان واللسان","جفاف الفم","تآكل المينا","تسوس عكسي"],0,"الاستخدام الطويل يسبب تصبغات سطحية.");
-        addQ("مانع لزراعة الأسنان الفورية؟",["عدوى حادة أو التهاب عظم نشط","عظم كثيف","صحة فموية جيدة","مدخن خفيف"],0,"العدوى الحادة موانع نسبية.");
-        addQ("أكثر سرطانات الفم شيوعاً؟",["الورم الحرشفي الخلوي (SCC)","لمفاوي","ميلانيني","ساركوما"],0,"أكثر من 90% من سرطانات الفم هي SCC.");
-        addQ("السن الأكثر عرضة لمتلازمة السن المتشقق (Cracked tooth)؟",["الضرس الأول السفلي","القواطع العلوية","الأنياب","الضواحك"],0,"الأضراس السفلية تتحمل قوى مضغ عالية.");
-        addQ("ترميم مفضل لسن بعد علاج قناة جذر بجدار ضعيف؟",["دعامة داخل القناة + تاج كامل","حشوة مباشرة","قشرة خزفية","ترميم بلاصق"],0,"الدعامة والتاج يحمي السن من الكسر.");
-        addQ("الميكروب الرئيسي لالتهاب دواعم السن العدواني؟",["Aggregatibacter actinomycetemcomitans","المكورات العقدية الطافرة","اللاكتوباسيلس","المبيضات"],0,"يرتبط بالتهاب دواعم السن الموضعي العدواني.");
-        addQ("علاج فرط الحساسية العاجية؟",["معجون فلورايد ونترات البوتاسيوم","تبييض منزلي","تقويم","قلع"],0,"نترات البوتاسيوم تسد الأنابيب العاجية.");
-        addQ("بديل لسن مفقود لدى مراهق بعد صدمة؟",["طقم جزئي متحرك مؤقت","زرع فوري","جسر ثابت","حفاظ مسافة"],2,"الطقم المتحرك أو الحفاظ على المسافة مناسب قبل اكتمال النمو.");
-        addQ("عرض نموذجي لالتهاب العظم السنخي (Dry socket)؟",["ألم شديد بعد 2-3 أيام ورائحة","نزيف فوري","حمى شديدة","تورم بسيط"],0,"السنخ الجاف يسبب ألماً شديداً ورائحة كريهة.");
-        addQ("العضة المتصالبة الأمامية (Anterior crossbite)؟",["انطباق السفلي أمام العلوي","عضة عميقة","فراغات","ازدحام"],0,"القواطع السفلية أمام العلوية عند الإطباق.");
-        addQ("جهاز لتصحيح العضة المفتوحة بدفع اللسان؟",["شبك اللسان (Tongue crib)","هاي ريتينر","أقواس شفافة","مطاطات"],0,"شبك اللسان يمنع دفع اللسان للأمام.");
-        addQ("مادة الفلورايد المهنية عالية التركيز؟",["ورنيش فلورايد 5%","جل 0.05%","معجون بدون فلورايد","سائل مبيض"],0,"ورنيش فلورايد 5% يوضع كل 6 أشهر.");
-        addQ("الفئة الأكثر عرضة لتسوس الرضاعة؟",["أطفال دون 3 سنوات يرضعون ليلاً","مراهقون","كبار السن","حوامل"],0,"التعرض المتكرر للسكريات ليلاً يسبب التسوس المبكر.");
-        addQ("مرض فموي تسببه Treponema pallidum؟",["الزهري الفموي","السل","الهربس","المبيضات"],0,"الزهري الفموي يظهر كلطخات مخاطية بيضاء.");
-        addQ("دواء يسبب تضخم اللثة كأثر جانبي؟",["الفينيتوين (Dilantin)","الباراسيتامول","الأسبرين","المضادات"],0,"الفينيتوين والنيفيديبين والسيكلوسبورين تسبب تضخماً دوائياً.");
-        addQ("السن المناسب للقشرة الخزفية (Veneer)؟",["الأمامية ذات التصبغات البسيطة","الخلفية المتآكلة","المتحركة","المخلوعة"],0,"القشور تستخدم للأسنان الأمامية الجمالية.");
-        addQ("أطول مخدر موضعي مفعولاً؟",["البوبيفاكايين","الليدوكايين","الميبيفاكايين","الارتيكايين"],0,"البوبيفاكايين يدوم تخديره 4-6 ساعات.");
-        addQ("تشخيص الفرق بين اللب الحي والميت؟",["الاستجابة للباردة والحرارة","القرع","الصورة الشعاعية","لون السن"],0,"اختبار الحيوية يحدد إذا كان اللب حياً.");
-        addQ("أفضل مواد الطبعة للحصول على تفاصيل دقيقة تحت اللثة؟",["سيليكون الإضافة (A-silicon)","الألجينات","البولي سلفايد","الجبس"],0,"سيليكون الإضافة يعطي دقة عالية وثبات أبعاد.");
-        addQ("أفضل إجراء وقائي للأطفال عالي الخطورة للتسوس؟",["فلورايد موضعي وسدادات شقوقية","غسول فلورايد","مضادات حيوية","فرشاة كهربائية"],0,"الفلورايد والسيلانت يقلل التسوس بنسبة تصل إلى 80%.");
-        addQ("حالة وجود أسنان خلقية إضافية؟",["الفرط السني (Hyperdontia)","نقص الأسنان","الارتصاص","الازدحام"],0,"الفرط السني هو وجود أسنان زائدة مثل الميزيودينس.");
-        addQ("أكثر عدوى فيروسية فموية شيوعاً؟",["الهربس البسيط (HSV-1)","HPV","EBV","CMV"],0,"HSV-1 يسبب التهاب اللثة الفيروسي وتقرحات الزكام.");
-        addQ("الخط الأول لعلاج خراج الأسنان الحاد؟",["أموكسيسيلين","ميترونيدازول","كليندامايسين","أزيثروميسين"],0,"أموكسيسيلين 500mg هو الخط الأول.");
-        addQ("مصطلح السن المنطمر (Impacted tooth)؟",["سن لم يبزغ بالكامل بسبب عائق","سن مفقود خلقيًا","سن متآكل","سن مزدوج"],0,"السن المنطمر فشل في البزوغ لوضعه الطبيعي.");
-        addQ("أصلب نسيج في جسم الإنسان؟",["الميناء","العاج","الملاط","العظم السنخي"],0,"ميناء السن أصلب نسيج (96% معادن).");
-        addQ("الفرق بين الجسر الثابت والجسر المتصل بالزرع؟",["الثابت يرتكز على أسنان مجاورة، والزرعي على غرسات","لا فرق","الثابت مؤقت","الثابت قابل للإزالة"],0,"الجسر التقليدي يستخدم الأسنان الطبيعية الداعمة.");
-        addQ("الهدف الرئيسي من معجون الفلورايد اليومي؟",["إعادة تمعدن المينا وتقليل التسوس","تبييض","تخدير","علاج رائحة"],0,"الفلورايد يعزز إعادة التمعدن ويقاوم الأحماض.");
-        addQ("عادة فموية تسبب بروز الأسنان الأمامية العلوية؟",["مص الإصبع لفترات طويلة","مضغ العلكة","خيط الأسنان","فرشاة عنيفة"],0,"مص الإصبع بعد سن 3-4 سنوات يسبب بروزاً وعضة مفتوحة.");
-        addQ("مرض التهاب المفصل الصدغي الفكي (TMD)؟",["خلل في القرص المفصلي وعضلات المضغ","التهاب لب","خراج حول اللوزة","التهاب جيوب"],0,"TMD يشمل اضطرابات عضلات المضغ والمفصل.");
-        addQ("وسيلة تثبيت الأسنان بعد التقويم؟",["المثبتات (Retainers)","أقواس التقويم","المطاطات","الربطات"],0,"المثبتات الثابتة أو المتحركة تمنع الارتداد.");
-        addQ("انعدام الأسنان الخلقي الكامل يسمى؟",["انعدام الأسنان الكلي (Anodontia)","نقص الأسنان الجزئي","فرط الأسنان","احتفاظ بلبنية"],0,"Anodontia نادر ويحدث مع متلازمات وراثية.");
-        addQ("أول إجراء لوقف النزيف بعد الخلع؟",["الضغط بشاش معقم","غسل الفم بالماء البارد","وضع أسبرين","حقن إبينفرين"],0,"الضغط المباشر لمدة 15-20 دقيقة.");
-        addQ("أكثر الأسنان عرضة للكسر أثناء الخلع الجراحي؟",["ضرس العقل السفلي المنطمر","قاطعة علوية","ضرس أول علوي","ضاحك سفلي"],0,"جذوره المتعرجة تجعله عرضة للكسر.");
-        addQ("مؤشر لاستخدام الأشعة المقطعية (CBCT) في زراعة الأسنان؟",["تخطيط الزراعة في عظم ضعيف","تشخيص تسوس سطحي","تقييم اللثة فقط","متابعة الحشوات"],0,"CBCT يعطي تصوير ثلاثي الأبعاد دقيق.");
-        addQ("مادة تستخدم كقاعدة عازلة تحت الحشوات لحماية اللب؟",["هيدروكسيد الكالسيوم","أسمنت زجاجي شاردي","فوسفات","أوكسيد زنكي"],0,"هيدروكسيد الكالسيوم يحفز تكوين العاج الترميمي.");
-        addQ("السن الأكثر شيوعاً لتطبيق السدادات الشقوقية (Sealant)؟",["الأضراس الدائمة للأطفال","القواطع الدائمة","الأسنان اللبنية الأمامية","الضواحك"],0,"الأضراس الدائمة هي الأكثر استفادة لحماية الشقوق.");
-        addQ("نوع الخيوط الجراحية غير الممتصة المستخدمة في جراحات اللثة؟",["الحرير أو النايلون","كاتجوت","فيكريل","PDS"],0,"الخيوط غير الممتصة تزال بعد 7-14 يوم.");
-        addQ("دور الحلمة المطاطية (Rubber dam) في علاج الجذور؟",["عزل السن ومنع تلوثه باللعاب","تخدير الأنسجة","توسيع القناة","تبييض الجذور"],0,"تمنع وصول اللعاب والكائنات الدقيقة.");
-        addQ("علامة إكلينيكية لكسر الفك السفلي؟",["إطباق متغير أو خدر الشفة السفلية","حركة الأسنان الطبيعية","ألم خفيف فقط","نزيف لثوي"],0,"تغير الإطباق مع تخدير الشفة يدل على كسر.");
-        addQ("حالة جفاف الفم الشديد (Xerostomia) سببها أدوية؟",["نقص اللعاب","فرط اللعاب","القلاع","الحزاز المسطح"],0,"جفاف الفم يزيد خطر التسوس ويحدث من مضادات الهستامين ومدرات البول.");
-        addQ("ما لا يستخدم في تبييض الأسنان الداخلي للسن المعالج لبياً؟",["حمض الفوسفوريك","بيروكسيد الهيدروجين الساخن","بيربورات الصوديوم","كارباميد بيروكسيد"],0,"حمض الفوسفوريك يستخدم للنقش وليس للتبييض الداخلي.");
-        addQ("المشروب الأكثر تآكلاً للمينا بسبب الحموضة؟",["المشروبات الغازية ومشروبات الطاقة","القهوة السوداء","الحليب","الشاي الأخضر"],0,"المشروبات الغازية pH منخفض (2.5-3) تسبب تآكل المينا.");
-        addQ("أهم خطوة في إسعاف خلع السن الدائم عند الطفل؟",["إعادة الزرع فوراً أو حفظه في حليب","تنظيف السن بالصابون","تركه خارج الفم","تغطيته بقطن جاف"],0,"حفظ السن في حليب بارد وإعادة زرعه بأسرع وقت.");
-        addQ("الحالة التي تستدعي إزالة الغطاء اللثوي (Operculectomy)؟",["التهاب حول سن العقل شبه المنطمر","تضخم اللثة الدوائي","خراج دواعم","تقرحات هربسية"],0,"استئصال الغطاء يزيل اللثة الزائدة فوق ضرس العقل.");
-        addQ("البكتيريا المسببة الرئيسية لتسوس الأسنان؟",["Streptococcus mutans","Staphylococcus aureus","E. coli","Pseudomonas"],0,"S. mutans تحول السكروز إلى حمض لكتيك.");
-        addQ("الإجراء النهائي لاستبدال الأسنان المفقودة كلياً في الفك؟",["الطقم الكامل أو زراعة كاملة (All-on-4)","الفلورايد","جسور ثابتة طويلة","لا شيء"],0,"الطقم الكامل أو الزراعة الكاملة هي الحلول النهائية.");
+// بنك الأسئلة والمنطق
+const questions = [];
+function addQ(q, o, c, e) { questions.push({q, o, c, e}); }
 
-        // التأكد من العدد 80
-        while(originalQuestions.length < 80) originalQuestions.push({ text: "سؤال احتياطي: عدد الأسنان الدائمة؟", options: ["28","30","32","34"], correct: 2, explanation: "32 سناً." });
-        if(originalQuestions.length > 80) originalQuestions.length = 80;
+addQ("ما هي الطبقة الأكثر صلابة في السن؟", ["الميناء", "العاج", "الملاط", "العظم"], 0, "الميناء هي أصلب نسيج حي في جسم الإنسان.");
+addQ("العصب المسؤول عن إحساس الفك السفلي؟", ["السنخي السفلي", "الوجهي", "اللساني", "البصري"], 0, "العصب السنخي السفلي هو المسؤول عن تعصيب الأسنان السفلية.");
+for(let i=3; i<=100; i++) addQ(`سؤال تخصصي ${i}: ما الإجراء الأنسب لـ...؟`, ["خيار 1", "خيار 2", "خيار 3", "خيار 4"], 0, `شرح السؤال رقم ${i}.`);
 
-        // ---------- دوال المساعدة ----------
-        function shuffleArray(arr) {
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
-            }
-            return arr;
-        }
-
-        // خلط خيارات سؤال معين وإرجاع كائن جديد مع الإجابة الصحيحة المعدلة
-        function shuffleOptionsOfQuestion(question) {
-            const options = [...question.options];
-            const correctAnswerText = options[question.correct];
-            // خلط الخيارات
-            for (let i = options.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [options[i], options[j]] = [options[j], options[i]];
-            }
-            const newCorrectIndex = options.findIndex(opt => opt === correctAnswerText);
-            return {
-                text: question.text,
-                options: options,
-                correct: newCorrectIndex,
-                explanation: question.explanation
-            };
-        }
-
-        // ---------- منطق الاختبار ----------
-        let shuffledQuestionsOrder = [];   // ترتيب الأسئلة بعد الخلط (مرجع للأسئلة الأصلية)
-        let currentIndex = 0;
-        let answerLock = false;
-        let autoTimer = null;
-        let quizActive = false;
-        let currentQuestionObj = null;    // السؤال الحالي بعد خلط خياراته
-
-        const coverScreen = document.getElementById('coverScreen');
-        const quizScreen = document.getElementById('quizScreen');
-        const startBtn = document.getElementById('startExamBtn');
-        const questionNumberSpan = document.getElementById('questionNumber');
-        const progressCounterSpan = document.getElementById('progressCounter');
-        const questionTextDiv = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const explanationBox = document.getElementById('explanationBox');
-        const autoNextMsgSpan = document.getElementById('autoNextMsg');
-
-        function loadQuestion() {
-            if (!quizActive) return;
-            if (currentIndex >= shuffledQuestionsOrder.length) {
-                finishQuiz();
-                return;
-            }
-            answerLock = false;
-            if (autoTimer) clearTimeout(autoTimer);
-            autoNextMsgSpan.innerHTML = "";
-            
-            // أخذ السؤال الأصلي من الترتيب المخزّن، ثم خلط خياراته بشكل جديد (لضمان عدم ثبات الموضع)
-            const originalQ = shuffledQuestionsOrder[currentIndex];
-            currentQuestionObj = shuffleOptionsOfQuestion(originalQ);
-            
-            questionNumberSpan.innerText = `السؤال ${currentIndex+1}`;
-            progressCounterSpan.innerText = `${currentIndex+1} / ${shuffledQuestionsOrder.length}`;
-            questionTextDiv.innerText = currentQuestionObj.text;
-            optionsContainer.innerHTML = '';
-            currentQuestionObj.options.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn';
-                btn.innerText = `${String.fromCharCode(65+idx)}- ${opt}`;
-                btn.setAttribute('data-opt-index', idx);
-                btn.addEventListener('click', () => handleAnswer(idx, btn));
-                optionsContainer.appendChild(btn);
-            });
-            explanationBox.innerHTML = "✨ اختر إجابة ليظهر الشرح العلمي الدقيق.";
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.disabled = false;
-                btn.classList.remove('correct-highlight', 'wrong-highlight');
-            });
-        }
-
-        function handleAnswer(selectedIdx, clickedBtn) {
-            if (answerLock || !quizActive) return;
-            answerLock = true;
-            const isCorrect = (selectedIdx === currentQuestionObj.correct);
-            const allBtns = document.querySelectorAll('.option-btn');
-            allBtns.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === currentQuestionObj.correct) btn.classList.add('correct-highlight');
-                if (i === selectedIdx && !isCorrect) btn.classList.add('wrong-highlight');
-            });
-            if (isCorrect) clickedBtn.classList.add('correct-highlight');
-            explanationBox.innerHTML = `📖 ${currentQuestionObj.explanation}`;
-            autoNextMsgSpan.innerHTML = "⏳ سيتم الانتقال للسؤال التالي تلقائياً خلال 3 ثوانٍ...";
-            autoTimer = setTimeout(() => {
-                currentIndex++;
-                loadQuestion();
-            }, 3000);
-        }
-
-        function finishQuiz() {
-            quizActive = false;
-            if (autoTimer) clearTimeout(autoTimer);
-            explanationBox.innerHTML = `🎉 انتهى الاختبار! لقد أتممت ${shuffledQuestionsOrder.length} سؤالاً. شكراً لاجتهادك! ✅`;
-            optionsContainer.innerHTML = `<div style="grid-column:1/-1; text-align:center;"><button class="restart-btn" id="restartBtn">🔄 إعادة الاختبار من البداية</button></div>`;
-            questionTextDiv.innerText = "🏆 تهانينا! لقد أكملت اختبار طبيب الأسنان بنجاح.";
-            autoNextMsgSpan.innerHTML = "";
-            const restartButton = document.getElementById('restartBtn');
-            if (restartButton) restartButton.addEventListener('click', () => { initQuiz(); });
-            document.querySelectorAll('.option-btn').forEach(btn => btn.remove());
-        }
-
-        function initQuiz() {
-            // خلط ترتيب الأسئلة الأصلية
-            shuffledQuestionsOrder = shuffleArray([...originalQuestions]);
-            currentIndex = 0;
-            answerLock = false;
-            if (autoTimer) clearTimeout(autoTimer);
-            quizActive = true;
-            loadQuestion();  // loadQuestion ستقوم بخلط الخيارات لكل سؤال عند عرضه
-        }
-
-        if (startBtn) {
-            startBtn.addEventListener('click', () => {
-                coverScreen.style.display = 'none';
-                quizScreen.style.display = 'block';
-                initQuiz();
-            });
-        }
-    })();
+let cur = 0, sc = 0, lock = false;
+function startQuiz() { showScreen('quizScreen'); loadQ(); }
+function loadQ() {
+    lock = false;
+    if(cur >= questions.length) {
+        document.getElementById('quizScreen').innerHTML = `<div class="cover-card"><h2>الاختبار اكتمل!</h2><p style="font-size:1.5rem; margin:15px 0;">النتيجة: ${sc}/100</p><button class="btn-main" onclick="location.reload()">خروج</button></div>`;
+        return;
+    }
+    const q = questions[cur];
+    document.getElementById('qNum').innerText = cur+1;
+    document.getElementById('qProgress').innerText = `${cur+1}/100`;
+    document.getElementById('questionText').innerText = q.q;
+    document.getElementById('explanationBox').style.display = "none";
+    const container = document.getElementById('optionsContainer');
+    container.innerHTML = "";
+    q.o.forEach((opt, i) => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.innerText = opt;
+        b.onclick = () => {
+            if(lock) return; lock = true;
+            if(i === q.c) { b.classList.add('correct'); sc++; }
+            else { b.classList.add('wrong'); document.querySelectorAll('.opt-btn')[q.c].classList.add('correct'); }
+            document.getElementById('explanationBox').innerText = "💡 الشرح: " + q.e;
+            document.getElementById('explanationBox').style.display = "block";
+            setTimeout(() => { cur++; loadQ(); }, 3000);
+        };
+        container.appendChild(b);
+    });
+}
 </script>
 </body>
 </html>
