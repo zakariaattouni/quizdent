@@ -5,26 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>اختبار طبيب الأسنان | د. زكريا عطوني</title>
     
-    <link rel="apple-touch-icon" href="image_0.png">
-    <link rel="icon" type="image/png" href="image_0.png">
+    <link rel="icon" type="image/png" href="https://files.catbox.moe/oat8z7.png">
+    <link rel="apple-touch-icon" href="https://files.catbox.moe/oat8z7.png">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 
     <style>
         :root { --primary: #2c7be5; --bg: #fff7e5; --dark: #1e3a5f; --accent: #f4c542; --success: #28a745; --danger: #e63946; }
-        
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', 'Cairo', sans-serif; }
         
-        body { 
-            background-color: var(--bg); 
-            min-height: 100vh; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            padding: 15px;
-        }
+        body { background-color: var(--bg); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 15px; }
 
         /* مؤشر الاتصال */
         .conn-status { position: fixed; top: 15px; left: 15px; display: flex; align-items: center; gap: 8px; background: white; padding: 5px 12px; border-radius: 50px; font-size: 0.8rem; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.1); z-index: 1000; }
@@ -37,184 +30,93 @@
         .active { display: block; animation: slideUp 0.4s ease; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* إعادة الواجهة الزرقاء الفاخرة */
-        .cover-card { 
-            text-align: center; 
-            background: white; 
-            border-radius: 40px; 
-            padding: 40px 30px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1); 
-            border: 1px solid #ffdfa5;
-        }
+        /* الواجهة الزرقاء الفاخرة */
+        .cover-card { text-align: center; background: white; border-radius: 40px; padding: 40px 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid #ffdfa5; }
 
-        .logo-wrapper {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 25px;
-            position: relative;
-        }
-        .logo-wrapper img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 4px solid var(--accent);
-            object-fit: cover;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
+        .logo-wrapper { width: 110px; height: 110px; margin: 0 auto 25px; }
+        .logo-wrapper img { width: 100%; height: 100%; border-radius: 50%; border: 4px solid var(--accent); object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
 
         .app-title { font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
         .app-subtitle { font-size: 1rem; color: #777; margin-bottom: 30px; }
 
-        input { 
-            width: 100%; 
-            padding: 16px; 
-            border: 2px solid #eee; 
-            border-radius: 50px; 
-            text-align: center; 
-            font-size: 1rem; 
-            margin-bottom: 15px;
-            outline: none; 
-            transition: 0.3s;
-        }
+        input { width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 50px; text-align: center; font-size: 1rem; margin-bottom: 15px; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--primary); background: #fdfdff; }
         
-        .btn-main { 
-            width: 100%;
-            background: var(--primary); 
-            border: none; 
-            padding: 16px; 
-            font-size: 1.2rem; 
-            font-weight: bold; 
-            color: white; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            box-shadow: 0 6px 0 #1a5bbf;
-            margin-bottom: 10px;
-        }
+        .btn-main { width: 100%; background: var(--primary); border: none; padding: 16px; font-size: 1.2rem; font-weight: bold; color: white; border-radius: 50px; cursor: pointer; box-shadow: 0 6px 0 #1a5bbf; margin-bottom: 10px; }
         .btn-main:active { transform: translateY(3px); box-shadow: 0 2px 0 #1a5bbf; }
-        
-        .btn-admin { background: #444; box-shadow: 0 6px 0 #222; margin-top: 5px; }
-
+        .btn-admin { background: #444; box-shadow: 0 6px 0 #222; }
         .btn-link { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 15px; font-weight: 600; width: 100%; }
 
-        /* واجهة الاختبار الاحترافية */
-        .quiz-card { 
-            background: linear-gradient(145deg, #2c7be5, #1a5bbf); 
-            border-radius: 40px; 
-            padding: 30px; 
-            color: white; 
-            box-shadow: 0 20px 45px rgba(0,0,0,0.25);
-        }
+        /* واجهة الاختبار */
+        .quiz-card { background: linear-gradient(145deg, #2c7be5, #1a5bbf); border-radius: 40px; padding: 30px; color: white; box-shadow: 0 20px 45px rgba(0,0,0,0.25); }
         .q-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         .q-badge { background: var(--accent); color: var(--dark); padding: 6px 18px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-        
         .question-text { font-size: 1.5rem; font-weight: 700; line-height: 1.4; margin: 30px 0; text-align: center; min-height: 80px; }
-        
         .options-grid { display: grid; gap: 15px; }
-        .opt-btn { 
-            background: rgba(255,255,255,0.95); 
-            border: none; 
-            border-radius: 50px; 
-            padding: 16px 25px; 
-            font-size: 1.1rem; 
-            font-weight: 600; 
-            color: var(--dark); 
-            cursor: pointer; 
-            text-align: right;
-            transition: 0.2s;
-        }
-        .opt-btn:hover { background: white; transform: scale(1.02); }
-
+        .opt-btn { background: rgba(255,255,255,0.95); border: none; border-radius: 50px; padding: 16px 25px; font-size: 1.1rem; font-weight: 600; color: var(--dark); cursor: pointer; text-align: right; }
         .correct { background: var(--success) !important; color: white !important; }
         .wrong { background: var(--danger) !important; color: white !important; }
+        .explanation { background: #fef9e6; color: #333; padding: 20px; border-radius: 25px; margin-top: 25px; border-right: 6px solid var(--accent); display: none; }
 
-        .explanation { 
-            background: #fef9e6; 
-            color: #333; 
-            padding: 20px; 
-            border-radius: 25px; 
-            margin-top: 25px; 
-            border-right: 6px solid var(--accent); 
-            display: none; 
-            animation: fadeIn 0.5s;
-        }
-
-        /* لوحة الإدارة */
+        /* الإدارة */
         .admin-table-container { background: #f8f9fa; border-radius: 20px; padding: 10px; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; }
         td { padding: 12px 5px; border-bottom: 1px solid #eee; text-align: center; font-size: 0.9rem; }
 
-        footer { margin-top: 25px; color: #aaa; font-size: 0.85rem; font-weight: 500; }
+        footer { margin-top: 25px; color: #aaa; font-size: 0.85rem; font-weight: 500; text-align: center; }
     </style>
 </head>
 <body>
 
-<div class="conn-status">
-    <div id="connDot" class="dot"></div>
-    <span id="connText">...</span>
-</div>
+<div class="conn-status"><div id="connDot" class="dot"></div><span id="connText">...</span></div>
 
 <div class="app-container">
-
     <div id="loginScreen" class="screen active cover-card">
         <div class="logo-wrapper">
-            <img src="image_0.png" alt="Logo">
+            <img src="https://files.catbox.moe/oat8z7.png" alt="Logo">
         </div>
         <h1 class="app-title">اختبار طبيب الأسنان</h1>
         <p class="app-subtitle">بإشراف د. زكريا محمد عطوني</p>
-        
         <input type="text" id="loginUser" placeholder="اسم المستخدم">
         <input type="password" id="loginPass" placeholder="كلمة السر">
-        
         <button class="btn-main" onclick="handleLogin()">دخول الطالب</button>
         <button class="btn-main btn-admin" onclick="showScreen('adminLoginScreen')">لوحة الإدارة</button>
         <button class="btn-link" onclick="showScreen('registerScreen')">إنشاء حساب جديد</button>
-        
         <footer>Professional Dental Quiz 2026</footer>
     </div>
 
     <div id="registerScreen" class="screen cover-card">
-        <h2 style="color:var(--dark); margin-bottom:10px;">تسجيل طلب</h2>
-        <p class="app-subtitle">أدخل بياناتك وسيتم التفعيل قريباً</p>
+        <h2>تسجيل طلب</h2>
         <input type="text" id="regUser" placeholder="الاسم الكامل">
-        <input type="password" id="regPass" placeholder="كلمة السر المطلوبة">
+        <input type="password" id="regPass" placeholder="كلمة السر">
         <button class="btn-main" onclick="handleRegister()">إرسال الطلب</button>
-        <button class="btn-link" onclick="showScreen('loginScreen')">الرجوع للقائمة</button>
+        <button class="btn-link" onclick="showScreen('loginScreen')">رجوع</button>
     </div>
 
     <div id="adminLoginScreen" class="screen cover-card">
-        <h2 style="color:var(--dark); margin-bottom:20px;">دخول المسؤول</h2>
-        <input type="password" id="adminKey" placeholder="كلمة سر الإدارة">
-        <button class="btn-main btn-admin" onclick="handleAdminLogin()">فتح لوحة التحكم</button>
+        <h2>المسؤول</h2>
+        <input type="password" id="adminKey" placeholder="كلمة السر">
+        <button class="btn-main btn-admin" onclick="handleAdminLogin()">دخول</button>
         <button class="btn-link" onclick="showScreen('loginScreen')">إلغاء</button>
     </div>
 
     <div id="adminDashboard" class="screen cover-card">
-        <h3 style="margin-bottom:15px; color:var(--dark);">إدارة الطلاب</h3>
-        <div class="admin-table-container">
-            <table>
-                <tbody id="usersTableBody"></tbody>
-            </table>
-        </div>
-        <button class="btn-link" onclick="location.reload()">تسجيل خروج</button>
+        <h3>الإدارة</h3>
+        <div class="admin-table-container"><table><tbody id="usersTableBody"></tbody></table></div>
+        <button class="btn-link" onclick="location.reload()">خروج</button>
     </div>
 
     <div id="quizScreen" class="screen">
         <div class="quiz-card">
-            <div class="q-header">
-                <span class="q-badge" id="qNum">1</span>
-                <span id="qProgress" style="font-weight:bold;">1/100</span>
-            </div>
+            <div class="q-header"><span class="q-badge" id="qNum">1</span><span id="qProgress">1/100</span></div>
             <div id="questionText" class="question-text"></div>
             <div id="optionsContainer" class="options-grid"></div>
             <div id="explanationBox" class="explanation"></div>
         </div>
     </div>
-
 </div>
 
 <script>
-// إعدادات Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
   authDomain: "quizdental-c4d5a.firebaseapp.com",
@@ -228,12 +130,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// مراقبة الاتصال
 db.ref(".info/connected").on("value", s => {
-    const d = document.getElementById('connDot');
-    const t = document.getElementById('connText');
-    if(s.val()) { d.className="dot online"; t.innerText="متصل بفايربيس"; }
-    else { d.className="dot offline"; t.innerText="فشل الاتصال"; }
+    const d = document.getElementById('connDot'), t = document.getElementById('connText');
+    if(s.val()) { d.className="dot online"; t.innerText="متصل"; }
+    else { d.className="dot offline"; t.innerText="منقطع"; }
 });
 
 function showScreen(id) {
@@ -241,87 +141,69 @@ function showScreen(id) {
     document.getElementById(id).classList.add('active');
 }
 
-// الوظائف البرمجية
 function handleRegister() {
-    const u = document.getElementById('regUser').value.trim();
-    const p = document.getElementById('regPass').value.trim();
-    if(!u || !p) return alert("يرجى ملء الحقول");
+    const u = document.getElementById('regUser').value.trim(), p = document.getElementById('regPass').value.trim();
+    if(!u || !p) return alert("أكمل البيانات");
     db.ref('users/' + u.replace(/\s+/g, '_')).set({ name: u, password: p, status: 'pending' })
-    .then(() => { alert("تم الإرسال بنجاح! انتظر التفعيل."); showScreen('loginScreen'); });
+    .then(() => { alert("تم الإرسال"); showScreen('loginScreen'); });
 }
 
 function handleLogin() {
-    const u = document.getElementById('loginUser').value.trim();
-    const p = document.getElementById('loginPass').value.trim();
+    const u = document.getElementById('loginUser').value.trim(), p = document.getElementById('loginPass').value.trim();
     db.ref('users/' + u.replace(/\s+/g, '_')).once('value', s => {
         const d = s.val();
         if(d && d.password === p) {
             if(d.status === 'active') startQuiz();
-            else alert(d.status === 'suspended' ? "هذا الحساب معطل حالياً" : "حسابك بانتظار تفعيل الإدارة");
-        } else alert("اسم المستخدم أو كلمة السر خطأ");
+            else alert("بانتظار التفعيل");
+        } else alert("خطأ");
     });
 }
 
 function handleAdminLogin() {
-    if(document.getElementById('adminKey').value === "salem1959") {
-        showScreen('adminDashboard');
-        loadUsers();
-    } else alert("كلمة سر الإدارة غير صحيحة");
+    if(document.getElementById('adminKey').value === "salem1959") { showScreen('adminDashboard'); loadUsers(); }
 }
 
 function loadUsers() {
     db.ref('users').on('value', s => {
-        const users = s.val();
-        const body = document.getElementById('usersTableBody');
+        const users = s.val(), body = document.getElementById('usersTableBody');
         body.innerHTML = "";
         for(let id in users) {
             const u = users[id];
-            body.innerHTML += `<tr>
-                <td style="text-align:right; font-weight:bold; color:var(--dark)">${u.name}</td>
-                <td><button onclick="upd('${id}','active')" style="color:green; border:none; background:none; font-size:1.2rem; cursor:pointer;">✔️</button></td>
-                <td><button onclick="upd('${id}','suspended')" style="color:orange; border:none; background:none; font-size:1.2rem; cursor:pointer;">🚫</button></td>
-                <td><button onclick="del('${id}')" style="color:red; border:none; background:none; font-size:1.2rem; cursor:pointer;">🗑️</button></td>
-            </tr>`;
+            body.innerHTML += `<tr><td style="text-align:right">${u.name}</td>
+                <td><button onclick="upd('${id}','active')">✔️</button></td>
+                <td><button onclick="upd('${id}','suspended')">🚫</button></td>
+                <td><button onclick="del('${id}')">🗑️</button></td></tr>`;
         }
     });
 }
 function upd(id, st) { db.ref('users/'+id).update({status: st}); }
-function del(id) { if(confirm("حذف الطالب نهائياً؟")) db.ref('users/'+id).remove(); }
+function del(id) { if(confirm("حذف؟")) db.ref('users/'+id).remove(); }
 
-// بنك الأسئلة والمنطق
 const questions = [];
 function addQ(q, o, c, e) { questions.push({q, o, c, e}); }
-
-addQ("ما هي الطبقة الأكثر صلابة في السن؟", ["الميناء", "العاج", "الملاط", "العظم"], 0, "الميناء هي أصلب نسيج حي في جسم الإنسان.");
-addQ("العصب المسؤول عن إحساس الفك السفلي؟", ["السنخي السفلي", "الوجهي", "اللساني", "البصري"], 0, "العصب السنخي السفلي هو المسؤول عن تعصيب الأسنان السفلية.");
-for(let i=3; i<=100; i++) addQ(`سؤال تخصصي ${i}: ما الإجراء الأنسب لـ...؟`, ["خيار 1", "خيار 2", "خيار 3", "خيار 4"], 0, `شرح السؤال رقم ${i}.`);
+addQ("ما هي الطبقة الأكثر صلابة في السن؟", ["الميناء", "العاج", "الملاط", "العظم"], 0, "الميناء هي الأصلب.");
+for(let i=2; i<=100; i++) addQ(`سؤال ${i}: ...؟`, ["خيار 1", "خيار 2", "خيار 3", "خيار 4"], 0, `شرح ${i}`);
 
 let cur = 0, sc = 0, lock = false;
 function startQuiz() { showScreen('quizScreen'); loadQ(); }
 function loadQ() {
     lock = false;
     if(cur >= questions.length) {
-        document.getElementById('quizScreen').innerHTML = `<div class="cover-card"><h2>الاختبار اكتمل!</h2><p style="font-size:1.5rem; margin:15px 0;">النتيجة: ${sc}/100</p><button class="btn-main" onclick="location.reload()">خروج</button></div>`;
+        document.getElementById('quizScreen').innerHTML = `<div class="cover-card"><h2>انتهى!</h2><p>${sc}/100</p></div>`;
         return;
     }
     const q = questions[cur];
     document.getElementById('qNum').innerText = cur+1;
     document.getElementById('qProgress').innerText = `${cur+1}/100`;
     document.getElementById('questionText').innerText = q.q;
-    document.getElementById('explanationBox').style.display = "none";
-    const container = document.getElementById('optionsContainer');
-    container.innerHTML = "";
+    const container = document.getElementById('optionsContainer'); container.innerHTML = "";
     q.o.forEach((opt, i) => {
-        const b = document.createElement('button');
-        b.className = 'opt-btn';
-        b.innerText = opt;
+        const b = document.createElement('button'); b.className = 'opt-btn'; b.innerText = opt;
         b.onclick = () => {
             if(lock) return; lock = true;
             if(i === q.c) { b.classList.add('correct'); sc++; }
-            else { b.classList.add('wrong'); document.querySelectorAll('.opt-btn')[q.c].classList.add('correct'); }
-            document.getElementById('explanationBox').innerText = "💡 الشرح: " + q.e;
-            document.getElementById('explanationBox').style.display = "block";
-            setTimeout(() => { cur++; loadQ(); }, 3000);
+            else { b.classList.add('wrong'); }
+            setTimeout(() => { cur++; loadQ(); }, 2000);
         };
         container.appendChild(b);
     });
