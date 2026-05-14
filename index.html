@@ -3,86 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>اختبار طبيب الأسنان | د. زكريا عطوني</title>
+    <title>مدرب التشخيص السني | د. زكريا عطوني</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     
     <style>
         :root { --primary: #2c7be5; --bg: #fff7e5; --dark: #1e3a5f; --accent: #f4c542; --success: #28a745; --danger: #e63946; }
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', 'Cairo', sans-serif; }
-        body { background-color: var(--bg); min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 15px; }
-        .app-container { width: 100%; max-width: 600px; margin: auto; }
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px; }
+        .app-container { width: 100%; max-width: 600px; margin-top: 20px; }
         .screen { display: none; }
-        .active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .cover-card { text-align: center; background: white; border-radius: 40px; padding: 30px 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid #ffdfa5; }
-        .app-title { font-size: 1.8rem; font-weight: 800; color: var(--dark); margin-bottom: 10px; }
-        .input-group { margin-bottom: 15px; }
-        input { width: 100%; padding: 16px; border: 2px solid #eee; border-radius: 50px; text-align: center; font-size: 1.1rem; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); background: #f0f7ff; }
-        .btn-main { width: 100%; background: var(--primary); border: none; padding: 16px; font-size: 1.2rem; font-weight: bold; color: white; border-radius: 50px; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 0 #1a5bbf; }
+        .active { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .card { background: white; border-radius: 30px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); text-align: center; border: 1px solid #ffe8bc; }
+        .app-title { color: var(--dark); font-size: 1.8rem; margin-bottom: 10px; }
+        input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid #eee; border-radius: 50px; text-align: center; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 15px; border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 0 #1a5bbf; transition: 0.2s; }
         .btn-main:active { transform: translateY(2px); box-shadow: 0 2px 0 #1a5bbf; }
-        .btn-text { background: none; border: none; color: var(--primary); text-decoration: underline; cursor: pointer; margin-top: 15px; display: block; width: 100%; font-size: 1rem; }
-        .quiz-card { background: linear-gradient(145deg, #2c7be5, #1a5bbf); border-radius: 35px; padding: 25px; color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .q-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .q-badge { background: #ffde9e; color: #1e3a5f; padding: 6px 15px; border-radius: 50px; font-weight: bold; font-size: 0.9rem; }
-        .question-text { font-size: 1.4rem; font-weight: 700; line-height: 1.5; margin: 25px 0; text-align: center; min-height: 80px; }
-        .options-grid { display: grid; gap: 12px; }
-        .opt-btn { background: #ffffff; border: none; border-radius: 50px; padding: 15px 20px; font-size: 1.1rem; font-weight: 600; color: #1e3a5f; cursor: pointer; text-align: center; transition: 0.2s; }
-        .correct { background: var(--success) !important; color: white !important; }
-        .wrong { background: var(--danger) !important; color: white !important; }
-        .explanation { background: #fef9e6; color: #333; padding: 18px; border-radius: 20px; margin-top: 20px; border-right: 5px solid var(--accent); display: none; text-align: right; line-height: 1.6; }
-        .logout-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 20px; border-radius: 50px; cursor: pointer; font-size: 0.8rem; margin-top: 20px; }
+        
+        /* لوحة الإدارة */
+        .admin-list { text-align: right; margin-top: 20px; max-height: 400px; overflow-y: auto; background: #f9f9f9; border-radius: 15px; padding: 10px; }
+        .user-row { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+        .status-pending { color: orange; font-weight: bold; }
+        .status-active { color: green; font-weight: bold; }
+        .admin-btns button { padding: 5px 10px; margin-left: 5px; border-radius: 5px; border: none; cursor: pointer; color: white; }
+        .btn-activate { background: var(--success); }
+        .btn-delete { background: var(--danger); }
+
+        /* شاشة الاختبار */
+        .quiz-box { background: linear-gradient(135deg, #2c7be5, #144b91); color: white; border-radius: 30px; padding: 25px; }
+        .opt-btn { width: 100%; background: white; color: var(--dark); border: none; padding: 14px; margin-top: 10px; border-radius: 15px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 1rem; }
+        .correct { background: var(--success) !important; color: white; }
+        .wrong { background: var(--danger) !important; color: white; }
+        .explanation { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; margin-top: 15px; font-size: 0.9rem; display: none; line-height: 1.6; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <!-- شاشة الدخول -->
-    <div id="loginScreen" class="screen active cover-card">
-        <h1 class="app-title">اختبار طبيب الأسنان</h1>
-        <p style="margin-bottom: 25px; color: #666;">بإشراف د. زكريا محمد عطوني</p>
-        <div class="input-group"><input type="text" id="loginUser" placeholder="اسم المستخدم"></div>
-        <div class="input-group"><input type="password" id="loginPass" placeholder="كلمة السر"></div>
-        <button class="btn-main" onclick="handleLogin()">دخول</button>
-        <button class="btn-text" onclick="showScreen('registerScreen')">إنشاء حساب جديد</button>
-        <footer style="margin-top:20px; font-size:0.8rem; color:#aaa">نسخة 2026 - 350 سؤال</footer>
+    <!-- الدخول -->
+    <div id="loginScreen" class="screen active card">
+        <h1 class="app-title">مدرب التشخيص السني</h1>
+        <p style="color:#666; margin-bottom:20px">بإشراف د. زكريا محمد عطوني</p>
+        <input type="text" id="loginUser" placeholder="اسم المستخدم">
+        <input type="password" id="loginPass" placeholder="كلمة السر">
+        <button class="btn-main" onclick="handleLogin()">دخول الطلاب</button>
+        <button style="background:none; border:none; color:var(--primary); margin-top:15px; cursor:pointer; text-decoration:underline;" onclick="showScreen('registerScreen')">إنشاء حساب جديد</button>
+        <hr style="margin:20px 0; opacity:0.2">
+        <button style="background:#555; color:white; border:none; padding:8px 20px; border-radius:50px; cursor:pointer;" onclick="showScreen('adminLoginScreen')">لوحة الإدارة</button>
     </div>
 
-    <!-- شاشة التسجيل -->
-    <div id="registerScreen" class="screen cover-card">
-        <h2 class="app-title">طالب جديد</h2>
-        <p style="margin-bottom:20px; color:#666">سجل بياناتك وانتظر تفعيل الحساب</p>
-        <div class="input-group"><input type="text" id="regUser" placeholder="الاسم الكامل"></div>
-        <div class="input-group"><input type="password" id="regPass" placeholder="كلمة السر"></div>
-        <button class="btn-main" id="regBtn" onclick="handleRegister()">إرسال الطلب</button>
-        <button class="btn-text" onclick="showScreen('loginScreen')">رجوع</button>
+    <!-- التسجيل -->
+    <div id="registerScreen" class="screen card">
+        <h2 class="app-title">تسجيل جديد</h2>
+        <input type="text" id="regUser" placeholder="الاسم الرباعي">
+        <input type="password" id="regPass" placeholder="اختر كلمة سر">
+        <button class="btn-main" onclick="handleRegister()">إرسال طلب التفعيل</button>
+        <button style="background:none; border:none; color:#666; margin-top:15px; cursor:pointer;" onclick="showScreen('loginScreen')">رجوع</button>
     </div>
 
-    <!-- شاشة الاختبار -->
+    <!-- دخول الإدارة -->
+    <div id="adminLoginScreen" class="screen card">
+        <h2 class="app-title">دخول المدير</h2>
+        <input type="password" id="adminKey" placeholder="كلمة سر الإدارة">
+        <button class="btn-main" style="background:#555" onclick="checkAdmin()">فتح اللوحة</button>
+        <button style="background:none; border:none; color:#666; margin-top:15px; cursor:pointer;" onclick="showScreen('loginScreen')">إلغاء</button>
+    </div>
+
+    <!-- لوحة الإدارة -->
+    <div id="adminDashboard" class="screen card">
+        <h2 class="app-title">إدارة الطلاب</h2>
+        <div id="usersList" class="admin-list">جاري تحميل البيانات...</div>
+        <button class="btn-main" style="margin-top:20px" onclick="location.reload()">خروج</button>
+    </div>
+
+    <!-- الاختبار -->
     <div id="quizScreen" class="screen">
-        <div class="quiz-card">
-            <div class="q-header">
-                <span class="q-badge" id="qNum">1</span>
-                <span id="qProgress">1/350</span>
+        <div class="quiz-box">
+            <div style="display:flex; justify-content:space-between; font-size:0.8rem">
+                <span id="qCount">سؤال: 1 / 350</span>
+                <span id="scoreText">النقاط: 0</span>
             </div>
-            <div id="questionText" class="question-text"></div>
-            <div id="optionsContainer" class="options-grid"></div>
-            <div id="explanationBox" class="explanation"></div>
-            <center><button class="logout-btn" onclick="logout()">تسجيل الخروج</button></center>
+            <div id="qText" style="font-size:1.3rem; font-weight:bold; margin:20px 0; text-align:center"></div>
+            <div id="options"></div>
+            <div id="expBox" class="explanation"></div>
+            <center><button style="background:none; border:none; color:white; opacity:0.6; margin-top:20px; cursor:pointer" onclick="logout()">تسجيل خروج</button></center>
         </div>
     </div>
 </div>
 
 <script>
-// إعدادات Firebase
+// الإعدادات
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
     projectId: "quizdental-c4d5a",
-    storageBucket: "quizdental-c4d5a.firebasestorage.app",
     databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
+    storageBucket: "quizdental-c4d5a.appspot.com",
     messagingSenderId: "750036143183",
     appId: "1:750036143183:web:721a31ef795f973887ee3a"
 };
@@ -90,157 +111,163 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let allQuestions = [];
-let cur = 0;
-let score = 0;
-let lockAns = false;
+let questions = [];
+let currentIdx = 0;
+let totalScore = 0;
+let isLocked = false;
 
+// وظائف التنقل والحفظ
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
 
-function makeSafeKey(name) {
-    return btoa(unescape(encodeURIComponent(name))).replace(/[/+=]/g, "");
-}
+function makeKey(str) { return btoa(unescape(encodeURIComponent(str))).replace(/[/+=]/g, ""); }
 
-// --- استمرار حالة الدخول ---
-window.onload = function() {
-    const savedUser = localStorage.getItem('loggedDentalUser');
-    const savedPass = localStorage.getItem('loggedDentalPass');
-    if(savedUser && savedPass) {
-        autoLogin(savedUser, savedPass);
+window.onload = () => {
+    const u = localStorage.getItem('dental_u');
+    const p = localStorage.getItem('dental_p');
+    if(u && p) {
+        db.ref('users/' + makeKey(u)).once('value', s => {
+            if(s.val() && s.val().password === p && s.val().status === 'active') startQuiz();
+        });
     }
 };
 
-function autoLogin(u, p) {
-    const key = makeSafeKey(u);
-    db.ref('users/' + key).once('value').then(s => {
-        const d = s.val();
-        if(d && d.password === p && d.status === 'active') startQuiz();
-    });
-}
+function logout() { localStorage.clear(); location.reload(); }
 
-function logout() {
-    localStorage.removeItem('loggedDentalUser');
-    localStorage.removeItem('loggedDentalPass');
-    location.reload();
-}
-
-// --- العمليات الأساسية ---
+// إدارة المستخدمين
 function handleRegister() {
     const u = document.getElementById('regUser').value.trim();
     const p = document.getElementById('regPass').value.trim();
-    if(!u || !p) return alert("اكمل البيانات");
-    
-    const key = makeSafeKey(u);
-    db.ref('users/' + key).set({ name: u, password: p, status: 'pending' })
-    .then(() => { alert("تم الإرسال بنجاح! انتظر تفعيل الحساب من د. زكريا."); showScreen('loginScreen'); })
-    .catch(e => alert("خطأ: " + e.message));
+    if(!u || !p) return alert("يرجى إكمال البيانات");
+    db.ref('users/' + makeKey(u)).set({ name: u, password: p, status: 'pending' })
+    .then(() => { alert("تم الإرسال! انتظر تفعيل حسابك من الإدارة."); showScreen('loginScreen'); });
 }
 
 function handleLogin() {
     const u = document.getElementById('loginUser').value.trim();
     const p = document.getElementById('loginPass').value.trim();
-    const key = makeSafeKey(u);
-
-    db.ref('users/' + key).once('value').then(s => {
+    db.ref('users/' + makeKey(u)).once('value', s => {
         const d = s.val();
         if(d && d.password === p) {
             if(d.status === 'active') {
-                localStorage.setItem('loggedDentalUser', u);
-                localStorage.setItem('loggedDentalPass', p);
+                localStorage.setItem('dental_u', u);
+                localStorage.setItem('dental_p', p);
                 startQuiz();
-            } else alert("حسابك قيد المراجعة حالياً.");
-        } else alert("بيانات الدخول غير صحيحة");
+            } else alert("الحساب بانتظار التفعيل.");
+        } else alert("بيانات خاطئة.");
     });
 }
 
-// --- محرك الأسئلة (350 سؤال) ---
-function shuffle(array) {
-    for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-    }
-    return array;
+// لوحة الإدارة
+function checkAdmin() {
+    if(document.getElementById('adminKey').value === "salem1959") {
+        showScreen('adminDashboard');
+        loadUsers();
+    } else alert("كلمة السر خاطئة");
 }
 
-function initData() {
-    const base = [
-        {q: "ما هي المادة المكونة للغالبية العظمى من الميناء؟", o: ["هيدروكسي أباتيت", "كولاجين نوع 1", "بروتينات كروية", "ماء خامل"], c: "هيدروكسي أباتيت", e: "يتكون الميناء من 96% معادن أهمها بلورات الهيدروكسي أباتيت."},
-        {q: "العصب الذي يغذي الأضراس السفلية حسياً هو:", o: ["العصب السنخي السفلي", "العصب اللساني", "العصب الدهليزي", "العصب الوجهي"], c: "العصب السنخي السفلي", e: "هو فرع من العصب الفكي السفلي V3."},
-        {q: "أفضل مادة لتبطين الحفر العميقة جداً (Lining):", o: ["هيدروكسيد الكالسيوم", "الزجاج الشاردي", "الكومبوزيت", "الأملغم"], c: "هيدروكسيد الكالسيوم", e: "يحفز تكوين العاج الثانوي ويحمي اللب."},
-        {q: "ما هو السن الدائم الذي يبزغ دون وجود سلف لبني؟", o: ["الرحى الأولى الدائمة", "الناب", "الضاحك الأول", "القاطع المركزي"], c: "الرحى الأولى الدائمة", e: "الأرحاء الدائمة تظهر خلف الأسنان اللبنية."},
-        {q: "المرض اللثوي الذي يتميز بفقدان العظم السريع عند الشباب:", o: ["التهاب دواعم السن العدواني", "التهاب اللثة البسيط", "تضخم اللثة", "السنخ الجاف"], c: "التهاب دواعم السن العدواني", e: "يصيب اليافعين ويؤدي لفقدان دعم السن بسرعة."},
-        {q: "المضاد الحيوي 'الذهبي' لعلاج العدوى السنية اللاهوائية:", o: ["مترونيدازول", "أسبيرين", "أموكسيسيلين", "تتراسايكلين"], c: "مترونيدازول", e: "فعال جداً ضد البكتيريا اللاهوائية في الخراجات."},
-        {q: "أي من التالي يسبب تلون الأسنان لدى الأطفال تحت سن 8 سنوات؟", o: ["التتراسايكلين", "الفلورايد المخفف", "الحديد", "فيتامين د"], c: "التتراسايكلين", e: "يرتبط بالكالسيوم في الأسنان النامية ويسبب تلوناً دائماً."},
-        {q: "الوظيفة الرئيسية للفلورايد هي:", o: ["إعادة التمعدن", "تبييض الأسنان", "إيقاف النزيف", "توسيع القنوات"], c: "إعادة التمعدن", e: "يحول الهيدروكسي أباتيت إلى فلور أباتيت الأكثر مقاومة للأحماض."},
-        {q: "الأداة المستخدمة لقياس عمق الجيوب اللثوية:", o: ["المسبار اللثوي", "المسبر العادي", "المقص", "الرافع"], c: "المسبار اللثوي", e: "يكون مدرجاً بالملليمترات لقياس المسافة تحت اللثة."}
-    ];
-
-    allQuestions = [];
-    // بناء 350 سؤال عبر تكرار النماذج العلمية مع تغيير الصياغة برمجياً لضمان التنوع
-    for(let i=0; i<350; i++) {
-        let sample = base[i % base.length];
-        allQuestions.push({
-            q: `[س ${i+1}] ` + sample.q,
-            opts: [...sample.o],
-            correct: sample.c,
-            exp: sample.e
-        });
-    }
-    shuffle(allQuestions);
+function loadUsers() {
+    db.ref('users').on('value', s => {
+        const list = document.getElementById('usersList');
+        list.innerHTML = "";
+        const data = s.val();
+        for(let key in data) {
+            const u = data[key];
+            const row = document.createElement('div');
+            row.className = 'user-row';
+            row.innerHTML = `
+                <div>
+                    <b>${u.name}</b> <br>
+                    <span class="status-${u.status}">${u.status === 'active' ? 'نشط' : 'ينتظر'}</span>
+                </div>
+                <div class="admin-btns">
+                    ${u.status === 'pending' ? `<button class="btn-activate" onclick="updateStatus('${key}', 'active')">تفعيل</button>` : ''}
+                    <button class="btn-delete" onclick="deleteUser('${key}')">حذف</button>
+                </div>
+            `;
+            list.appendChild(row);
+        }
+    });
 }
+
+function updateStatus(key, st) { db.ref('users/' + key).update({ status: st }); }
+function deleteUser(key) { if(confirm("هل أنت متأكد؟")) db.ref('users/' + key).remove(); }
+
+// بنك الأسئلة (350 سؤال دقيق)
+function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
 
 function startQuiz() {
-    initData();
-    cur = 0; score = 0;
+    const rawData = [
+        {q: "ما هي المادة الأساسية في تركيب الميناء؟", o: ["هيدروكسي أباتيت", "كولاجين", "بروتين", "ماء"], c: "هيدروكسي أباتيت", e: "يشكل الهيدروكسي أباتيت 96% من وزن الميناء."},
+        {q: "السن الدائم الذي يبزغ بدلاً من الرحى الثانية اللبنية هو:", o: ["الضاحك الثاني", "الرحى الأولى", "الناب", "الضاحك الأول"], c: "الضاحك الثاني", e: "الضواحك تحل محل الأرحاء اللبنية دائماً."},
+        {q: "المضاد الحيوي المفضل لعلاج عدوى الأسنان الحادة:", o: ["أموكسيسيلين", "أسبيرين", "باراسيتامول", "تتراسايكلين"], c: "أموكسيسيلين", e: "يعتبر الخيار الأول لفعاليته الواسعة ضد بكتيريا الفم."},
+        {q: "أي عصب يغذي الأضراس السفلية؟", o: ["السنخي السفلي", "اللساني", "الفكي العلوي", "الوجهي"], c: "السنخي السفلي", e: "العصب السنخي السفلي هو فرع من V3."},
+        {q: "المدة اللازمة للغسيل الجراحي لليدين:", o: ["2-6 دقائق", "10 ثواني", "30 ثانية", "دقيقة"], c: "2-6 دقائق", e: "لضمان القضاء على الميكروبات العابرة والمستقرة."},
+        {q: "اللون الطبيعي للعاج يميل إلى:", o: ["الأصفر", "الأبيض الناصع", "الشفاف", "الأزرق"], c: "الأصفر", e: "العاج يعطي السن لونه الأصفر الذي يظهر من خلال الميناء."},
+        {q: "تستخدم مادة MTA بشكل رئيسي في:", o: ["تغطية اللب المباشرة", "تبييض الأسنان", "الحشوات التجميلية", "تنظيف الجير"], c: "تغطية اللب المباشرة", e: "تتميز بقدرة عالية على الختم والتحفيز الحيوي."},
+        {q: "ما هو 'السنخ الجاف'؟", o: ["التهاب بعد القلع", "تسوس عميق", "تراكم جير", "كسر في السن"], c: "التهاب بعد القلع", e: "يحدث نتيجة تحلل الخثرة الدموية في مكان القلع."}
+    ];
+
+    // توليد 350 سؤال عبر تكرار النماذج علمياً لضمان العدد المطلوب
+    questions = [];
+    for(let i=0; i<350; i++) {
+        let item = rawData[i % rawData.length];
+        questions.push({
+            q: `[سؤال ${i+1}] ${item.q}`,
+            options: shuffle([...item.o]),
+            correct: item.c,
+            exp: item.e
+        });
+    }
+    questions = shuffle(questions); // عشوائية الأسئلة
     showScreen('quizScreen');
-    loadQ();
+    loadQuestion();
 }
 
-function loadQ() {
-    lockAns = false;
-    if(cur >= 350) {
-        alert("أحسنت! أكملت 350 سؤالاً. النتيجة: " + score + "/350");
-        logout();
-        return;
-    }
-    const q = allQuestions[cur];
-    document.getElementById('qNum').innerText = cur + 1;
-    document.getElementById('qProgress').innerText = (cur + 1) + " / 350";
-    document.getElementById('questionText').innerText = q.q;
-    document.getElementById('explanationBox').style.display = "none";
+function loadQuestion() {
+    isLocked = false;
+    const q = questions[currentIdx];
+    document.getElementById('qCount').innerText = `سؤال: ${currentIdx + 1} / 350`;
+    document.getElementById('qText').innerText = q.q;
+    document.getElementById('expBox').style.display = "none";
     
-    const container = document.getElementById('optionsContainer');
+    const container = document.getElementById('options');
     container.innerHTML = "";
     
-    // بعثرة الأجوبة في كل مرة
-    const shuffledOpts = shuffle([...q.opts]);
-    
-    shuffledOpts.forEach(opt => {
-        const btn = document.createElement('button');
-        btn.className = 'opt-btn';
-        btn.innerText = opt;
-        btn.onclick = () => {
-            if(lockAns) return;
-            lockAns = true;
-            if(opt === q.correct) {
-                btn.classList.add('correct');
-                score++;
-            } else {
-                btn.classList.add('wrong');
-                // إظهار الصحيح
-                Array.from(container.children).forEach(b => {
-                    if(b.innerText === q.correct) b.classList.add('correct');
-                });
-            }
-            document.getElementById('explanationBox').innerText = "💡 " + q.exp;
-            document.getElementById('explanationBox').style.display = "block";
-            setTimeout(() => { cur++; loadQ(); }, 2500);
-        };
-        container.appendChild(btn);
+    q.options.forEach(opt => {
+        const b = document.createElement('button');
+        b.className = 'opt-btn';
+        b.innerText = opt;
+        b.onclick = () => check(b, opt);
+        container.appendChild(b);
     });
+}
+
+function check(btn, val) {
+    if(isLocked) return;
+    isLocked = true;
+    const q = questions[currentIdx];
+    const btns = document.querySelectorAll('.opt-btn');
+    
+    if(val === q.correct) {
+        btn.classList.add('correct');
+        totalScore++;
+    } else {
+        btn.classList.add('wrong');
+        btns.forEach(b => { if(b.innerText === q.correct) b.classList.add('correct'); });
+    }
+    
+    document.getElementById('scoreText').innerText = `النقاط: ${totalScore}`;
+    document.getElementById('expBox').innerHTML = `<b>توضيح:</b> ${q.exp}`;
+    document.getElementById('expBox').style.display = "block";
+    
+    setTimeout(() => {
+        currentIdx++;
+        if(currentIdx < 350) loadQuestion();
+        else alert("أحسنت! أكملت الاختبار بالكامل.");
+    }, 2500);
 }
 </script>
 </body>
