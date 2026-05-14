@@ -55,6 +55,7 @@
         footer { margin-top: 20px; text-align: center; color: #999; font-size: 0.8rem; }
         button.act-btn { background: #e9ecef; border: none; border-radius: 30px; padding: 6px 12px; margin: 0 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; }
         .admin-msg { background: #eef2ff; padding: 8px; border-radius: 20px; margin: 10px 0; font-size: 0.8rem; color: #1e3a5f; }
+        .logout-quiz-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.5); margin-top: 20px; padding: 8px; border-radius: 40px; font-size: 0.8rem; font-weight: bold; color: white; backdrop-filter: blur(4px); }
     </style>
 </head>
 <body>
@@ -94,10 +95,12 @@
         <h3>إدارة المستخدمين</h3>
         <div id="adminMsgArea" class="admin-msg">🔹 انتظر تحميل البيانات...</div>
         <div class="admin-box">
-            <table><thead><tr><th>الاسم</th><th>تفعيل</th><th>تعليق</th><th>حذف</th></tr></thead><tbody id="usersTableBody"><tr><td colspan="4">جاري التحميل...</td></tr></tbody>
+            <table>
+                <thead><tr><th>الاسم</th><th>تفعيل</th><th>تعليق</th><th>حذف</th></tr></thead>
+                <tbody id="usersTableBody"><tr><td colspan="4">جاري التحميل...</td></tr></tbody>
             </table>
         </div>
-        <button class="btn-text" onclick="location.reload()">تسجيل الخروج</button>
+        <button class="btn-text" onclick="logout()">تسجيل الخروج</button>
     </div>
     <div id="quizScreen" class="screen">
         <div class="quiz-card">
@@ -105,6 +108,7 @@
             <div id="questionText" class="question-text"></div>
             <div id="optionsContainer" class="options-grid"></div>
             <div id="explanationBox" class="explanation"></div>
+            <button class="btn-text logout-quiz-btn" onclick="logout()" style="color:white; text-decoration:none; background: rgba(0,0,0,0.2); border-radius:40px; margin-top:20px;">🚪 تسجيل الخروج</button>
         </div>
     </div>
 </div>
@@ -124,8 +128,12 @@ let db;
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-} catch(e) { console.error(e); alert("خطأ في تهيئة قاعدة البيانات"); }
+} catch(e) { console.error(e); }
 
+let currentUser = null;      // اسم المستخدم الحالي (الطالب)
+let cur = 0, score = 0, lockAns = false;
+
+// حالة الاتصال
 db?.ref(".info/connected").on("value", s => {
     const d = document.getElementById('connDot');
     const t = document.getElementById('connText');
@@ -136,6 +144,46 @@ db?.ref(".info/connected").on("value", s => {
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
+}
+
+// تسجيل الخروج العام (يمسح التخزين ويعيد تعيين الجلسة)
+function logout() {
+    localStorage.removeItem('dentalQuizUser');
+    currentUser = null;
+    cur = 0; score = 0; lockAns = false;
+    // إظهار شاشة الدخول
+    showScreen('loginScreen');
+    // إعادة تعيين حقول الدخول (اختياري)
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+}
+
+// محاولة الدخول التلقائي عند تحميل الصفحة
+function autoLogin() {
+    const savedUser = localStorage.getItem('dentalQuizUser');
+    if (!savedUser) return false;
+    if (!db) {
+        // إذا لم تكن قاعدة البيانات جاهزة بعد، نعيد المحاولة بعد قليل
+        setTimeout(() => autoLogin(), 500);
+        return false;
+    }
+    const key = savedUser.replace(/\s+/g, '_');
+    db.ref('users/' + key).once('value').then(snap => {
+        const data = snap.val();
+        if (data && data.status === 'active') {
+            currentUser = savedUser;
+            startQuiz();  // يبدأ الاختبار مباشرة
+        } else {
+            // الحساب غير نشط أو محذوف: نمسح التخزين ونبقى على شاشة الدخول
+            localStorage.removeItem('dentalQuizUser');
+            showScreen('loginScreen');
+        }
+    }).catch(err => {
+        console.error("AutoLogin error", err);
+        localStorage.removeItem('dentalQuizUser');
+        showScreen('loginScreen');
+    });
+    return true;
 }
 
 function handleRegister() {
@@ -158,8 +206,11 @@ function handleLogin() {
     db.ref('users/' + key).once('value').then(s => {
         const d = s.val();
         if(d && d.password === p) {
-            if(d.status === 'active') startQuiz();
-            else if(d.status === 'suspended') alert("تم تعليق حسابك، تواصل مع الإدارة.");
+            if(d.status === 'active') {
+                localStorage.setItem('dentalQuizUser', u);
+                currentUser = u;
+                startQuiz();
+            } else if(d.status === 'suspended') alert("تم تعليق حسابك، تواصل مع الإدارة.");
             else alert("حسابك لم يتم تفعيله بعد.");
         } else alert("خطأ في البيانات");
     }).catch(err => alert("خطأ: "+err.message));
@@ -241,7 +292,6 @@ addQ("اختبار النقر العمودي الإيجابي يدل على:", [
 addQ("أكثر أنواع السرطان شيوعاً في تجويف الفم:", ["الخلية الحرشفية", "اللمفوما", "السرطان الغدي", "الورم الميلانيني"], "الخلية الحرشفية", "أكثر من 90% من سرطانات الفم هي سرطانة حرشفية.");
 addQ("عامل خطر لأمراض اللثة:", ["التدخين", "شرب الشاي", "تناول الخضروات", "غسول الفم"], "التدخين", "يضعف التروية الدموية ويزيد خطر التهاب دواعم السن.");
 addQ("الترتيب الصحيح لبزوغ الأسنان اللبنية:", ["قواطع وسطى سفلية أولاً", "قواطع وسطى علوية أولاً", "أنياب سفلية أولاً", "ضواحك أولاً"], "قواطع وسطى سفلية أولاً", "تنبثق القواطع الوسطى السفلية حوالي 6-10 أشهر.");
-// إكمال حتى 100 سؤال تلقائي بمحتوى علمي متنوع
 for(let i=26; i<=100; i++) {
     if(i===26) addQ("ما هي وظيفة الفلورايد الموضعي؟", ["إعادة التمعدن", "تآكل الميناء", "تسوس الأسنان", "تآكل العاج"], "إعادة التمعدن", "الفلورايد يعيد تمعدن الميناء ويمنع إزالة المعادن.");
     else if(i===27) addQ("أي من التالي هو السن الأكثر تشابهاً من حيث الشكل مع الضاحك العلوي الأول؟", ["الضاحك العلوي الثاني", "الضرس الأول العلوي", "الناب العلوي", "القاطع الوحشي"], "الضاحك العلوي الثاني", "يتشابهان في شكل الإطباق ولكن الضاحك الأول له أخدود أطول.");
@@ -262,25 +312,25 @@ for(let i=26; i<=100; i++) {
     else if(i===42) addQ("ما هي المادة المستخدمة لتبييض الأسنان الحيوية؟", ["بيروكسيد الكارباميد", "هيبوكلوريت الصوديوم", "الفلورايد", "كلورهكسيدين"], "بيروكسيد الكارباميد", "يتحلل إلى بيروكسيد الهيدروجين ويساعد على تبييض الأسنان.");
     else if(i===43) addQ("أي من التالي هو مؤشر لخلع ضرس العقل؟", ["تسوس غير قابل للترميم", "بروز كامل", "غياب الأعراض", "وضع طبيعي"], "تسوس غير قابل للترميم", "إذا كان ضرس العقل متسوساً بشدة ولا يمكن ترميمه يتم خلعه.");
     else if(i===44) addQ("ما هو أكثر ترميم يسبب حساسية بعد وضعه؟", ["الكومبوزيت العميق", "الذهب", "الأملغم", "السيراميك"], "الكومبوزيت العميق", "الحشوات المركبة العميقة قد تسبب حساسية بسبب قربها من اللب.");
-    else if(i===45) addQ("أي من هذه الأدوية يسبب جفاف الفم كأثر جانبي؟", ["مضادات الهيستامين", "الأسبرين", "الباراسيتامول", "الأموكسيسيلين"], "مضادات الهيستامين", "مضادات الهيستامين ومضادات الاكتئاب تسبب جفاف الفم.");
-    else if(i===46) addQ("ما هو التصرف الأمثل لكسر سن دائم لدى طفل عمره 8 سنوات مع تعرض اللب؟", ["معالجة لب مباشرة", "خلع", "مراقبة", "ترميم بدون معالجة"], "معالجة لب مباشرة", "يجب حماية اللب المكشوف بمواد خاصة وإجراء ترميم.");
-    else if(i===47) addQ("أي من التالي هو أفضل طريقة للوقاية من تسوس الأسنان؟", ["الفلورايد والتنظيف اليومي", "تجنب السكر فقط", "غسول الفم فقط", "استخدام المسواك"], "الفلورايد والتنظيف اليومي", "التنظيف المنتظم مع الفلورايد يمنع التسوس بشكل فعال.");
-    else if(i===48) addQ("ما هو حجم معجون الفلورايد المناسب للطفل من 3-6 سنوات؟", ["بحجم حبة البازلاء", "بحجم حبة الأرز", "ملء الفرشاة", "كمية كبيرة"], "بحجم حبة البازلاء", "لتقليل خطر ابتلاع الفلورايد الزائد.");
-    else if(i===49) addQ("أي من التالي هو علامة على التهاب دواعم السن المتقدم؟", ["ارتحاف العظم", "نزيف خفيف", "احمرار فقط", "رائحة الفم"], "ارتحاف العظم", "يظهر في الأشعة السينية فقدان العظم حول الأسنان.");
-    else if(i===50) addQ("ما هو أفضل مخدر موضعي لمرضى القلب الذين يتناولون مضادات التخثر؟", ["ليدوكائين بدون أدرينالين", "ليدوكائين مع أدرينالين", "أرتيكائين", "ميبيفاكائين"], "ليدوكائين بدون أدرينالين", "تجنب الأدرينالين لتقليل خطر مضاعفات القلب.");
     else addQ(`سؤال ${i}: ما هو الإجراء المتبع في حالة التهاب اللب العكوس (Reversible pulpitis)؟`, ["حشوة مؤقتة", "معالجة لب", "خلع السن", "مراقبة"], "حشوة مؤقتة", "في حالة التهاب اللب العكوس يمكن وضع حشوة مهدئة وتجنب المثيرات.");
 }
-// التأكد من 100 سؤال بالضبط
 while(questions.length < 100) addQ("ما هو أنسب حشوة للطفل ذي التسوس العميق في سن لبني؟", ["حشوة زجاج شاردي", "أملغم", "كومبوزيت عادي", "تاج معدني"], "حشوة زجاج شاردي", "الزجاج الشاردي يفرز فلورايد ويرتبط كيميائياً بالسن.");
 if(questions.length > 100) questions.length = 100;
 
-let cur = 0, score = 0, lockAns = false;
-function startQuiz() { cur = 0; score = 0; lockAns = false; showScreen('quizScreen'); loadQ(); }
 function shuffleArray(arr) { for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+function startQuiz() {
+    cur = 0; score = 0; lockAns = false;
+    showScreen('quizScreen');
+    loadQ();
+}
+
 function loadQ() {
     lockAns = false;
     if(cur >= questions.length) {
-        document.getElementById('quizScreen').innerHTML = `<div class="cover-card"><h2>🏆 انتهى الاختبار!</h2><p style="font-size:1.8rem; margin:15px">${score}/${questions.length}</p><button class="btn-main" onclick="location.reload()">خروج</button></div>`;
+        // نهاية الاختبار مع زر خروج آمن
+        const finishHtml = `<div class="cover-card"><h2>🏆 انتهى الاختبار!</h2><p style="font-size:1.8rem; margin:15px">${score}/${questions.length}</p><button class="btn-main" onclick="logout()">تسجيل الخروج</button></div>`;
+        document.getElementById('quizScreen').innerHTML = finishHtml;
         return;
     }
     const q = questions[cur];
@@ -288,7 +338,6 @@ function loadQ() {
     document.getElementById('qProgress').innerText = `${cur+1}/${questions.length}`;
     document.getElementById('questionText').innerText = q.q;
     document.getElementById('explanationBox').style.display = "none";
-    // خلط الخيارات
     let shuffledOpts = shuffleArray([...q.opts]);
     const container = document.getElementById('optionsContainer');
     container.innerHTML = "";
@@ -302,7 +351,6 @@ function loadQ() {
             const isCorrect = (opt === q.correct);
             if(isCorrect) { btn.classList.add('correct'); score++; }
             else { btn.classList.add('wrong'); 
-                   // إظهار الإجابة الصحيحة
                    Array.from(container.children).forEach(b => { if(b.innerText === q.correct) b.classList.add('correct'); });
             }
             document.getElementById('explanationBox').innerText = "💡 " + q.exp;
@@ -312,6 +360,12 @@ function loadQ() {
         container.appendChild(btn);
     });
 }
+
+// تشغيل الدخول التلقائي عند تحميل الصفحة
+window.addEventListener('DOMContentLoaded', () => {
+    if(db) autoLogin();
+    else setTimeout(() => autoLogin(), 800);
+});
 </script>
 </body>
 </html>
