@@ -350,8 +350,8 @@ async function updQ(id) {
 }
 function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
 
-// 📢 نظام التحكم بالإعلانات الذكية (نصوص + صور) المتبدلة تلقائياً
-let noticeInterval = null;
+// 📢 نظام التحكم بالإعلانات الذكية (نصوص + صور) المتبدلة بتوقيت ديناميكي
+let noticeTimeout = null;
 let currentNoticeIndex = 0;
 let noticeLines = [];
 
@@ -363,14 +363,41 @@ async function saveNotice() {
     } catch(e) { alert('❌ فشل الحفظ: ' + e.message); }
 }
 
-// دالة فحص وعرض المحتوى داخل الصندوق (نص أو صورة)
+// دالة فحص ما إذا كان النص رابط صورة أم لا
+function checkIsImage(content) {
+    return /\.(jpeg|jpg|gif|png|webp)$/i.test(content.toLowerCase()) || content.startsWith('data:image/');
+}
+
+// دالة عرض المحتوى
 function displayNoticeContent(targetBox, content) {
-    const isImage = /\.(jpeg|jpg|gif|png|webp)$/i.test(content.toLowerCase()) || content.startsWith('data:image/');
-    if (isImage) {
+    if (checkIsImage(content)) {
         targetBox.innerHTML = `<img src="${content}" alt="إعلان ممتد">`;
     } else {
         targetBox.innerText = content;
     }
+}
+
+// دالة التبديل الدائري الديناميكي
+function scheduleNextNotice() {
+    if (noticeLines.length <= 1) return;
+    
+    const currentContent = noticeLines[currentNoticeIndex];
+    // تحديد وقت العرض: 8 ثوانٍ للصورة، و4 ثوانٍ للنص
+    const displayTime = checkIsImage(currentContent) ? 8000 : 4000;
+    
+    noticeTimeout = setTimeout(() => {
+        const box = document.getElementById('appNoticeBox');
+        box.style.opacity = 0; // تلاشي الإخفاء
+        
+        setTimeout(() => {
+            currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length;
+            displayNoticeContent(box, noticeLines[currentNoticeIndex]);
+            box.style.opacity = 1; // تلاشي الظهور
+            
+            // جدولة الإعلان الذي يليه بناءً على نوعه الجديد
+            scheduleNextNotice();
+        }, 400); // وقت انتقال التلاشي الأنيق
+    }, displayTime);
 }
 
 function listenToNotice() {
@@ -382,7 +409,7 @@ function listenToNotice() {
         
         noticeLines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
         
-        if(noticeInterval) clearInterval(noticeInterval);
+        if(noticeTimeout) clearTimeout(noticeTimeout);
         currentNoticeIndex = 0;
         
         if (noticeLines.length > 0) {
@@ -390,16 +417,8 @@ function listenToNotice() {
             displayNoticeContent(box, noticeLines[0]);
             box.style.opacity = 1;
             
-            if (noticeLines.length > 1) {
-                noticeInterval = setInterval(() => {
-                    box.style.opacity = 0;
-                    setTimeout(() => {
-                        currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length;
-                        displayNoticeContent(box, noticeLines[currentNoticeIndex]);
-                        box.style.opacity = 1;
-                    }, 400);
-                }, 4000);
-            }
+            // بدء الجدولة الديناميكية
+            scheduleNextNotice();
         } else {
             box.style.display = 'none';
         }
