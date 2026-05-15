@@ -48,17 +48,38 @@
             padding: 15px 20px;
             text-align: center;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
         }
 
         .app-header h1 {
             color: white;
             font-size: 1.3rem;
             margin-bottom: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
         .app-header p {
             color: rgba(255,255,255,0.9);
             font-size: 0.85rem;
+        }
+
+        /* مؤشر الاتصال */
+        .db-status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #e17055; /* أحمر افتراضي قبل الاتصال */
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #e17055;
+            transition: all 0.4s ease;
+        }
+        
+        .db-status-dot.connected {
+            background-color: #00b894; /* أخضر عند نجاح الاتصال */
+            box-shadow: 0 0 8px #00b894;
         }
 
         .screen {
@@ -249,9 +270,9 @@
 <body>
 
 <div class="app-container">
-    <!-- الهيدر - يظهر في جميع الشاشات -->
+    <!-- الهيدر - يظهر في جميع الشاشات ومزود بمؤشر الاتصال -->
     <div class="app-header">
-        <h1>🦷 مدرب التشخيص السني</h1>
+        <h1>🦷 مدرب التشخيص السني <span id="dbStatusDot" class="db-status-dot" title="جاري الاتصال بقاعدة البيانات..."></span></h1>
         <p>بإشراف د. زكريا محمد عطوني</p>
     </div>
 
@@ -361,6 +382,18 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+// مراقبة حالة الاتصال بـ Firebase وتحديث النقطة تلقائياً
+db.ref(".info/connected").on("value", function(snap) {
+    const dot = document.getElementById("dbStatusDot");
+    if (snap.val() === true) {
+        dot.classList.add("connected");
+        dot.title = "متصل بقاعدة البيانات بنجاح";
+    } else {
+        dot.classList.remove("connected");
+        dot.title = "مقطوع أو جاري إعادة الاتصال...";
+    }
+});
 
 let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
 let editModeId = null;
