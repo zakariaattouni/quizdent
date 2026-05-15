@@ -19,7 +19,7 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* يمنع سحب الشاشة بالكامل */
+            overflow: hidden;
         }
 
         .app-container {
@@ -49,14 +49,13 @@
             border: 1px solid rgba(66, 153, 225, 0.15);
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* لاحتواء المكونات بالداخل */
+            overflow: hidden;
             flex: 1;
         }
 
-        /* تنسيق السؤال والخيارات لتناسب الشاشة */
         .quiz-content {
             flex: 1;
-            overflow-y: auto; /* يسمح بالتمرير فقط إذا كانت الخيارات كثيرة */
+            overflow-y: auto;
             padding-right: 5px;
             margin-bottom: 10px;
         }
@@ -120,9 +119,9 @@
             font-weight: 700;
         }
 
-        .flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
 
-        input {
+        input, textarea {
             width: 100%;
             padding: 12px;
             margin: 8px 0;
@@ -142,6 +141,10 @@
             width: 100%;
         }
 
+        .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
+        .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
+        .btn-warning { background: linear-gradient(105deg, #f39c12, #e67e22); color: #000; }
+
         footer {
             padding: 8px;
             color: #528d7c;
@@ -150,7 +153,6 @@
             flex-shrink: 0;
         }
 
-        /* Scrollbar styling for a cleaner look */
         .quiz-content::-webkit-scrollbar { width: 4px; }
         .quiz-content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
 
@@ -158,6 +160,25 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .question-item {
+            background: #f8fafc;
+            border-radius: 16px;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-right: 3px solid #2c9b7a;
+        }
+        .correct-badge {
+            background: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            display: inline-block;
+            margin: 6px 0;
+        }
+        .batch-area { background: #f1f5f9; border-radius: 20px; padding: 10px; margin: 10px 0; }
+        textarea.batch-json { font-family: monospace; direction: ltr; text-align: left; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -175,6 +196,17 @@
         </div>
     </div>
 
+    <!-- شاشة التسجيل -->
+    <div id="registerScreen" class="screen">
+        <div class="card" style="justify-content: center;">
+            <h2>📝 تسجيل جديد</h2>
+            <input type="text" id="regUser" placeholder="الاسم الكامل">
+            <input type="password" id="regPass" placeholder="كلمة السر">
+            <button class="btn" onclick="doRegister()">إرسال الطلب</button>
+            <button class="btn" style="background:#aaa;" onclick="showScreen('loginScreen')">رجوع</button>
+        </div>
+    </div>
+
     <!-- شاشة الطالب -->
     <div id="studentScreen" class="screen">
         <div class="card">
@@ -182,42 +214,51 @@
                 <span class="status-pill" id="qCounter">--</span>
                 <span class="status-pill" id="scoreValue">⭐ 0</span>
             </div>
-            
             <div class="quiz-content" id="quizScrollArea">
                 <div id="qText" class="question-text"></div>
                 <div id="optionsGrid"></div>
                 <div id="expBox" class="exp-box" style="display:none;"></div>
             </div>
-
             <button class="btn" style="background:#e2edf0; color:#4a5568; margin-top: auto;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
 
-    <!-- لوحة الإدارة -->
+    <!-- لوحة الإدارة (مكتملة) -->
     <div id="adminScreen" class="screen">
         <div class="card">
             <h3 style="margin-bottom:10px; color:#5f4b8b;">🔧 لوحة الإدارة</h3>
             <div class="quiz-content" id="adminList">
-                <button class="btn" style="background:#5f4b8b; margin-bottom:10px;" onclick="showAddSingleForm()">➕ إضافة سؤال جديد</button>
-                <div id="adminQuestionsList"></div>
+                <div class="batch-area">
+                    <button class="btn btn-admin" onclick="toggleBatchJson()">📦 إضافة دفعة JSON (50+ سؤال)</button>
+                    <div id="batchJsonPanel" style="display:none; margin-top:10px;">
+                        <textarea id="batchJsonInput" rows="8" class="batch-json" placeholder='[
+  { "q": "نص السؤال؟", "o": ["خيار1","خيار2","خيار3","خيار4"], "c": "الإجابة الصحيحة", "e": "تفسير..." }
+]'></textarea>
+                        <button class="btn btn-admin" onclick="addBatchQuestions()">➕ إضافة الدفعة</button>
+                        <button class="btn" style="background:#aaa;" onclick="toggleBatchJson()">إلغاء</button>
+                    </div>
+                </div>
+                <button class="btn btn-admin" onclick="showAddSingleForm()">➕ إضافة سؤال واحد</button>
+                <button class="btn btn-danger" onclick="deleteAllQuestions()" style="margin-top:5px;">🗑️ حذف جميع الأسئلة</button>
+                <div id="adminQuestionsList" style="margin-top: 15px;"></div>
             </div>
             <button class="btn" onclick="logout()">🚪 تسجيل خروج</button>
         </div>
     </div>
 
-    <!-- مودال الإضافة (مبسط) -->
+    <!-- مودال الإضافة / التعديل -->
     <div id="singleModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
-        <div class="card" style="flex:0 1 auto; width:100%; max-width:400px; max-height:90vh; overflow-y:auto;">
-            <h3>📌 تفاصيل السؤال</h3>
+        <div class="card" style="flex:0 1 auto; width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+            <h3 id="modalTitle">📌 إضافة سؤال</h3>
             <input type="text" id="newQ" placeholder="نص السؤال">
             <input type="text" id="newOpt1" placeholder="خيار 1">
             <input type="text" id="newOpt2" placeholder="خيار 2">
             <input type="text" id="newOpt3" placeholder="خيار 3">
             <input type="text" id="newOpt4" placeholder="خيار 4">
-            <input type="text" id="newCorrect" placeholder="الإجابة الصحيحة">
-            <textarea id="newExp" style="width:100%; border-radius:15px; padding:10px; border:1px solid #ddd;" placeholder="التفسير"></textarea>
+            <input type="text" id="newCorrect" placeholder="الإجابة الصحيحة (نص مطابق)" style="background:#e8f0fe;">
+            <textarea id="newExp" rows="2" placeholder="التفسير السريري"></textarea>
             <div class="flex-row" style="margin-top:10px; gap:10px;">
-                <button class="btn" id="saveQuestionBtn">حفظ</button>
+                <button class="btn" id="saveQuestionBtn">💾 حفظ</button>
                 <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء</button>
             </div>
         </div>
@@ -227,7 +268,6 @@
 </div>
 
 <script>
-// الإعدادات وقاعدة البيانات
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
@@ -241,19 +281,19 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
+let editModeId = null;  // للتعديل
 
 window.onload = checkPersistentLogin;
 
+// دوال تسجيل الدخول والتسجيل
 async function checkPersistentLogin() {
     const u = localStorage.getItem('dentalQuizUser'), p = localStorage.getItem('dentalQuizPass');
     if (u && p) await handleLoginLogic(u, p, true);
 }
-
 async function doLogin() {
     const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
     await handleLoginLogic(u, p, false);
 }
-
 async function handleLoginLogic(u, p, isAuto) {
     if(!p) return;
     if(p === "salem1959") {
@@ -267,26 +307,35 @@ async function handleLoginLogic(u, p, isAuto) {
             localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
             await loadQuestions(); startStudentQuiz();
         } else if(!isAuto) alert("الحساب خاطئ أو غير مفعل");
-    } catch(e) {}
+    } catch(e) { console.error(e); }
+}
+async function doRegister() {
+    let u = document.getElementById('regUser').value.trim();
+    let p = document.getElementById('regPass').value.trim();
+    if(!u || !p) return alert("املأ الحقول");
+    await db.ref('users/'+makeKey(u)).set({ name: u, password: p, status: 'pending' });
+    alert("تم إرسال الطلب. سيتم تفعيله من قبل المدير.");
+    showScreen('loginScreen');
 }
 
+// تحميل الأسئلة
 async function loadQuestions() {
     let snap = await db.ref('questions').once('value');
     let data = snap.val();
     questionsList = data ? Object.entries(data).map(([id,q])=>({...q, firebaseId:id})) : [];
 }
 
+// بدء اختبار الطالب
 function startStudentQuiz() {
-    if(!questionsList.length) return (alert("لا توجد أسئلة."), logout());
+    if(!questionsList.length) { alert("لا توجد أسئلة بعد، أضف أسئلة من لوحة الإدارة."); logout(); return; }
     quizQuestions = [...questionsList].sort(()=>Math.random()-0.5);
     quizScore = 0; quizIndex = 0;
     showScreen('studentScreen');
     renderQuiz();
 }
-
 function renderQuiz() {
     if(quizIndex >= quizQuestions.length) { 
-        alert(`تم الانتهاء! النقاط: ${quizScore}`);
+        alert(`🎉 تم الانتهاء! نقاطك: ${quizScore}`);
         startStudentQuiz(); return; 
     }
     let q = quizQuestions[quizIndex];
@@ -316,42 +365,154 @@ function renderQuiz() {
             document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;
             document.getElementById('expBox').innerHTML = `<b>📘 التفسير:</b> ${q.e || "لا يوجد"}`;
             document.getElementById('expBox').style.display = 'block';
-            
-            // تمرير تلقائي للشرح إذا ظهر في الأسفل
-            setTimeout(() => {
-                document.getElementById('quizScrollArea').scrollTo({top: 500, behavior: 'smooth'});
-            }, 100);
-
             setTimeout(()=>{ quizIndex++; renderQuiz(); }, 2000);
         };
         grid.appendChild(div);
     });
 }
 
+// لوحة الإدارة
 function showAdminPanel() { showScreen('adminScreen'); renderAdminList(); }
 function renderAdminList() {
     let container = document.getElementById('adminQuestionsList');
+    if(!container) return;
+    if(questionsList.length === 0) { container.innerHTML = "<p>⚠️ لا توجد أسئلة. أضف دفعة JSON أو سؤالاً واحداً.</p>"; return; }
     container.innerHTML = "";
-    questionsList.forEach((q,i)=>{
-        let d = document.createElement('div');
-        d.style.padding = "10px"; d.style.borderBottom = "1px solid #eee";
-        d.innerHTML = `<div>${i+1}. ${q.q}</div><button onclick="deleteQuestion('${q.firebaseId}')" style="color:red; border:none; background:none; cursor:pointer;">حذف</button>`;
-        container.appendChild(d);
+    questionsList.forEach((q, idx) => {
+        let div = document.createElement('div');
+        div.className = "question-item";
+        div.innerHTML = `
+            <div><strong>${idx+1}. ${q.q}</strong></div>
+            <div class="correct-badge">✅ الإجابة الصحيحة: ${q.c}</div>
+            <div class="flex-row" style="margin-top: 8px;">
+                <button class="btn" style="background:#ffb703; color:#000; width:auto; padding:6px 15px;" onclick="editQuestion('${q.firebaseId}')">✏️ تعديل</button>
+                <button class="btn" style="background:#e17055; width:auto; padding:6px 15px;" onclick="deleteQuestion('${q.firebaseId}')">🗑️ حذف</button>
+            </div>
+        `;
+        container.appendChild(div);
     });
 }
 
+// حذف واحد
+async function deleteQuestion(id) { 
+    if(confirm("حذف هذا السؤال نهائياً؟")) { 
+        await db.ref('questions/'+id).remove(); 
+        await loadQuestions(); 
+        renderAdminList(); 
+    } 
+}
+// حذف الكل
+async function deleteAllQuestions() {
+    if(!confirm("⚠️ تحذير: سيتم حذف جميع الأسئلة نهائياً. هل أنت متأكد؟")) return;
+    const updates = {};
+    questionsList.forEach(q => { updates[`questions/${q.firebaseId}`] = null; });
+    await db.ref().update(updates);
+    await loadQuestions();
+    renderAdminList();
+    alert("تم حذف جميع الأسئلة.");
+}
+
+// إضافة دفعة JSON
+function toggleBatchJson() {
+    let panel = document.getElementById('batchJsonPanel');
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    if(panel.style.display === 'block') document.getElementById('batchJsonInput').value = '';
+}
+async function addBatchQuestions() {
+    let jsonText = document.getElementById('batchJsonInput').value.trim();
+    if(!jsonText) return alert("الصق مصفوفة JSON.");
+    let batch;
+    try { batch = JSON.parse(jsonText); }
+    catch(e) { return alert("خطأ في JSON: " + e.message); }
+    if(!Array.isArray(batch)) return alert("يجب أن تكون البيانات مصفوفة (array).");
+    if(batch.length === 0) return alert("المصفوفة فارغة.");
+    let added = 0;
+    for(let item of batch) {
+        if(!item.q || !item.o || !item.c || !item.e) { alert(`سؤال ناقص: ${JSON.stringify(item)}`); continue; }
+        if(!Array.isArray(item.o) || item.o.length !== 4) { alert(`الخيارات يجب أن تكون 4: ${item.q}`); continue; }
+        if(!item.o.includes(item.c)) { alert(`الإجابة "${item.c}" غير موجودة في خيارات: ${item.q}`); continue; }
+        await db.ref('questions').push({ q: item.q, o: item.o, c: item.c, e: item.e });
+        added++;
+    }
+    alert(`✅ تمت إضافة ${added} سؤال.`);
+    toggleBatchJson();
+    await loadQuestions();
+    renderAdminList();
+}
+
+// إضافة / تعديل سؤال واحد
+function showAddSingleForm() {
+    editModeId = null;
+    document.getElementById('modalTitle').innerText = "➕ إضافة سؤال";
+    document.getElementById('newQ').value = '';
+    document.getElementById('newOpt1').value = '';
+    document.getElementById('newOpt2').value = '';
+    document.getElementById('newOpt3').value = '';
+    document.getElementById('newOpt4').value = '';
+    document.getElementById('newCorrect').value = '';
+    document.getElementById('newExp').value = '';
+    document.getElementById('singleModal').style.display = 'flex';
+    document.getElementById('saveQuestionBtn').onclick = () => addSingleQuestion();
+}
+async function addSingleQuestion() {
+    let q = document.getElementById('newQ').value.trim();
+    let o = [
+        document.getElementById('newOpt1').value.trim(),
+        document.getElementById('newOpt2').value.trim(),
+        document.getElementById('newOpt3').value.trim(),
+        document.getElementById('newOpt4').value.trim()
+    ];
+    let c = document.getElementById('newCorrect').value.trim();
+    let e = document.getElementById('newExp').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e) return alert("املأ جميع الحقول.");
+    if(!o.includes(c)) return alert("⚠️ الإجابة الصحيحة غير موجودة في الخيارات الأربعة.");
+    await db.ref('questions').push({ q, o, c, e });
+    alert("تمت الإضافة.");
+    closeModal();
+    await loadQuestions();
+    renderAdminList();
+}
+function editQuestion(id) {
+    let qObj = questionsList.find(q => q.firebaseId === id);
+    if(!qObj) return;
+    editModeId = id;
+    document.getElementById('modalTitle').innerText = "✏️ تعديل سؤال";
+    document.getElementById('newQ').value = qObj.q;
+    document.getElementById('newOpt1').value = qObj.o[0];
+    document.getElementById('newOpt2').value = qObj.o[1];
+    document.getElementById('newOpt3').value = qObj.o[2];
+    document.getElementById('newOpt4').value = qObj.o[3];
+    document.getElementById('newCorrect').value = qObj.c;
+    document.getElementById('newExp').value = qObj.e;
+    document.getElementById('singleModal').style.display = 'flex';
+    document.getElementById('saveQuestionBtn').onclick = () => updateQuestion(id);
+}
+async function updateQuestion(id) {
+    let q = document.getElementById('newQ').value.trim();
+    let o = [
+        document.getElementById('newOpt1').value.trim(),
+        document.getElementById('newOpt2').value.trim(),
+        document.getElementById('newOpt3').value.trim(),
+        document.getElementById('newOpt4').value.trim()
+    ];
+    let c = document.getElementById('newCorrect').value.trim();
+    let e = document.getElementById('newExp').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e) return alert("املأ جميع الحقول.");
+    if(!o.includes(c)) return alert("⚠️ الإجابة الصحيحة غير موجودة في الخيارات.");
+    await db.ref('questions/'+id).set({ q, o, c, e });
+    alert("تم التعديل.");
+    closeModal();
+    await loadQuestions();
+    renderAdminList();
+}
+
+function closeModal() { document.getElementById('singleModal').style.display = 'none'; editModeId = null; }
 function showScreen(id) { 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
 }
 function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
 function logout() { localStorage.clear(); location.reload(); }
-function closeModal() { document.getElementById('singleModal').style.display = 'none'; }
-function showAddSingleForm() { document.getElementById('singleModal').style.display = 'flex'; }
-
-async function deleteQuestion(id) { 
-    if(confirm("حذف؟")) { await db.ref('questions/'+id).remove(); await loadQuestions(); renderAdminList(); } 
-}
 </script>
 </body>
 </html>
