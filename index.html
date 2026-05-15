@@ -470,11 +470,14 @@ db.ref(".info/connected").on("value", function(snap) {
 let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
 let editModeId = null;
 
+// فحص وجود الحساب المسجل تلقائياً عند فتح التطبيق لضمان بقاء الدخول مستمراً
 window.onload = checkPersistentLogin;
 
 async function checkPersistentLogin() {
     const u = localStorage.getItem('dentalQuizUser'), p = localStorage.getItem('dentalQuizPass');
-    if (u && p) await handleLoginLogic(u, p, true);
+    if (u && p) {
+        await handleLoginLogic(u, p, true);
+    }
 }
 
 async function doLogin() {
@@ -802,6 +805,7 @@ function showScreen(id) {
 
 function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
 
+// دالة تسجيل الخروج الفعلي ومسح الذاكرة لإيقاف الدخول المستمر
 function logout() { 
     db.ref('users').off();
     localStorage.clear(); 
