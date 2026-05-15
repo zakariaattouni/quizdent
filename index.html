@@ -71,20 +71,7 @@
         <div class="batch-area">
             <button class="btn btn-admin" onclick="toggleBatchJson()">📦 إضافة دفعة JSON (50 سؤال فأكثر)</button>
             <div id="batchJsonPanel" style="display:none; margin-top:10px;">
-                <textarea id="batchJsonInput" rows="12" placeholder='[
-  {
-    "q": "نص السؤال الأول؟",
-    "o": ["خيار1", "خيار2", "خيار3", "خيار4"],
-    "c": "الإجابة الصحيحة",
-    "e": "تفسير الإجابة..."
-  },
-  {
-    "q": "السؤال الثاني؟",
-    "o": ["أ", "ب", "ج", "د"],
-    "c": "ب",
-    "e": "شرح ..."
-  }
-]' style="direction:ltr; text-align:left;"></textarea>
+                <textarea id="batchJsonInput" rows="12" placeholder='[{"q": "نص السؤال", "o": ["1","2","3","4"], "c": "1", "e": "شرح"}]' style="direction:ltr; text-align:left;"></textarea>
                 <button class="btn btn-admin" onclick="addBatchQuestions()">➕ إضافة الدفعة إلى قاعدة البيانات</button>
                 <button class="btn" style="background:#aaa;" onclick="toggleBatchJson()">إلغاء</button>
             </div>
@@ -127,18 +114,30 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let currentUserType = null; // 'admin' or 'student'
+let currentUserType = null;
 let questionsList = [];
 let quizQuestions = [], quizScore = 0, quizIndex = 0;
 
-// ========== دوال عامة ==========
+// تشغيل عند تحميل الصفحة للتحقق من الجلسة السابقة
+window.onload = function() {
+    checkPersistentLogin();
+};
+
+async function checkPersistentLogin() {
+    const savedUser = localStorage.getItem('dentalQuizUser');
+    const savedPass = localStorage.getItem('dentalQuizPass');
+    if (savedUser && savedPass) {
+        // محاولة تسجيل الدخول تلقائياً بالبيانات المحفوظة
+        await handleLoginLogic(savedUser, savedPass, true);
+    }
+}
+
 function showScreen(id) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
 function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
 
-// ========== تسجيل طالب ==========
 async function doRegister() {
     let u = document.getElementById('regUser').value.trim();
     let p = document.getElementById('regPass').value.trim();
@@ -148,48 +147,61 @@ async function doRegister() {
     showScreen('loginScreen');
 }
 
-// ========== دخول ==========
 async function doLogin() {
     let u = document.getElementById('username').value.trim();
     let p = document.getElementById('password').value.trim();
-    
-    // مدير
+    await handleLoginLogic(u, p, false);
+}
+
+// دالة منطق تسجيل الدخول الموحدة
+async function handleLoginLogic(u, p, isAuto) {
+    if(!u || !p) return;
+
+    // حالة المدير
     if(u === "admin" && p === "salem1959") {
         currentUserType = 'admin';
+        localStorage.setItem('dentalQuizUser', u);
+        localStorage.setItem('dentalQuizPass', p);
         await loadQuestions();
         showAdminPanel();
         return;
     }
     
-    // طالب
-    let snap = await db.ref('users/'+makeKey(u)).once('value');
-    let data = snap.val();
-    if(data && data.password === p && data.status === 'active') {
-        currentUserType = 'student';
-        await loadQuestions();
-        startStudentQuiz();
-    } else {
-        alert("بيانات خاطئة أو الحساب غير مفعل");
+    // حالة الطالب
+    try {
+        let snap = await db.ref('users/'+makeKey(u)).once('value');
+        let data = snap.val();
+        if(data && data.password === p && data.status === 'active') {
+            currentUserType = 'student';
+            localStorage.setItem('dentalQuizUser', u);
+            localStorage.setItem('dentalQuizPass', p);
+            await loadQuestions();
+            startStudentQuiz();
+        } else {
+            if(!isAuto) alert("بيانات خاطئة أو الحساب غير مفعل");
+            if(isAuto) logout(); 
+        }
+    } catch(e) {
+        console.error("Login Error", e);
     }
 }
 
-// ========== تحميل الأسئلة ==========
 async function loadQuestions() {
     let snap = await db.ref('questions').once('value');
     let data = snap.val();
     questionsList = data ? Object.entries(data).map(([id,q])=>({...q, firebaseId:id})) : [];
 }
 
-// ========== واجهة المدير ==========
 function showAdminPanel() {
     showScreen('adminScreen');
     renderAdminList();
 }
+
 function renderAdminList() {
     let container = document.getElementById('adminQuestionsList');
     if(!container) return;
     if(questionsList.length===0) {
-        container.innerHTML = "<p>⚠️ لا توجد أسئلة. استخدم إضافة دفعة JSON أو أضف سؤالاً واحداً.</p>";
+        container.innerHTML = "<p>⚠️ لا توجد أسئلة.</p>";
         return;
     }
     container.innerHTML = "";
@@ -205,79 +217,48 @@ function renderAdminList() {
     });
 }
 
-// ========== إضافة دفعة JSON ==========
 function toggleBatchJson() {
     let panel = document.getElementById('batchJsonPanel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    if(panel.style.display === 'block') document.getElementById('batchJsonInput').value = '';
 }
+
 async function addBatchQuestions() {
     let jsonText = document.getElementById('batchJsonInput').value.trim();
     if(!jsonText) return alert("الرجاء لصق مصفوفة JSON.");
     let batch;
-    try {
-        batch = JSON.parse(jsonText);
-    } catch(e) {
-        return alert("خطأ في صيغة JSON: " + e.message);
-    }
-    if(!Array.isArray(batch)) return alert("يجب أن تكون البيانات مصفوفة (array) من الأسئلة.");
-    if(batch.length === 0) return alert("المصفوفة فارغة.");
+    try { batch = JSON.parse(jsonText); } catch(e) { return alert("خطأ في JSON"); }
     
     let added = 0;
     for(let item of batch) {
-        if(!item.q || !item.o || !item.c || !item.e) {
-            alert(`سؤال ناقص: ${JSON.stringify(item)}`);
-            continue;
-        }
-        if(!Array.isArray(item.o) || item.o.length !== 4) {
-            alert(`الخيارات يجب أن تكون مصفوفة من 4 عناصر: ${item.q}`);
-            continue;
-        }
-        if(!item.o.includes(item.c)) {
-            alert(`الإجابة الصحيحة "${item.c}" غير موجودة ضمن خيارات السؤال: ${item.q}`);
-            continue;
-        }
-        await db.ref('questions').push({
-            q: item.q,
-            o: item.o,
-            c: item.c,
-            e: item.e
-        });
+        await db.ref('questions').push({ q: item.q, o: item.o, c: item.c, e: item.e });
         added++;
     }
-    alert(`✅ تمت إضافة ${added} سؤال بنجاح.`);
+    alert(`✅ تمت إضافة ${added} سؤال.`);
     toggleBatchJson();
     await loadQuestions();
     renderAdminList();
 }
 
-// ========== إضافة سؤال واحد ==========
-let editModeId = null;
 function showAddSingleForm() {
-    editModeId = null;
     document.getElementById('modalTitle').innerText = "إضافة سؤال";
     document.querySelectorAll('#singleModal input, #singleModal textarea').forEach(el=>el.value='');
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => addSingleQuestion();
 }
+
 async function addSingleQuestion() {
     let q = document.getElementById('newQ').value.trim();
-    let o = [ document.getElementById('newOpt1').value.trim(), document.getElementById('newOpt2').value.trim(), document.getElementById('newOpt3').value.trim(), document.getElementById('newOpt4').value.trim() ];
+    let o = [document.getElementById('newOpt1').value, document.getElementById('newOpt2').value, document.getElementById('newOpt3').value, document.getElementById('newOpt4').value];
     let c = document.getElementById('newCorrect').value.trim();
     let e = document.getElementById('newExp').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e) return alert("املأ جميع الحقول");
-    if(!o.includes(c)) return alert("الإجابة الصحيحة غير موجودة في الخيارات");
     await db.ref('questions').push({q,o,c,e});
-    alert("تمت الإضافة");
     closeModal();
     await loadQuestions();
     renderAdminList();
 }
+
 function editQuestion(id) {
     let qq = questionsList.find(x=>x.firebaseId===id);
-    if(!qq) return;
-    editModeId = id;
-    document.getElementById('modalTitle').innerText = "تعديل سؤال";
     document.getElementById('newQ').value = qq.q;
     document.getElementById('newOpt1').value = qq.o[0];
     document.getElementById('newOpt2').value = qq.o[1];
@@ -288,60 +269,49 @@ function editQuestion(id) {
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => updateQuestion(id);
 }
+
 async function updateQuestion(id) {
-    let q = document.getElementById('newQ').value.trim();
-    let o = [ document.getElementById('newOpt1').value.trim(), document.getElementById('newOpt2').value.trim(), document.getElementById('newOpt3').value.trim(), document.getElementById('newOpt4').value.trim() ];
-    let c = document.getElementById('newCorrect').value.trim();
-    let e = document.getElementById('newExp').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e) return alert("املأ الحقول");
-    if(!o.includes(c)) return alert("الإجابة غير مطابقة");
+    let q = document.getElementById('newQ').value;
+    let o = [document.getElementById('newOpt1').value, document.getElementById('newOpt2').value, document.getElementById('newOpt3').value, document.getElementById('newOpt4').value];
+    let c = document.getElementById('newCorrect').value;
+    let e = document.getElementById('newExp').value;
     await db.ref('questions/'+id).set({q,o,c,e});
-    alert("تم التعديل");
     closeModal();
     await loadQuestions();
     renderAdminList();
 }
+
 async function deleteQuestion(id) {
-    if(confirm("حذف هذا السؤال نهائياً؟")) {
+    if(confirm("حذف؟")) {
         await db.ref('questions/'+id).remove();
         await loadQuestions();
         renderAdminList();
     }
 }
-function closeModal() {
-    document.getElementById('singleModal').style.display = 'none';
-    editModeId = null;
-}
 
-// ========== واجهة الطالب ==========
+function closeModal() { document.getElementById('singleModal').style.display = 'none'; }
+
 function startStudentQuiz() {
-    if(questionsList.length === 0) {
-        alert("⚠️ لا توجد أسئلة بعد. الرجاء مراجعة المدير.");
-        logout();
-        return;
-    }
-    quizQuestions = [...questionsList];
-    for(let i=quizQuestions.length-1;i>0;i--) { let j=Math.floor(Math.random()*(i+1)); [quizQuestions[i],quizQuestions[j]]=[quizQuestions[j],quizQuestions[i]]; }
-    quizScore = 0;
-    quizIndex = 0;
-    document.getElementById('scoreValue').innerText = `النقاط: 0`;
+    if(questionsList.length === 0) return (alert("لا توجد أسئلة"), logout());
+    quizQuestions = [...questionsList].sort(()=>Math.random()-0.5);
+    quizScore = 0; quizIndex = 0;
     showScreen('studentScreen');
     renderQuiz();
 }
+
 function renderQuiz() {
     if(quizIndex >= quizQuestions.length) {
-        alert(`🎉 أكملت جميع الأسئلة (${quizQuestions.length})! نقاطك: ${quizScore}`);
-        logout();
-        return;
+        alert("انتهت الأسئلة!");
+        return startStudentQuiz(); // إعادة تشغيل أو تخصيص نهاية
     }
     let q = quizQuestions[quizIndex];
     document.getElementById('qCounter').innerText = `السؤال: ${quizIndex+1} / ${quizQuestions.length}`;
+    document.getElementById('scoreValue').innerText = `النقاط: ${quizScore}`;
     document.getElementById('qText').innerText = q.q;
     document.getElementById('expBox').style.display = 'none';
     let grid = document.getElementById('optionsGrid');
     grid.innerHTML = "";
-    let shuffled = [...q.o].sort(()=>Math.random()-0.5);
-    shuffled.forEach(opt=>{
+    q.o.forEach(opt=>{
         let btn = document.createElement('div');
         btn.className = 'option-card';
         btn.innerText = opt;
@@ -354,10 +324,8 @@ function renderQuiz() {
                 btn.classList.add('wrong-card');
                 Array.from(grid.children).forEach(ch=>{ if(ch.innerText===q.c) ch.classList.add('correct-card'); });
             }
-            document.getElementById('scoreValue').innerText = `النقاط: ${quizScore}`;
-            let expDiv = document.getElementById('expBox');
-            expDiv.innerHTML = `<b>📘 التفسير:</b> ${q.e}`;
-            expDiv.style.display = 'block';
+            document.getElementById('expBox').innerHTML = `<b>📘 التفسير:</b> ${q.e}`;
+            document.getElementById('expBox').style.display = 'block';
             setTimeout(()=>{ quizIndex++; renderQuiz(); }, 2500);
         };
         grid.appendChild(btn);
@@ -365,10 +333,13 @@ function renderQuiz() {
 }
 
 function logout() {
+    // مسح البيانات المحفوظة عند الخروج الصريح فقط
+    localStorage.removeItem('dentalQuizUser');
+    localStorage.removeItem('dentalQuizPass');
     currentUserType = null;
-    showScreen('loginScreen');
     document.getElementById('username').value = '';
     document.getElementById('password').value = '';
+    showScreen('loginScreen');
 }
 </script>
 </body>
