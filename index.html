@@ -15,321 +15,73 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', 'Tajawal', system-ui, sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-        .app-container {
-            width: 100%;
-            max-width: 580px;
-            background: transparent;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        /* الهيدر */
-        .app-header {
-            background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
-            border-radius: 24px;
-            padding: 15px 20px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        .app-header h1 {
-            color: white;            font-size: 1.3rem;
-            margin-bottom: 5px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .app-header p {
-            color: rgba(255,255,255,0.9);
-            font-size: 0.85rem;
-        }
-        /* مؤشر الاتصال */
-        .db-status-dot {
-            width: 10px;
-            height: 10px;
-            background-color: #e17055; /* أحمر افتراضي قبل الاتصال */
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 8px #e17055;
-            transition: all 0.4s ease;
-        }
-        
-        .db-status-dot.connected {
-            background-color: #00b894; /* أخضر عند نجاح الاتصال */
-            box-shadow: 0 0 8px #00b894;
-        }
-        .screen {
-            display: none;
-            animation: fadeSlideUp 0.3s ease-out;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Tajawal', system-ui, sans-serif; }
+        body { background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .app-container { width: 100%; max-width: 580px; background: transparent; display: flex; flex-direction: column; gap: 10px; }
+        .app-header { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 15px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .app-header h1 { color: white; font-size: 1.3rem; margin-bottom: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .app-header p { color: rgba(255,255,255,0.9); font-size: 0.85rem; }
+        .db-status-dot { width: 10px; height: 10px; background-color: #e17055; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #e17055; transition: all 0.4s ease; }
+        .db-status-dot.connected { background-color: #00b894; box-shadow: 0 0 8px #00b894; }
+        .screen { display: none; animation: fadeSlideUp 0.3s ease-out; }
         .active { display: block; }
-        .card {
-            background: rgba(255, 255, 255, 0.98);
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(66, 153, 225, 0.15);
-        }
-        /* شاشة الطالب تحتاج ارتفاع محدد */
-        #studentScreen .card {
-            min-height: 500px;
-            display: flex;
-            flex-direction: column;
-        }
-        .quiz-content {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 5px;
-            margin: 15px 0;
-            max-height: 400px;        }
-        h2 {
-            color: #1e4a6e;
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 10px;
-        }
-        .question-text {
-            font-size: 1.2rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            color: #1f3e48;
-            line-height: 1.4;
-        }
-        .option-card {
-            background: #fafefd;
-            border: 1.5px solid #e2f0ed;
-            padding: 12px 20px;
-            border-radius: 50px;
-            cursor: pointer;
-            margin-bottom: 8px;
-            text-align: right;
-            font-weight: 600;
-            font-size: 0.95rem;
-            transition: all 0.2s ease;
-        }
-        .correct-card {
-            background: linear-gradient(135deg, #00b894, #009688) !important;
-            color: white !important;
-            border: none !important;
-        }
-        .wrong-card {
-            background: linear-gradient(135deg, #ff7675, #d63031) !important;
-            color: white !important;
-            border: none !important;
-        }
-        .exp-box {
-            background: #fff7e5;
-            border-right: 4px solid #f4b942;
-            padding: 10px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            color: #7a5a2a;
-        }
-        .status-pill {
-            background: #e6f4f0;
-            color: #1f6e5c;
-            padding: 5px 12px;
-            border-radius: 20px;            font-size: 0.8rem;
-            font-weight: 700;
-        }
-        .flex-row { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 10px; 
-            gap: 10px; 
-            flex-wrap: wrap; 
-        }
-        input, textarea {
-            width: 100%;
-            padding: 12px;
-            margin: 8px 0;
-            border-radius: 20px;
-            border: 1px solid #dceaf2;
-            outline: none;
-        }
-        .btn {
-            background: linear-gradient(105deg, #1f7b6e, #2c9b7a);
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 40px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            transition: transform 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
+        .card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border: 1px solid rgba(66, 153, 225, 0.15); }
+        #studentScreen .card { min-height: 500px; display: flex; flex-direction: column; }
+        .quiz-content { flex: 1; overflow-y: auto; padding-right: 5px; margin: 15px 0; max-height: 400px; }
+        h2 { color: #1e4a6e; font-size: 1.5rem; text-align: center; margin-bottom: 10px; }
+        .question-text { font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; color: #1f3e48; line-height: 1.4; }
+        .option-card { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; cursor: pointer; margin-bottom: 8px; text-align: right; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; }
+        .correct-card { background: linear-gradient(135deg, #00b894, #009688) !important; color: white !important; border: none !important; }
+        .wrong-card { background: linear-gradient(135deg, #ff7675, #d63031) !important; color: white !important; border: none !important; }
+        .exp-box { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; font-size: 0.9rem; margin-top: 5px; color: #7a5a2a; }
+        .status-pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; }
+        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-warning { background: linear-gradient(105deg, #f39c12, #e67e22); color: #000; }
-        /* الفوتر */
-        .app-footer {
-            background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
-            border-radius: 24px;
-            padding: 12px;
-            text-align: center;
-            color: white;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
+        .app-footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; font-weight: 500; }
         .quiz-content::-webkit-scrollbar { width: 4px; }
         .quiz-content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(10px); }            to { opacity: 1; transform: translateY(0); }
-        }
-        .question-item {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 12px;
-            border-right: 3px solid #2c9b7a;
-        }
-        
-        .correct-badge {
-            background: #d4edda;
-            color: #155724;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            display: inline-block;
-            margin: 6px 0;
-        }
-        
-        .batch-area { 
-            background: #f1f5f9; 
-            border-radius: 20px; 
-            padding: 10px; 
-            margin: 10px 0; 
-        }
-        
-        textarea.batch-json { 
-            font-family: monospace; 
-            direction: ltr; 
-            text-align: left; 
-            font-size: 0.8rem; 
-        }
-        .admin-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        /* تنسيقات إدارة المشتركين */
-        .admin-section-title {
-            margin: 20px 0 10px 0;
-            color: #1e4a6e;
-            border-bottom: 2px solid #e2f0ed;
-            padding-bottom: 5px;
-            font-size: 1.1rem;
-        }
-        /* حاوية قابلة للطي والفتح للمشتركين */
-        .collapse-container {
-            display: none;
-            margin-top: 10px;            animation: fadeSlideUp 0.2s ease-out;
-        }
-        
-        .collapse-container.show {
-            display: block;
-        }
-        .user-item {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-right: 3px solid #6c5ce7;
-        }
-        .status-tag {
-            font-size: 0.75rem;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-weight: bold;
-        }
+        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .question-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin-bottom: 12px; border-right: 3px solid #2c9b7a; }
+        .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 6px 0; }        .batch-area { background: #f1f5f9; border-radius: 20px; padding: 10px; margin: 10px 0; }
+        textarea.batch-json { font-family: monospace; direction: ltr; text-align: left; font-size: 0.8rem; }
+        .admin-buttons { display: flex; flex-direction: column; gap: 8px; }
+        .admin-section-title { margin: 20px 0 10px 0; color: #1e4a6e; border-bottom: 2px solid #e2f0ed; padding-bottom: 5px; font-size: 1.1rem; }
+        .collapse-container { display: none; margin-top: 10px; animation: fadeSlideUp 0.2s ease-out; }
+        .collapse-container.show { display: block; }
+        .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin-bottom: 10px; border-right: 3px solid #6c5ce7; }
+        .status-tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
         .status-active { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
         .status-suspended { background: #e2e3e5; color: #383d41; }
-        /* شارة الإشعار لطلبات التسجيل الجديدة */
-        .req-badge {
-            background-color: #d63031;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 8px;
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-right: 8px;
-            animation: pulseNotification 1.5s infinite alternate;
-        }
-        @keyframes pulseNotification {
-            from { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); }
-            to { transform: scale(1.1); box-shadow: 0 0 10px 4px rgba(214, 48, 49, 0); }
-        }
-        /* شاشة التحميل */
-        .loading-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(255,255,255,0.98);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 999;
-            gap: 15px;
-        }        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid #e2f0ed;
-            border-top-color: #2c9b7a;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
+        .req-badge { background-color: #d63031; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-right: 8px; animation: pulseNotification 1.5s infinite alternate; }
+        @keyframes pulseNotification { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 10px 4px rgba(214, 48, 49, 0); } }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 15px; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e2f0ed; border-top-color: #2c9b7a; border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .skip-btn {
-            margin-top: 10px;
-            background: transparent;
-            color: #2c9b7a;
-            border: 1px solid #2c9b7a;
-            padding: 8px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.9rem;
-        }
+        .loading-text { color: #1e4a6e; font-weight: 600; text-align: center; }
+        .loading-sub { color: #666; font-size: 0.85rem; }
+        .skip-btn { margin-top: 10px; background: transparent; color: #2c9b7a; border: 1px solid #2c9b7a; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
         .skip-btn:hover { background: #e6f4f0; }
     </style>
 </head>
 <body>
-<!-- شاشة التحميل مع زر تخطي احتياطي -->
 <div id="loadingOverlay" class="loading-overlay">
     <div class="spinner"></div>
-    <p style="color:#1e4a6e; font-weight:600;">جاري التحقق من الجلسة...</p>
-    <p style="color:#666; font-size:0.85rem;" id="loadingSub">يرجى الانتظار</p>
+    <p class="loading-text">جاري التحقق من الجلسة...</p>
+    <p class="loading-sub" id="loadingSub">يرجى الانتظار</p>
     <button class="skip-btn" onclick="forceLogin()">تسجيل الدخول يدوياً</button>
 </div>
-
 <div class="app-container">
-    <!-- الهيدر - يظهر في جميع الشاشات ومزود بمؤشر الاتصال -->
     <div class="app-header">
-        <h1>🦷 مدرب التشخيص السني <span id="dbStatusDot" class="db-status-dot" title="جاري الاتصال بقاعدة البيانات..."></span></h1>
+        <h1>🦷 مدرب التشخيص السني <span id="dbStatusDot" class="db-status-dot" title="جاري الاتصال..."></span></h1>
         <p>بإشراف د. زكريا محمد عطوني</p>
     </div>
-    <!-- شاشة الدخول -->
+    
     <div id="loginScreen" class="screen">
         <div class="card">
             <h2>🎯 تسجيل الدخول</h2>
@@ -341,8 +93,8 @@
             </p>
         </div>
     </div>
-    <!-- شاشة التسجيل -->    <div id="registerScreen" class="screen">
-        <div class="card">
+    
+    <div id="registerScreen" class="screen">        <div class="card">
             <h2>📝 تسجيل جديد</h2>
             <input type="text" id="regUser" placeholder="الاسم الكامل">
             <input type="password" id="regPass" placeholder="كلمة السر">
@@ -350,7 +102,7 @@
             <button class="btn" style="background:#aaa;" onclick="showScreen('loginScreen')">رجوع</button>
         </div>
     </div>
-    <!-- شاشة الطالب -->
+    
     <div id="studentScreen" class="screen">
         <div class="card">
             <div class="flex-row">
@@ -365,53 +117,39 @@
             <button class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-    <!-- لوحة الإدارة -->
+    
     <div id="adminScreen" class="screen">
         <div class="card">
             <h3 style="margin-bottom:10px; color:#5f4b8b;">🔧 لوحة الإدارة</h3>
             <div class="quiz-content" id="adminList" style="max-height: 450px;">
-                
-                <!-- قسم إدارة الطلاب والمشتركين تم نقله إلى الأعلى هنا -->
-                <h4 class="admin-section-title" style="margin-top: 5px;">👥 إدارة الطلاب والمشتركين</h4>
+                <h4 class="admin-section-title" style="margin-top: 5px;">👥 إدارة الطلاب</h4>
                 <button class="btn btn-admin" id="toggleUsersBtn" onclick="toggleUsersPanel()" style="background: linear-gradient(105deg, #5f4b8b, #6c5ce7); display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <span>📂 عرض قائمة الطلاب المشتركين</span>
+                    <span>📂 عرض قائمة الطلاب</span>
                     <span id="newRequestsBadge" class="req-badge" style="display: none;">0</span>
                 </button>
-                
                 <div id="usersCollapsePanel" class="collapse-container">
                     <div id="adminUsersList"></div>
                 </div>
-                <!-- قسم إدارة الأسئلة في الأسفل -->
                 <h4 class="admin-section-title">📝 إدارة الأسئلة</h4>
                 <div class="batch-area">
-                    <button class="btn btn-admin" onclick="toggleBatchJson()">📦 إضافة دفعة JSON (50+ سؤال)</button>
+                    <button class="btn btn-admin" onclick="toggleBatchJson()">📦 إضافة دفعة JSON</button>
                     <div id="batchJsonPanel" style="display:none; margin-top:10px;">
-                        <textarea id="batchJsonInput" rows="6" class="batch-json" placeholder='[
-  {
-    "q": "ما هو التسوس السني؟",
-    "o": ["مرض بكتيري", "مرض فيروسي", "مرض فطري", "مرض وراثي"],
-    "c": "مرض بكتيري",    "e": "التسوس هو مرض بكتيري متعدد العوامل"
-  }
-]'></textarea>
-                        <button class="btn btn-admin" onclick="addBatchQuestions()">➕ إضافة الدفعة</button>
+                        <textarea id="batchJsonInput" rows="6" class="batch-json" placeholder='[{"q":"سؤال؟","o":["أ","ب","ج","د"],"c":"أ","e":"تفسير"}]'></textarea>
+                        <button class="btn btn-admin" onclick="addBatchQuestions()">➕ إضافة</button>
                         <button class="btn" style="background:#aaa;" onclick="toggleBatchJson()">إلغاء</button>
                     </div>
                 </div>
                 <div class="admin-buttons">
-                    <button class="btn btn-admin" onclick="showAddSingleForm()">➕ إضافة سؤال واحد</button>
-                    <button class="btn btn-danger" onclick="deleteAllQuestions()">🗑️ حذف جميع الأسئلة</button>
+                    <button class="btn btn-admin" onclick="showAddSingleForm()">➕ إضافة سؤال</button>
+                    <button class="btn btn-danger" onclick="deleteAllQuestions()">🗑️ حذف الكل</button>
                 </div>
-                <div id="adminQuestionsList" style="margin-top: 15px;"></div>
-            </div>
-            <button class="btn" style="margin-top: 10px;" onclick="logout()">🚪 تسجيل خروج</button>
+                <div id="adminQuestionsList" style="margin-top: 15px;"></div>            </div>
+            <button class="btn" style="margin-top: 10px;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-    <!-- الفوتر - يظهر في جميع الشاشات -->
-    <div class="app-footer">
-        🦷 إعداد الدكتور زكريا محمد عطوني | جميع الحقوق محفوظة © 2026
-    </div>
+    
+    <div class="app-footer">🦷 د. زكريا محمد عطوني | © 2026</div>
 </div>
-<!-- مودال الإضافة / التعديل -->
 <div id="singleModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
     <div class="card" style="flex:0 1 auto; width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
         <h3 id="modalTitle">📌 إضافة سؤال</h3>
@@ -420,7 +158,7 @@
         <input type="text" id="newOpt2" placeholder="خيار 2">
         <input type="text" id="newOpt3" placeholder="خيار 3">
         <input type="text" id="newOpt4" placeholder="خيار 4">
-        <input type="text" id="newCorrect" placeholder="الإجابة الصحيحة (نص مطابق)" style="background:#e8f0fe;">
+        <input type="text" id="newCorrect" placeholder="الإجابة الصحيحة" style="background:#e8f0fe;">
         <textarea id="newExp" rows="2" placeholder="التفسير السريري"></textarea>
         <div class="flex-row" style="margin-top:10px; gap:10px;">
             <button class="btn" id="saveQuestionBtn">💾 حفظ</button>
@@ -429,6 +167,7 @@
     </div>
 </div>
 <script>
+// ========== تهيئة فايربيس ==========
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
@@ -438,31 +177,24 @@ const firebaseConfig = {
     messagingSenderId: "750036143183",
     appId: "1:750036143183:web:721a31ef795f973887ee3a"
 };
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 // ========== متغيرات عامة ==========
 let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
-let editModeId = null;
-let currentPendingCount = 0;
-let usersListener = null;
-let appReady = false; // لمنع التكرار
-
-// مراقبة حالة الاتصال بـ Firebase وتحديث النقطة تلقائياً
-db.ref(".info/connected").on("value", function(snap) {
+let editModeId = null, currentPendingCount = 0, usersListener = null;
+let appReady = false; // يمنع التنفيذ المكرر
+// ========== مؤشر الاتصال ==========
+db.ref(".info/connected").on("value", snap => {
     const dot = document.getElementById("dbStatusDot");
     if (snap.val() === true) {
-        dot.classList.add("connected");
-        dot.title = "متصل بقاعدة البيانات بنجاح";
+        dot.classList.add("connected");        dot.title = "متصل ✓";
     } else {
         dot.classList.remove("connected");
-        dot.title = "مقطوع أو جاري إعادة الاتصال...";
+        dot.title = "جاري إعادة الاتصال...";
     }
 });
-
 // ========== نظام التهيئة المضمون (بدون تعليق) ==========
-// مهلة قصوى 3.5 ثانية لضمان عدم التعليق حتى لو انقطع النت
-let initTimeout = setTimeout(() => forceLogin(), 3500);
-
+let initTimeout = setTimeout(() => forceLogin(), 3500); // مهلة قصوى 3.5 ثانية
 function hideOverlayAndShow(screenId) {
     if (appReady) return;
     appReady = true;
@@ -470,23 +202,18 @@ function hideOverlayAndShow(screenId) {
     document.getElementById('loadingOverlay').style.display = 'none';
     showScreen(screenId);
 }
-
 function updateLoadingStatus(msg) {
     const el = document.getElementById('loadingSub');
     if (el) el.innerText = msg;
 }
-
 // بدء التطبيق
 window.addEventListener('load', () => {
     const u = localStorage.getItem('dentalQuizUser');
     const p = localStorage.getItem('dentalQuizPass');
-
-    // إذا لم توجد بيانات محفوظة، نعرض شاشة الدخول فوراً
     if (!u || !p) {
         hideOverlayAndShow('loginScreen');
         return;
     }
-
     updateLoadingStatus("جاري التحقق من البيانات...");
     // دخول المدير
     if (p === "salem1959") {
@@ -495,17 +222,14 @@ window.addEventListener('load', () => {
             .catch(() => hideOverlayAndShow('loginScreen'));
         return;
     }
-
     // دخول الطالب مع مهلة زمنية صارمة
     let resolved = false;
     const dbTimeout = setTimeout(() => {
         if (!resolved) {
             resolved = true;
             console.warn("انتهت مهلة التحقق من قاعدة البيانات");
-            hideOverlayAndShow('loginScreen');
-        }
+            hideOverlayAndShow('loginScreen');        }
     }, 2500); // 2.5 ثانية فقط للتحقق من DB
-
     db.ref('users/' + makeKey(u)).once('value')
         .then(snap => {
             resolved = true;
@@ -519,7 +243,6 @@ window.addEventListener('load', () => {
                     })
                     .catch(() => hideOverlayAndShow('loginScreen'));
             } else {
-                // بيانات خاطئة أو حالة غير نشطة
                 localStorage.removeItem('dentalQuizUser');
                 localStorage.removeItem('dentalQuizPass');
                 hideOverlayAndShow('loginScreen');
@@ -531,309 +254,272 @@ window.addEventListener('load', () => {
             hideOverlayAndShow('loginScreen');
         });
 });
-
 function forceLogin() {
     hideOverlayAndShow('loginScreen');
 }
-
+// ========== دوال الدخول والتسجيل ==========
 async function doLogin() {
-    const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();    await handleLoginLogic(u, p, false);
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    await handleLoginLogic(u, p, false);
 }
 async function handleLoginLogic(u, p, isAuto) {
-    if(!p) return;
-    if(p === "salem1959") {
-        localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
-        await loadQuestions(); showAdminPanel(); return;
+    if (!p) { if (!isAuto) alert("❌ أدخل كلمة السر"); return; }
+    
+    if (p === "salem1959") {
+        localStorage.setItem('dentalQuizUser', u);
+        localStorage.setItem('dentalQuizPass', p);
+        await loadQuestions();
+        hideOverlayAndShow('adminScreen');
+        showAdminPanel();
+        return;
     }
     try {
-        let snap = await db.ref('users/'+makeKey(u)).once('value');
-        let data = snap.val();
-        if(data && data.password === p && data.status === 'active') {
-            localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
-            await loadQuestions(); startStudentQuiz();
-        } else if(!isAuto) alert("❌ الحساب خاطئ أو غير مفعل");
-    } catch(e) { console.error(e); alert("حدث خطأ في الاتصال"); }
+        const snap = await db.ref('users/' + makeKey(u)).once('value');
+        const data = snap.val();
+        if (data && data.password === p && data.status === 'active') {
+            localStorage.setItem('dentalQuizUser', u);
+            localStorage.setItem('dentalQuizPass', p);
+            await loadQuestions();
+            hideOverlayAndShow('studentScreen');
+            startStudentQuiz();
+        } else if (!isAuto) {
+            if (data?.status === 'pending') alert("⏳ حسابك قيد المراجعة");
+            else if (data?.status === 'suspended') alert("🚫 حسابك موقوف");
+            else alert("❌ بيانات الدخول غير صحيحة");
+        }
+    } catch (e) {
+        console.error("خطأ:", e);
+        if (!isAuto) alert("⚠️ خطأ في الاتصال، تحقق من الإنترنت");
+    }
 }
 async function doRegister() {
-    let u = document.getElementById('regUser').value.trim();
-    let p = document.getElementById('regPass').value.trim();
-    if(!u || !p) return alert("❌ املأ جميع الحقول");
-    await db.ref('users/'+makeKey(u)).set({ name: u, password: p, status: 'pending' });
-    alert("✅ تم إرسال الطلب. سيتم تفعيله من قبل المدير.");
+    const u = document.getElementById('regUser').value.trim();
+    const p = document.getElementById('regPass').value.trim();
+    if (!u || !p) return alert("❌ املأ جميع الحقول");
+    
+    await db.ref('users/' + makeKey(u)).set({
+        name: u, password: p, status: 'pending',
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    alert("✅ تم إرسال الطلب، سيتم تفعيله من المدير");
     showScreen('loginScreen');
+    document.getElementById('regUser').value = '';
+    document.getElementById('regPass').value = '';
 }
+// ========== إدارة الأسئلة ==========
 async function loadQuestions() {
-    let snap = await db.ref('questions').once('value');
-    let data = snap.val();
-    questionsList = data ? Object.entries(data).map(([id,q])=>({...q, firebaseId:id})) : [];
+    try {
+        const snap = await db.ref('questions').once('value');
+        const data = snap.val();
+        questionsList = data ? Object.entries(data).map(([id, q]) => ({...q, firebaseId: id})) : [];
+    } catch (e) { questionsList = []; }
 }
 function startStudentQuiz() {
-    if(!questionsList.length) { 
-        alert("⚠️ لا توجد أسئلة بعد، يرجى إضافة أسئلة من لوحة الإدارة."); 
-        logout(); 
-        return; 
-    }
-    quizQuestions = [...questionsList].sort(()=>Math.random()-0.5);
+    if (!questionsList.length) { alert("⚠️ لا توجد أسئلة حالياً"); logout(); return; }
+    quizQuestions = [...questionsList].sort(() => Math.random() - 0.5);
     quizScore = 0; quizIndex = 0;
-    showScreen('studentScreen');
-    renderQuiz();
+    showScreen('studentScreen');    renderQuiz();
 }
 function renderQuiz() {
-    if(quizIndex >= quizQuestions.length) { 
-        alert(`🎉 تهانينا! لقد أكملت الاختبار\n⭐ نقاطك: ${quizScore} من ${quizQuestions.length*10}`);
-        startStudentQuiz(); 
-        return; 
+    if (quizIndex >= quizQuestions.length) {
+        alert(`🎉 أكملت الاختبار!\n⭐ نتيجتك: ${quizScore}`);
+        startStudentQuiz(); return;
     }
-    let q = quizQuestions[quizIndex];
-    document.getElementById('qCounter').innerText = `س ${quizIndex+1}/${quizQuestions.length}`;
-    document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;    document.getElementById('qText').innerText = q.q;
+    const q = quizQuestions[quizIndex];
+    document.getElementById('qCounter').innerText = `س ${quizIndex + 1}/${quizQuestions.length}`;
+    document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;
+    document.getElementById('qText').innerText = q.q;
     document.getElementById('expBox').style.display = 'none';
-    let grid = document.getElementById('optionsGrid');
+    
+    const grid = document.getElementById('optionsGrid');
     grid.innerHTML = "";
-    let shuffledOptions = [...q.o].sort(() => Math.random() - 0.5);
-    shuffledOptions.forEach(opt=>{
-        let div = document.createElement('div');
+    const shuffled = [...q.o].sort(() => Math.random() - 0.5);
+    
+    shuffled.forEach(opt => {
+        const div = document.createElement('div');
         div.className = 'option-card';
         div.innerText = opt;
-        div.onclick = ()=>{
-            if(document.querySelector('.correct-card')) return;
-            if(opt === q.c) { 
+        div.onclick = function () {
+            if (document.querySelector('.correct-card') || document.querySelector('.wrong-card')) return;
+            if (opt === q.c) {
                 quizScore += 10;
                 div.classList.add('correct-card');
             } else {
                 div.classList.add('wrong-card');
                 Array.from(grid.children).forEach(ch => {
-                    if(ch.innerText === q.c) ch.classList.add('correct-card');
+                    if (ch.innerText === q.c) ch.classList.add('correct-card');
                 });
             }
             document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;
-            document.getElementById('expBox').innerHTML = `<b>📘 التفسير السريري:</b><br>${q.e || "لا يوجد تفسير"}`;
+            document.getElementById('expBox').innerHTML = `<b>📘 التفسير:</b><br>${q.e || "لا يوجد"}`;
             document.getElementById('expBox').style.display = 'block';
-            setTimeout(()=>{ quizIndex++; renderQuiz(); }, 2000);
+            setTimeout(() => { quizIndex++; renderQuiz(); }, 2000);
         };
         grid.appendChild(div);
     });
 }
-function showAdminPanel() { 
-    showScreen('adminScreen'); 
-    renderAdminList(); 
-    listenToUsers(); 
+// ========== لوحة الإدارة ==========
+function showAdminPanel() {
+    showScreen('adminScreen');
+    renderAdminList();
+    listenToUsers();
 }
-function renderAdminList() {
-    let container = document.getElementById('adminQuestionsList');
-    if(!container) return;
-    if(questionsList.length === 0) { 
-        container.innerHTML = "<p style='text-align:center; color:#888;'>📭 لا توجد أسئلة. أضف دفعة JSON أو سؤالاً واحداً.</p>"; 
-        return; 
+function renderAdminList() {    const container = document.getElementById('adminQuestionsList');
+    if (!container) return;
+    if (!questionsList.length) {
+        container.innerHTML = "<p style='text-align:center;color:#888;padding:20px'>📭 أضف أسئلة جديدة</p>";
+        return;
     }
     container.innerHTML = "";
     questionsList.forEach((q, idx) => {
-        let div = document.createElement('div');
+        const div = document.createElement('div');
         div.className = "question-item";
         div.innerHTML = `
-            <div><strong>${idx+1}. ${q.q}</strong></div>
-            <div class="correct-badge">✅ الإجابة الصحيحة: ${q.c}</div>
-            <div class="flex-row" style="margin-top: 8px;">
-                <button class="btn" style="background:#ffb703; color:#000; width:auto; padding:6px 15px;" onclick="editQuestion('${q.firebaseId}')">✏️ تعديل</button>
-                <button class="btn" style="background:#e17055; width:auto; padding:6px 15px;" onclick="deleteQuestion('${q.firebaseId}')">🗑️ حذف</button>            </div>
-        `;
+            <div style="margin-bottom:8px"><strong>${idx + 1}. ${q.q}</strong></div>
+            <div class="correct-badge">✅ ${q.c}</div>
+            <div class="flex-row" style="margin-top:8px">
+                <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;font-size:0.85rem" onclick="editQuestion('${q.firebaseId}')">✏️</button>
+                <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;font-size:0.85rem" onclick="deleteQuestion('${q.firebaseId}')">🗑️</button>
+            </div>`;
         container.appendChild(div);
     });
 }
-// دالة التحكم بطي وفتح لوحة الطلاب المشتركين
 function toggleUsersPanel() {
-    let panel = document.getElementById('usersCollapsePanel');
-    if(panel.classList.contains('show')) {
-        panel.classList.remove('show');
-    } else {
-        panel.classList.add('show');
-    }
+    document.getElementById('usersCollapsePanel').classList.toggle('show');
     updateToggleButtonText(currentPendingCount);
 }
-// تحديث نص زر الفتح والطي مع الحفاظ على الهيكل العام
 function updateToggleButtonText(pendingCount) {
-    let panel = document.getElementById('usersCollapsePanel');
-    let btn = document.getElementById('toggleUsersBtn');
-    let isShown = panel.classList.contains('show');
-    
-    if(isShown) {
-        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين`;
-    } else {
-        btn.innerHTML = `📂 عرض قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: ${pendingCount > 0 ? 'inline-block' : 'none'};">${pendingCount}</span>`;
-    }
+    const panel = document.getElementById('usersCollapsePanel');
+    const btn = document.getElementById('toggleUsersBtn');
+    if (panel.classList.contains('show')) btn.innerHTML = `📁 طي القائمة`;
+    else btn.innerHTML = `📂 عرض الطلاب <span id="newRequestsBadge" class="req-badge" style="display:${pendingCount > 0 ? 'inline-block' : 'none'}">${pendingCount}</span>`;
 }
-// دالة جلب ومراقبة حسابات الطلاب وإحصاء طلبات التسجيل الجديدة فورياً
 function listenToUsers() {
-    if(usersListener) db.ref('users').off('value', usersListener);
-    usersListener = db.ref('users').on('value', (snap) => {
-        let usersData = snap.val();
-        let container = document.getElementById('adminUsersList');
-        let badge = document.getElementById('newRequestsBadge');
-        
-        if(!container) return;
-        if(!usersData) {
-            container.innerHTML = "<p style='text-align:center; color:#888;'>📭 لا يوجد طلاب مسجلين بعد.</p>";
-            currentPendingCount = 0;
-            updateToggleButtonText(0);
-            return;
+    if (usersListener) db.ref('users').off('value', usersListener);
+    usersListener = db.ref('users').on('value', snap => {
+        const data = snap.val();
+        const container = document.getElementById('adminUsersList');
+        const badge = document.getElementById('newRequestsBadge');
+        if (!container) return;
+        if (!data) {
+            container.innerHTML = "<p style='text-align:center;color:#888;padding:20px'>📭 لا يوجد طلاب</p>";
+            currentPendingCount = 0; updateToggleButtonText(0); if (badge) badge.style.display = 'none'; return;
         }
-        let pendingCount = 0;
-        container.innerHTML = "";
-        
-        Object.entries(usersData).forEach(([key, user]) => {
-            let statusText = "قيد الانتظار", statusClass = "status-pending";
-            if(user.status === 'active') { statusText = "نشط"; statusClass = "status-active"; }
-            if(user.status === 'suspended') { statusText = "مُرقّن / موقوف"; statusClass = "status-suspended"; }
-                        if(user.status === 'pending') {
-                pendingCount++;
-            }
-            let div = document.createElement('div');
+        let pending = 0; container.innerHTML = "";
+        Object.entries(data).sort((a, b) => {
+            if (a[1].status === 'pending' && b[1].status !== 'pending') return -1;
+            if (a[1].status !== 'pending' && b[1].status === 'pending') return 1; return 0;
+        }).forEach(([key, user]) => {
+            const st = { pending: ["قيد الانتظار", "status-pending"], active: ["✅ نشط", "status-active"], suspended: ["🚫 موقوف", "status-suspended"] };            const [txt, cls] = st[user.status] || ["غير معروف", ""];
+            if (user.status === 'pending') pending++;
+            const div = document.createElement('div');
             div.className = "user-item";
             div.innerHTML = `
-                <div class="flex-row">
-                    <strong>👤 ${user.name}</strong>
-                    <span class="status-tag ${statusClass}">${statusText}</span>
-                </div>
-                <div style="font-size:0.85rem; color:#666; margin-bottom:8px;">🔑 كلمة السر: ${user.password}</div>
-                <div class="flex-row" style="gap:5px;">
-                    <button class="btn" style="background:#00b894; width:auto; padding:5px 10px; font-size:0.8rem;" onclick="updateUserStatus('${key}', 'active')">✅ تفعيل</button>
-                    <button class="btn" style="background:#aeaeae; color:#000; width:auto; padding:5px 10px; font-size:0.8rem;" onclick="updateUserStatus('${key}', 'suspended')">🚫 ترقين</button>
-                    <button class="btn" style="background:#d63031; width:auto; padding:5px 10px; font-size:0.8rem;" onclick="deleteUser('${key}', '${user.name}')">🗑️ حذف</button>
-                </div>
-            `;
+                <div class="flex-row"><strong>👤 ${user.name}</strong><span class="status-tag ${cls}">${txt}</span></div>
+                <div style="font-size:0.8rem;color:#666;margin:5px 0;direction:ltr;text-align:left">🔑 ${user.password}</div>
+                <div class="flex-row" style="gap:5px;flex-wrap:wrap">
+                    <button class="btn" style="background:#00b894;width:auto;padding:5px 12px;font-size:0.8rem" onclick="updateUserStatus('${key}','active')">✅</button>
+                    <button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 12px;font-size:0.8rem" onclick="updateUserStatus('${key}','pending')">⏳</button>
+                    <button class="btn" style="background:#d63031;width:auto;padding:5px 12px;font-size:0.8rem" onclick="deleteUser('${key}','${user.name}')">🗑️</button>
+                </div>`;
             container.appendChild(div);
         });
-        // حفظ القيمة الحالية وتحديث النص والشارة بشكل سليم
-        currentPendingCount = pendingCount;
-        updateToggleButtonText(pendingCount);
+        currentPendingCount = pending;
+        updateToggleButtonText(pending);
+        if (badge) { badge.innerText = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
     });
 }
-// تغيير حالة المشترك (تفعيل أو ترقين)
-async function updateUserStatus(key, newStatus) {
-    await db.ref('users/' + key).update({ status: newStatus });
+async function updateUserStatus(key, status) {
+    if (confirm(`تعديل حالة المستخدم إلى "${status}"؟`)) await db.ref('users/' + key).update({ status });
 }
-// حذف حساب مشترك نهائياً
 async function deleteUser(key, name) {
-    if(confirm(`⚠️ هل أنت متأكد من حذف حساب الطالب "${name}" نهائياً؟`)) {
-        await db.ref('users/' + key).remove();
-    }
+    if (confirm(`⚠️ حذف حساب "${name}" نهائياً؟`)) await db.ref('users/' + key).remove();
 }
-async function deleteQuestion(id) { 
-    if(confirm("⚠️ هل أنت متأكد من حذف هذا السؤال نهائياً؟")) { 
-        await db.ref('questions/'+id).remove(); 
-        await loadQuestions(); 
-        renderAdminList(); 
-    } 
+async function deleteQuestion(id) {
+    if (confirm("حذف هذا السؤال؟")) { await db.ref('questions/' + id).remove(); await loadQuestions(); renderAdminList(); }
 }
 async function deleteAllQuestions() {
-    if(!confirm("⚠️ تحذير خطير! سيتم حذف جميع الأسئلة نهائياً. هل أنت متأكد؟")) return;
+    if (!questionsList.length) return alert("📭 لا توجد أسئلة");
+    if (!confirm(`⚠️ حذف جميع الأسئلة (${questionsList.length})؟`)) return;
     const updates = {};
-    questionsList.forEach(q => { updates[`questions/${q.firebaseId}`] = null; });
+    questionsList.forEach(q => updates[`questions/${q.firebaseId}`] = null);
     await db.ref().update(updates);
-    await loadQuestions();
-    renderAdminList();
-    alert("✅ تم حذف جميع الأسئلة.");
-}function toggleBatchJson() {
-    let panel = document.getElementById('batchJsonPanel');
-    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    if(panel.style.display === 'block') document.getElementById('batchJsonInput').value = '';
+    await loadQuestions(); renderAdminList();
+    alert("✅ تم الحذف");
+}
+function toggleBatchJson() {
+    const p = document.getElementById('batchJsonPanel');
+    p.style.display = p.style.display === 'none' ? 'block' : 'none';
+    if (p.style.display === 'block') { document.getElementById('batchJsonInput').value = ''; document.getElementById('batchJsonInput').focus(); }
 }
 async function addBatchQuestions() {
-    let jsonText = document.getElementById('batchJsonInput').value.trim();
-    if(!jsonText) return alert("❌ الرجاء لصق مصفوفة JSON.");
+    const txt = document.getElementById('batchJsonInput').value.trim();    if (!txt) return alert("❌ ألصق بيانات JSON");
     let batch;
-    try { batch = JSON.parse(jsonText); }
-    catch(e) { return alert("❌ خطأ في صيغة JSON: " + e.message); }
-    if(!Array.isArray(batch)) return alert("❌ يجب أن تكون البيانات مصفوفة (array).");
-    if(batch.length === 0) return alert("❌ المصفوفة فارغة.");
+    try { batch = JSON.parse(txt); } catch (e) { return alert("❌ خطأ JSON: " + e.message); }
+    if (!Array.isArray(batch)) return alert("❌ يجب أن تكون مصفوفة");
     let added = 0, errors = 0;
-    for(let item of batch) {
-        if(!item.q || !item.o || !item.c || !item.e) { errors++; continue; }
-        if(!Array.isArray(item.o) || item.o.length !== 4) { errors++; continue; }
-        if(!item.o.includes(item.c)) { errors++; continue; }
-        await db.ref('questions').push({ q: item.q, o: item.o, c: item.c, e: item.e });
+    for (let item of batch) {
+        if (!item.q || !item.o || !item.c || !item.e || !Array.isArray(item.o) || item.o.length !== 4 || !item.o.includes(item.c)) { errors++; continue; }
+        await db.ref('questions').push({ q: item.q.trim(), o: item.o.map(o => o.trim()), c: item.c.trim(), e: item.e.trim(), addedAt: firebase.database.ServerValue.TIMESTAMP });
         added++;
     }
-    alert(`✅ تمت إضافة ${added} سؤال بنجاح\n❌ فشل ${errors} سؤال`);
-    toggleBatchJson();
-    await loadQuestions();
-    renderAdminList();
+    alert(`✅ أضيف ${added} سؤال${errors ? `\n❌ فشل ${errors}` : ''}`);
+    toggleBatchJson(); await loadQuestions(); renderAdminList();
 }
 function showAddSingleForm() {
     editModeId = null;
-    document.getElementById('modalTitle').innerText = "➕ إضافة سؤال جديد";
-    document.getElementById('newQ').value = '';
-    document.getElementById('newOpt1').value = '';
-    document.getElementById('newOpt2').value = '';
-    document.getElementById('newOpt3').value = '';
-    document.getElementById('newOpt4').value = '';
-    document.getElementById('newCorrect').value = '';
-    document.getElementById('newExp').value = '';
+    document.getElementById('modalTitle').innerText = "➕ إضافة سؤال";
+    ['newQ', 'newOpt1', 'newOpt2', 'newOpt3', 'newOpt4', 'newCorrect', 'newExp'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => addSingleQuestion();
 }
 async function addSingleQuestion() {
-    let q = document.getElementById('newQ').value.trim();
-    let o = [
-        document.getElementById('newOpt1').value.trim(),
-        document.getElementById('newOpt2').value.trim(),
-        document.getElementById('newOpt3').value.trim(),
-        document.getElementById('newOpt4').value.trim()
-    ];
-    let c = document.getElementById('newCorrect').value.trim();
-    let e = document.getElementById('newExp').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e) return alert("❌ املأ جميع الحقول.");    if(!o.includes(c)) return alert("⚠️ الإجابة الصحيحة غير موجودة في الخيارات الأربعة.");
-    await db.ref('questions').push({ q, o, c, e });
-    alert("✅ تمت الإضافة بنجاح.");
-    closeModal();
-    await loadQuestions();
-    renderAdminList();
+    const q = document.getElementById('newQ').value.trim();
+    const o = ['newOpt1', 'newOpt2', 'newOpt3', 'newOpt4'].map(id => document.getElementById(id).value.trim());
+    const c = document.getElementById('newCorrect').value.trim();
+    const e = document.getElementById('newExp').value.trim();
+    if (!q || o.some(v => !v) || !c || !e) return alert("❌ املأ جميع الحقول");
+    if (!o.includes(c)) return alert("⚠️ الإجابة يجب أن تكون في الخيارات");
+    await db.ref('questions').push({ q, o, c, e, addedAt: firebase.database.ServerValue.TIMESTAMP });
+    alert("✅ تمت الإضافة"); closeModal(); await loadQuestions(); renderAdminList();
 }
 function editQuestion(id) {
-    let qObj = questionsList.find(q => q.firebaseId === id);
-    if(!qObj) return;
+    const q = questionsList.find(x => x.firebaseId === id);
+    if (!q) return;
     editModeId = id;
-    document.getElementById('modalTitle').innerText = "✏️ تعديل السؤال";
-    document.getElementById('newQ').value = qObj.q;
-    document.getElementById('newOpt1').value = qObj.o[0];
-    document.getElementById('newOpt2').value = qObj.o[1];
-    document.getElementById('newOpt3').value = qObj.o[2];
-    document.getElementById('newOpt4').value = qObj.o[3];
-    document.getElementById('newCorrect').value = qObj.c;
-    document.getElementById('newExp').value = qObj.e;
+    document.getElementById('modalTitle').innerText = "✏️ تعديل";
+    document.getElementById('newQ').value = q.q;
+    q.o.forEach((v, i) => document.getElementById('newOpt' + (i + 1)).value = v);
+    document.getElementById('newCorrect').value = q.c;
+    document.getElementById('newExp').value = q.e;
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => updateQuestion(id);
 }
 async function updateQuestion(id) {
-    let q = document.getElementById('newQ').value.trim();
-    let o = [
-        document.getElementById('newOpt1').value.trim(),
-        document.getElementById('newOpt2').value.trim(),
-        document.getElementById('newOpt3').value.trim(),
-        document.getElementById('newOpt4').value.trim()
-    ];
-    let c = document.getElementById('newCorrect').value.trim();
-    let e = document.getElementById('newExp').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e) return alert("❌ املأ جميع الحقول.");
-    if(!o.includes(c)) return alert("⚠️ الإجابة الصحيحة غير موجودة في الخيارات.");
-    await db.ref('questions/'+id).set({ q, o, c, e });
-    alert("✅ تم التعديل بنجاح.");
-    closeModal();
-    await loadQuestions();
-    renderAdminList();
+    const q = document.getElementById('newQ').value.trim();
+    const o = ['newOpt1', 'newOpt2', 'newOpt3', 'newOpt4'].map(id => document.getElementById(id).value.trim());
+    const c = document.getElementById('newCorrect').value.trim();    const e = document.getElementById('newExp').value.trim();
+    if (!q || o.some(v => !v) || !c || !e) return alert("❌ املأ جميع الحقول");
+    if (!o.includes(c)) return alert("⚠️ الإجابة في الخيارات");
+    await db.ref('questions/' + id).set({ q, o, c, e, updatedAt: firebase.database.ServerValue.TIMESTAMP });
+    alert("✅ تم التعديل"); closeModal(); await loadQuestions(); renderAdminList();
 }
 function closeModal() { document.getElementById('singleModal').style.display = 'none'; editModeId = null; }
-function showScreen(id) { 
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
-    document.getElementById(id).classList.add('active'); 
+function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function makeKey(s) { try { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g, ""); } catch (e) { return s.replace(/[^a-zA-Z0-9]/g, '_'); } }
+function logout() {
+    if (usersListener) { db.ref('users').off('value', usersListener); usersListener = null; }
+    db.ref(".info/connected").off();
+    localStorage.removeItem('dentalQuizUser');
+    localStorage.removeItem('dentalQuizPass');
+    questionsList = []; quizQuestions = [];
+    showScreen('loginScreen');
+    location.reload();
 }
-function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
-// دالة تسجيل الخروج الفعلي ومسح الذاكرة لإيقاف الدخول المستمر
-function logout() { 
-    if(usersListener) { db.ref('users').off('value', usersListener); usersListener = null; }
-    db.ref(".info/connected").off();    localStorage.clear(); 
-    location.reload(); 
-}
+window.addEventListener('popstate', () => {
+    if (document.querySelector('.screen.active')?.id !== 'loginScreen') history.pushState(null, null, location.href);
+});
 </script>
 </body>
 </html>
