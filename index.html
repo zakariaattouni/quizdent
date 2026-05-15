@@ -48,6 +48,9 @@
         #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
         .whatsapp-btn { background: linear-gradient(105deg, #25D366, #128C7E); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 24px; font-weight: 700; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); transition: 0.2s; font-size: 1rem; }
         .whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
+        
+        /* التنسيق الجديد للنافذة المطلوبة */
+        .admin-notice-box { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 18px; padding: 10px 15px; text-align: center; color: #0369a1; font-weight: 800; font-size: 0.95rem; line-height: 1.5; min-height: 50px; display: none; white-space: pre-line; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.05); }
     </style>
 </head><body>
 <div class="app">
@@ -55,9 +58,7 @@
         <h1>🦷 مدرب التشخيص السني <span id="dot" class="status-dot"></span></h1>
         <p>بإشراف د. زكريا محمد عطوني</p>
     </div>
-
     <div id="err" class="error"></div>
-
     <!-- الدخول -->
     <div id="login" class="screen active">
         <div class="card">
@@ -70,7 +71,6 @@
             </p>
         </div>
     </div>
-
     <!-- تسجيل جديد -->
     <div id="register" class="screen">
         <div class="card">
@@ -81,7 +81,6 @@
             <button class="btn" style="background:#aaa;" onclick="show('login')">رجوع</button>
         </div>
     </div>
-
     <!-- الطالب -->
     <div id="student" class="screen">
         <div class="card">
@@ -97,11 +96,17 @@
             <button class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-
     <!-- الإدارة -->    <div id="admin" class="screen">
         <div class="card">
             <h3 style="color:#5f4b8b; margin-bottom:10px;">🔧 الإدارة</h3>
             <div style="max-height:450px; overflow-y:auto;">
+                
+                <!-- إضافة خيار التحكم بالنافذة لسطرين من الإدارة -->
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">📢 نص الإعلان (سطرين)</h4>
+                <textarea id="adminNoticeInput" rows="2" style="font-size:0.9rem;" placeholder="اكتب هنا السطر الأول ثم اضغط Enter واكتب السطر الثاني..."></textarea>
+                <button class="btn btn-admin" style="margin-bottom:15px;" onclick="saveNotice()">💾 حفظ ونص الإعلان</button>
+                <hr style="border:0; border-top:1px dashed #dceaf2; margin:10px 0;">
+
                 <h4 style="margin:15px 0 10px; color:#1e4a6e;">👥 الطلاب</h4>
                 <button class="btn btn-admin" onclick="toggleUsers()">📂 القائمة <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
@@ -119,12 +124,13 @@
             <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
+    
+    <!-- النافذة الجديدة المضافة فوق الواتساب والفوتر مباشرة -->
+    <div id="appNoticeBox" class="admin-notice-box"></div>
 
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">💬 تواصل معنا عبر واتساب</a>
-
     <div class="footer">🦷 د. زكريا عطوني | © 2026</div>
 </div>
-
 <!-- مودال السؤال -->
 <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
     <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
@@ -140,30 +146,26 @@
         </div>
     </div>
 </div>
-
 <script>
 // ⚙️ Firebase
 const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
 firebase.initializeApp(cfg);
 const db = firebase.database();
-
 // 🔗 حالة الاتصال
 db.ref('.info/connected').on('value', s => {
     document.getElementById('dot').className = 'status-dot' + (s.val()?' ok':'');});
-
 // 🗃️ متغيرات
 let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null;
-
 // 🔐 مفاتيح التخزين
 const K = { U:'dq_u', P:'dq_p' };
-
 // 🚀 البدء - بدون انتظار!
 window.onload = () => {
     show('login');
     // محاولة الدخول التلقائي في الخلفية
     autoLogin().catch(()=>{});
+    // تشغيل المراقبة المستمرة للنص المكتوب من الإدارة ليعرض فوراً
+    listenToNotice();
 };
-
 // 🔁 الدخول التلقائي
 async function autoLogin() {
     const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
@@ -178,7 +180,6 @@ async function autoLogin() {
     } catch(e) { console.log('Auto-login failed:', e.message); }
     return false;
 }
-
 // 🎯 تسجيل الدخول
 async function login() {
     const u = document.getElementById('user').value.trim();
@@ -201,7 +202,6 @@ async function login() {
     } catch (e) {        showError('⚠️ خطأ في الاتصال: ' + e.message);
     }
 }
-
 // 📝 تسجيل جديد
 async function register() {
     const n = document.getElementById('regUser').value.trim();
@@ -212,21 +212,18 @@ async function register() {
         alert('✅ تم الإرسال'); show('login');
     } catch(e) { alert('❌ '+e.message); }
 }
-
 // 📥 تحميل الأسئلة
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
     const d = snap.val();
     Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
-
 // 🎮 بدء الاختبار
 function startQuiz() {
     if (!Qs.length) { alert('لا توجد أسئلة'); logout(); return; }
     quiz = [...Qs].sort(()=>Math.random()-0.5);
     score = 0; qi = 0; show('student'); renderQ();
 }
-
 // 🖥️ عرض السؤال
 function renderQ() {
     if (qi >= quiz.length) { alert(`🎉 انتهى! نتيجتك: ${score}/${quiz.length*10}`); startQuiz(); return; }
@@ -250,10 +247,8 @@ function renderQ() {
         };        opts.appendChild(div);
     });
 }
-
 // 🔧 الإدارة
 function showAdmin() { show('admin'); renderAdmin(); listenUsers(); }
-
 function renderAdmin() {
     const c = document.getElementById('qList');
     if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888">📭 لا توجد أسئلة</p>'; return; }
@@ -268,7 +263,6 @@ function renderAdmin() {
         c.appendChild(div);
     });
 }
-
 // 👥 المستخدمين
 function listenUsers() {
     if (usersRef) db.ref('users').off('value', usersRef);
@@ -293,23 +287,17 @@ function listenUsers() {
         updBadge();
     });
 }
-
 function updBadge() {
     const b = document.getElementById('reqBadge');
     b.innerText = pending; b.style.display = pending>0?'inline-block':'none';}
-
 function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
-
 async function setSt(k, st) { if (confirm('تأكيد؟')) await db.ref('users/'+k).update({status:st}); }
 async function delU(k, n) { if (confirm(`حذف "${n}"؟`)) await db.ref('users/'+k).remove(); }
-
 // ❓ الأسئلة
 async function delQ(id) { if (confirm('حذف؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
 async function delAll() { if (!confirm(`حذف جميع الأسئلة (${Qs.length})؟`)) return; 
     const up = {}; Qs.forEach(q=>up[`questions/${q.id}`]=null); await db.ref().update(up); await loadQs(); renderAdmin(); alert('✅ تم'); }
-
 function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
-
 async function addJson() {
     const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('ألصق JSON');
     let arr; try { arr = JSON.parse(t); } catch(e) { return alert('❌ '+e.message); }
@@ -321,7 +309,6 @@ async function addJson() {
     }
     alert(`✅ ${ok} | ❌ ${err}`); toggleJson(); await loadQs(); renderAdmin();
 }
-
 // ➕ سؤال واحد
 function addOne() {
     editId = null; document.getElementById('mTitle').innerText = '➕ جديد';
@@ -329,7 +316,6 @@ function addOne() {
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('mSave').onclick = saveOne;
 }
-
 async function saveOne() {
     const q = document.getElementById('mQ').value.trim();
     const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
@@ -342,7 +328,6 @@ async function saveOne() {
         alert('✅ تمت'); closeModal(); await loadQs(); if (document.getElementById('admin').classList.contains('active')) renderAdmin();
     } catch(err) { alert('❌ '+err.message); }
 }
-
 // ✏️ تعديل
 function editQ(id) {
     const q = Qs.find(x=>x.id===id); if (!q) return;    editId = id; document.getElementById('mTitle').innerText = '✏️ تعديل';
@@ -352,7 +337,6 @@ function editQ(id) {
     document.getElementById('modal').style.display = 'flex';
     document.getElementById('mSave').onclick = () => updQ(id);
 }
-
 async function updQ(id) {
     const q = document.getElementById('mQ').value.trim();
     const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
@@ -365,14 +349,35 @@ async function updQ(id) {
         alert('✅ تم'); closeModal(); await loadQs(); renderAdmin();
     } catch(err) { alert('❌ '+err.message); }
 }
-
 function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
+
+// 📢 دوال التحكم في النافذة الجديدة (الإعلان)
+async function saveNotice() {
+    const text = document.getElementById('adminNoticeInput').value;
+    try {
+        await db.ref('app_notice').set(text);
+        alert('✅ تم تحديث نص النافذة بنجاح');
+    } catch(e) { alert('❌ فشل الحفظ: ' + e.message); }
+}
+function listenToNotice() {
+    db.ref('app_notice').on('value', snap => {
+        const text = snap.val() || "";
+        const box = document.getElementById('appNoticeBox');
+        const input = document.getElementById('adminNoticeInput');
+        if(input) input.value = text;
+        if(text.trim() !== "") {
+            box.innerText = text;
+            box.style.display = 'block';
+        } else {
+            box.style.display = 'none';
+        }
+    });
+}
 
 // 🧭 أدوات
 function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
 function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
 function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 4000); }
-
 // 🚪 الخروج
 function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
