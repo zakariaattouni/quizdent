@@ -12,7 +12,6 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="#1e4a6e">
-
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
@@ -22,7 +21,6 @@
             box-sizing: border-box;
             font-family: 'Segoe UI', 'Tajawal', system-ui, sans-serif;
         }
-
         body {
             background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
             min-height: 100vh;
@@ -31,7 +29,6 @@
             align-items: center;
             padding: 10px;
         }
-
         .app-container {
             width: 100%;
             max-width: 580px;
@@ -40,7 +37,6 @@
             flex-direction: column;
             gap: 10px;
         }
-
         /* الهيدر */
         .app-header {
             background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
@@ -50,7 +46,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             position: relative;
         }
-
         .app-header h1 {
             color: white;
             font-size: 1.3rem;
@@ -60,12 +55,10 @@
             justify-content: center;
             gap: 8px;
         }
-
         .app-header p {
             color: rgba(255,255,255,0.9);
             font-size: 0.85rem;
         }
-
         /* مؤشر الاتصال */
         .db-status-dot {
             width: 10px;
@@ -81,14 +74,11 @@
             background-color: #00b894; /* أخضر عند نجاح الاتصال */
             box-shadow: 0 0 8px #00b894;
         }
-
         .screen {
             display: none;
             animation: fadeSlideUp 0.3s ease-out;
         }
-
         .active { display: block; }
-
         .card {
             background: rgba(255, 255, 255, 0.98);
             border-radius: 24px;
@@ -96,14 +86,12 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
             border: 1px solid rgba(66, 153, 225, 0.15);
         }
-
         /* شاشة الطالب تحتاج ارتفاع محدد */
         #studentScreen .card {
             min-height: 500px;
             display: flex;
             flex-direction: column;
         }
-
         .quiz-content {
             flex: 1;
             overflow-y: auto;
@@ -111,14 +99,12 @@
             margin: 15px 0;
             max-height: 400px;
         }
-
         h2 {
             color: #1e4a6e;
             font-size: 1.5rem;
             text-align: center;
             margin-bottom: 10px;
         }
-
         .question-text {
             font-size: 1.2rem;
             font-weight: 800;
@@ -126,7 +112,6 @@
             color: #1f3e48;
             line-height: 1.4;
         }
-
         .option-card {
             background: #fafefd;
             border: 1.5px solid #e2f0ed;
@@ -139,19 +124,16 @@
             font-size: 0.95rem;
             transition: all 0.2s ease;
         }
-
         .correct-card {
             background: linear-gradient(135deg, #00b894, #009688) !important;
             color: white !important;
             border: none !important;
         }
-
         .wrong-card {
             background: linear-gradient(135deg, #ff7675, #d63031) !important;
             color: white !important;
             border: none !important;
         }
-
         .exp-box {
             background: #fff7e5;
             border-right: 4px solid #f4b942;
@@ -161,7 +143,6 @@
             margin-top: 5px;
             color: #7a5a2a;
         }
-
         .status-pill {
             background: #e6f4f0;
             color: #1f6e5c;
@@ -170,7 +151,6 @@
             font-size: 0.8rem;
             font-weight: 700;
         }
-
         .flex-row { 
             display: flex; 
             justify-content: space-between; 
@@ -179,7 +159,6 @@
             gap: 10px; 
             flex-wrap: wrap; 
         }
-
         input, textarea {
             width: 100%;
             padding: 12px;
@@ -188,7 +167,6 @@
             border: 1px solid #dceaf2;
             outline: none;
         }
-
         .btn {
             background: linear-gradient(105deg, #1f7b6e, #2c9b7a);
             color: white;
@@ -200,15 +178,12 @@
             width: 100%;
             transition: transform 0.2s;
         }
-
         .btn:hover {
             transform: translateY(-2px);
         }
-
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-warning { background: linear-gradient(105deg, #f39c12, #e67e22); color: #000; }
-
         /* الفوتر */
         .app-footer {
             background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
@@ -219,15 +194,12 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
-
         .quiz-content::-webkit-scrollbar { width: 4px; }
         .quiz-content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
         .question-item {
             background: #f8fafc;
             border-radius: 16px;
@@ -259,13 +231,11 @@
             text-align: left; 
             font-size: 0.8rem; 
         }
-
         .admin-buttons {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
-
         /* تنسيقات إدارة المشتركين */
         .admin-section-title {
             margin: 20px 0 10px 0;
@@ -274,7 +244,6 @@
             padding-bottom: 5px;
             font-size: 1.1rem;
         }
-
         /* حاوية قابلة للطي والفتح للمشتركين */
         .collapse-container {
             display: none;
@@ -285,7 +254,6 @@
         .collapse-container.show {
             display: block;
         }
-
         .user-item {
             background: #f8fafc;
             border-radius: 16px;
@@ -293,18 +261,15 @@
             margin-bottom: 10px;
             border-right: 3px solid #6c5ce7;
         }
-
         .status-tag {
             font-size: 0.75rem;
             padding: 3px 8px;
             border-radius: 12px;
             font-weight: bold;
         }
-
         .status-active { background: #d4edda; color: #155724; }
         .status-pending { background: #fff3cd; color: #856404; }
         .status-suspended { background: #e2e3e5; color: #383d41; }
-
         /* شارة الإشعار لطلبات التسجيل الجديدة */
         .req-badge {
             background-color: #d63031;
@@ -317,7 +282,6 @@
             margin-right: 8px;
             animation: pulseNotification 1.5s infinite alternate;
         }
-
         @keyframes pulseNotification {
             from { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); }
             to { transform: scale(1.1); box-shadow: 0 0 10px 4px rgba(214, 48, 49, 0); }
@@ -325,14 +289,12 @@
     </style>
 </head>
 <body>
-
 <div class="app-container">
     <!-- الهيدر - يظهر في جميع الشاشات ومزود بمؤشر الاتصال -->
     <div class="app-header">
         <h1>🦷 مدرب التشخيص السني <span id="dbStatusDot" class="db-status-dot" title="جاري الاتصال بقاعدة البيانات..."></span></h1>
         <p>بإشراف د. زكريا محمد عطوني</p>
     </div>
-
     <!-- شاشة الدخول -->
     <div id="loginScreen" class="screen active">
         <div class="card">
@@ -345,7 +307,6 @@
             </p>
         </div>
     </div>
-
     <!-- شاشة التسجيل -->
     <div id="registerScreen" class="screen">
         <div class="card">
@@ -356,7 +317,6 @@
             <button class="btn" style="background:#aaa;" onclick="showScreen('loginScreen')">رجوع</button>
         </div>
     </div>
-
     <!-- شاشة الطالب -->
     <div id="studentScreen" class="screen">
         <div class="card">
@@ -372,7 +332,6 @@
             <button class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-
     <!-- لوحة الإدارة -->
     <div id="adminScreen" class="screen">
         <div class="card">
@@ -389,7 +348,6 @@
                 <div id="usersCollapsePanel" class="collapse-container">
                     <div id="adminUsersList"></div>
                 </div>
-
                 <!-- قسم إدارة الأسئلة في الأسفل -->
                 <h4 class="admin-section-title">📝 إدارة الأسئلة</h4>
                 <div class="batch-area">
@@ -412,18 +370,15 @@
                     <button class="btn btn-danger" onclick="deleteAllQuestions()">🗑️ حذف جميع الأسئلة</button>
                 </div>
                 <div id="adminQuestionsList" style="margin-top: 15px;"></div>
-
             </div>
             <button class="btn" style="margin-top: 10px;" onclick="logout()">🚪 تسجيل خروج</button>
         </div>
     </div>
-
     <!-- الفوتر - يظهر في جميع الشاشات -->
     <div class="app-footer">
         🦷 إعداد الدكتور زكريا محمد عطوني | جميع الحقوق محفوظة © 2026
     </div>
 </div>
-
 <!-- مودال الإضافة / التعديل -->
 <div id="singleModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
     <div class="card" style="flex:0 1 auto; width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
@@ -441,7 +396,6 @@
         </div>
     </div>
 </div>
-
 <script>
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
@@ -454,7 +408,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-
 // مراقبة حالة الاتصال بـ Firebase وتحديث النقطة تلقائياً
 db.ref(".info/connected").on("value", function(snap) {
     const dot = document.getElementById("dbStatusDot");
@@ -466,57 +419,36 @@ db.ref(".info/connected").on("value", function(snap) {
         dot.title = "مقطوع أو جاري إعادة الاتصال...";
     }
 });
-
 let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
 let editModeId = null;
-
+let currentPendingCount = 0; // متغير داخلي لحفظ عدد الطلبات المعلقة
 // فحص وجود الحساب المسجل تلقائياً عند فتح التطبيق لضمان بقاء الدخول مستمراً
 window.onload = checkPersistentLogin;
-
 async function checkPersistentLogin() {
-    const u = localStorage.getItem('dentalQuizUser');
-    const p = localStorage.getItem('dentalQuizPass');
+    const u = localStorage.getItem('dentalQuizUser'), p = localStorage.getItem('dentalQuizPass');
     if (u && p) {
-        // محاولة تسجيل الدخول التلقائي
         await handleLoginLogic(u, p, true);
     }
 }
-
 async function doLogin() {
-    const u = document.getElementById('username').value.trim();
-    const p = document.getElementById('password').value.trim();
-    if (!u || !p) return alert("❌ الرجاء إدخال اسم المستخدم وكلمة المرور");
+    const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
     await handleLoginLogic(u, p, false);
 }
-
 async function handleLoginLogic(u, p, isAuto) {
-    // حالة المدير
+    if(!p) return;
     if(p === "salem1959") {
-        localStorage.setItem('dentalQuizUser', u);
-        localStorage.setItem('dentalQuizPass', p);
-        await loadQuestions();
-        showAdminPanel();
-        return;
+        localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
+        await loadQuestions(); showAdminPanel(); return;
     }
-    
     try {
         let snap = await db.ref('users/'+makeKey(u)).once('value');
         let data = snap.val();
         if(data && data.password === p && data.status === 'active') {
-            localStorage.setItem('dentalQuizUser', u);
-            localStorage.setItem('dentalQuizPass', p);
-            await loadQuestions();
-            startStudentQuiz();
-        } else {
-            if(!isAuto) alert("❌ الحساب خاطئ أو غير مفعل بعد (يرجى انتظار موافقة المدير)");
-            else console.log("Auto login failed, session expired or account inactive.");
-        }
-    } catch(e) { 
-        console.error(e); 
-        if(!isAuto) alert("حدث خطأ في الاتصال"); 
-    }
+            localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
+            await loadQuestions(); startStudentQuiz();
+        } else if(!isAuto) alert("❌ الحساب خاطئ أو غير مفعل");
+    } catch(e) { console.error(e); alert("حدث خطأ في الاتصال"); }
 }
-
 async function doRegister() {
     let u = document.getElementById('regUser').value.trim();
     let p = document.getElementById('regPass').value.trim();
@@ -525,13 +457,11 @@ async function doRegister() {
     alert("✅ تم إرسال الطلب. سيتم تفعيله من قبل المدير.");
     showScreen('loginScreen');
 }
-
 async function loadQuestions() {
     let snap = await db.ref('questions').once('value');
     let data = snap.val();
     questionsList = data ? Object.entries(data).map(([id,q])=>({...q, firebaseId:id})) : [];
 }
-
 function startStudentQuiz() {
     if(!questionsList.length) { 
         alert("⚠️ لا توجد أسئلة بعد، يرجى إضافة أسئلة من لوحة الإدارة."); 
@@ -543,7 +473,6 @@ function startStudentQuiz() {
     showScreen('studentScreen');
     renderQuiz();
 }
-
 function renderQuiz() {
     if(quizIndex >= quizQuestions.length) { 
         alert(`🎉 تهانينا! لقد أكملت الاختبار\n⭐ نقاطك: ${quizScore} من ${quizQuestions.length*10}`);
@@ -557,7 +486,6 @@ function renderQuiz() {
     document.getElementById('expBox').style.display = 'none';
     let grid = document.getElementById('optionsGrid');
     grid.innerHTML = "";
-
     let shuffledOptions = [...q.o].sort(() => Math.random() - 0.5);
     shuffledOptions.forEach(opt=>{
         let div = document.createElement('div');
@@ -582,13 +510,11 @@ function renderQuiz() {
         grid.appendChild(div);
     });
 }
-
 function showAdminPanel() { 
     showScreen('adminScreen'); 
     renderAdminList(); 
     listenToUsers(); 
 }
-
 function renderAdminList() {
     let container = document.getElementById('adminQuestionsList');
     if(!container) return;
@@ -611,21 +537,16 @@ function renderAdminList() {
         container.appendChild(div);
     });
 }
-
 // دالة التحكم بطي وفتح لوحة الطلاب المشتركين
 function toggleUsersPanel() {
     let panel = document.getElementById('usersCollapsePanel');
     if(panel.classList.contains('show')) {
         panel.classList.remove('show');
-        updateToggleButtonText(0);
     } else {
         panel.classList.add('show');
-        // عند الفتح، نقوم بتحديث النص فقط مع الحفاظ على الشارة داخل الزر
-        let btn = document.getElementById('toggleUsersBtn');
-        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: none;">0</span>`;
     }
+    updateToggleButtonText(currentPendingCount);
 }
-
 // تحديث نص زر الفتح والطي مع الحفاظ على الهيكل العام
 function updateToggleButtonText(pendingCount) {
     let panel = document.getElementById('usersCollapsePanel');
@@ -633,12 +554,11 @@ function updateToggleButtonText(pendingCount) {
     let isShown = panel.classList.contains('show');
     
     if(isShown) {
-        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: ${pendingCount > 0 ? 'inline-block' : 'none'};">${pendingCount}</span>`;
+        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين`;
     } else {
         btn.innerHTML = `📂 عرض قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: ${pendingCount > 0 ? 'inline-block' : 'none'};">${pendingCount}</span>`;
     }
 }
-
 // دالة جلب ومراقبة حسابات الطلاب وإحصاء طلبات التسجيل الجديدة فورياً
 function listenToUsers() {
     db.ref('users').on('value', (snap) => {
@@ -649,10 +569,10 @@ function listenToUsers() {
         if(!container) return;
         if(!usersData) {
             container.innerHTML = "<p style='text-align:center; color:#888;'>📭 لا يوجد طلاب مسجلين بعد.</p>";
-            if(badge) badge.style.display = 'none';
+            currentPendingCount = 0;
+            updateToggleButtonText(0);
             return;
         }
-
         let pendingCount = 0;
         container.innerHTML = "";
         
@@ -664,7 +584,6 @@ function listenToUsers() {
             if(user.status === 'pending') {
                 pendingCount++;
             }
-
             let div = document.createElement('div');
             div.className = "user-item";
             div.innerHTML = `
@@ -681,24 +600,21 @@ function listenToUsers() {
             `;
             container.appendChild(div);
         });
-
-        // تحديث إشعارات طلبات التسجيل الجديدة
+        // حفظ القيمة الحالية وتحديث النص والشارة بشكل سليم
+        currentPendingCount = pendingCount;
         updateToggleButtonText(pendingCount);
     });
 }
-
 // تغيير حالة المشترك (تفعيل أو ترقين)
 async function updateUserStatus(key, newStatus) {
     await db.ref('users/' + key).update({ status: newStatus });
 }
-
 // حذف حساب مشترك نهائياً
 async function deleteUser(key, name) {
     if(confirm(`⚠️ هل أنت متأكد من حذف حساب الطالب "${name}" نهائياً؟`)) {
         await db.ref('users/' + key).remove();
     }
 }
-
 async function deleteQuestion(id) { 
     if(confirm("⚠️ هل أنت متأكد من حذف هذا السؤال نهائياً؟")) { 
         await db.ref('questions/'+id).remove(); 
@@ -706,7 +622,6 @@ async function deleteQuestion(id) {
         renderAdminList(); 
     } 
 }
-
 async function deleteAllQuestions() {
     if(!confirm("⚠️ تحذير خطير! سيتم حذف جميع الأسئلة نهائياً. هل أنت متأكد؟")) return;
     const updates = {};
@@ -716,13 +631,11 @@ async function deleteAllQuestions() {
     renderAdminList();
     alert("✅ تم حذف جميع الأسئلة.");
 }
-
 function toggleBatchJson() {
     let panel = document.getElementById('batchJsonPanel');
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     if(panel.style.display === 'block') document.getElementById('batchJsonInput').value = '';
 }
-
 async function addBatchQuestions() {
     let jsonText = document.getElementById('batchJsonInput').value.trim();
     if(!jsonText) return alert("❌ الرجاء لصق مصفوفة JSON.");
@@ -744,7 +657,6 @@ async function addBatchQuestions() {
     await loadQuestions();
     renderAdminList();
 }
-
 function showAddSingleForm() {
     editModeId = null;
     document.getElementById('modalTitle').innerText = "➕ إضافة سؤال جديد";
@@ -758,7 +670,6 @@ function showAddSingleForm() {
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => addSingleQuestion();
 }
-
 async function addSingleQuestion() {
     let q = document.getElementById('newQ').value.trim();
     let o = [
@@ -777,7 +688,6 @@ async function addSingleQuestion() {
     await loadQuestions();
     renderAdminList();
 }
-
 function editQuestion(id) {
     let qObj = questionsList.find(q => q.firebaseId === id);
     if(!qObj) return;
@@ -793,7 +703,6 @@ function editQuestion(id) {
     document.getElementById('singleModal').style.display = 'flex';
     document.getElementById('saveQuestionBtn').onclick = () => updateQuestion(id);
 }
-
 async function updateQuestion(id) {
     let q = document.getElementById('newQ').value.trim();
     let o = [
@@ -812,22 +721,12 @@ async function updateQuestion(id) {
     await loadQuestions();
     renderAdminList();
 }
-
 function closeModal() { document.getElementById('singleModal').style.display = 'none'; editModeId = null; }
-
 function showScreen(id) { 
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); 
     document.getElementById(id).classList.add('active'); 
 }
-
-function makeKey(s) { 
-    try {
-        return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,"");
-    } catch(e) {
-        return s;
-    }
-}
-
+function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
 // دالة تسجيل الخروج الفعلي ومسح الذاكرة لإيقاف الدخول المستمر
 function logout() { 
     db.ref('users').off();
