@@ -119,7 +119,6 @@
                     <button class="btn btn-admin" onclick="addJson()">➕ إضافة</button>
                 </div>
                 <button class="btn btn-admin" onclick="addOne()">➕ سؤال واحد</button>
-                <button class="btn btn-danger" onclick="delAll()">🗑️ حذف الكل</button>
                 <div id="qList"></div>
             </div>
             <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج</button>
@@ -294,8 +293,6 @@ async function setSt(k, st) { if (confirm('تأكيد؟')) await db.ref('users/'
 async function delU(k, n) { if (confirm(`حذف "${n}"؟`)) await db.ref('users/'+k).remove(); }
 // ❓ الأسئلة
 async function delQ(id) { if (confirm('حذف؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
-async function delAll() { if (!confirm(`حذف جميع الأسئلة (${Qs.length})؟`)) return; 
-    const up = {}; Qs.forEach(q=>up[`questions/${q.id}`]=null); await db.ref().update(up); await loadQs(); renderAdmin(); alert('✅ تم'); }
 function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
 async function addJson() {
     const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('ألصق JSON');
