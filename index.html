@@ -474,31 +474,47 @@ let editModeId = null;
 window.onload = checkPersistentLogin;
 
 async function checkPersistentLogin() {
-    const u = localStorage.getItem('dentalQuizUser'), p = localStorage.getItem('dentalQuizPass');
+    const u = localStorage.getItem('dentalQuizUser');
+    const p = localStorage.getItem('dentalQuizPass');
     if (u && p) {
+        // محاولة تسجيل الدخول التلقائي
         await handleLoginLogic(u, p, true);
     }
 }
 
 async function doLogin() {
-    const u = document.getElementById('username').value.trim(), p = document.getElementById('password').value.trim();
+    const u = document.getElementById('username').value.trim();
+    const p = document.getElementById('password').value.trim();
+    if (!u || !p) return alert("❌ الرجاء إدخال اسم المستخدم وكلمة المرور");
     await handleLoginLogic(u, p, false);
 }
 
 async function handleLoginLogic(u, p, isAuto) {
-    if(!p) return;
+    // حالة المدير
     if(p === "salem1959") {
-        localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
-        await loadQuestions(); showAdminPanel(); return;
+        localStorage.setItem('dentalQuizUser', u);
+        localStorage.setItem('dentalQuizPass', p);
+        await loadQuestions();
+        showAdminPanel();
+        return;
     }
+    
     try {
         let snap = await db.ref('users/'+makeKey(u)).once('value');
         let data = snap.val();
         if(data && data.password === p && data.status === 'active') {
-            localStorage.setItem('dentalQuizUser', u); localStorage.setItem('dentalQuizPass', p);
-            await loadQuestions(); startStudentQuiz();
-        } else if(!isAuto) alert("❌ الحساب خاطئ أو غير مفعل");
-    } catch(e) { console.error(e); alert("حدث خطأ في الاتصال"); }
+            localStorage.setItem('dentalQuizUser', u);
+            localStorage.setItem('dentalQuizPass', p);
+            await loadQuestions();
+            startStudentQuiz();
+        } else {
+            if(!isAuto) alert("❌ الحساب خاطئ أو غير مفعل بعد (يرجى انتظار موافقة المدير)");
+            else console.log("Auto login failed, session expired or account inactive.");
+        }
+    } catch(e) { 
+        console.error(e); 
+        if(!isAuto) alert("حدث خطأ في الاتصال"); 
+    }
 }
 
 async function doRegister() {
@@ -599,13 +615,14 @@ function renderAdminList() {
 // دالة التحكم بطي وفتح لوحة الطلاب المشتركين
 function toggleUsersPanel() {
     let panel = document.getElementById('usersCollapsePanel');
-    let btn = document.getElementById('toggleUsersBtn');
     if(panel.classList.contains('show')) {
         panel.classList.remove('show');
         updateToggleButtonText(0);
     } else {
         panel.classList.add('show');
-        updateToggleButtonText(0);
+        // عند الفتح، نقوم بتحديث النص فقط مع الحفاظ على الشارة داخل الزر
+        let btn = document.getElementById('toggleUsersBtn');
+        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: none;">0</span>`;
     }
 }
 
@@ -616,7 +633,7 @@ function updateToggleButtonText(pendingCount) {
     let isShown = panel.classList.contains('show');
     
     if(isShown) {
-        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين`;
+        btn.innerHTML = `📁 طي قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: ${pendingCount > 0 ? 'inline-block' : 'none'};">${pendingCount}</span>`;
     } else {
         btn.innerHTML = `📂 عرض قائمة الطلاب المشتركين <span id="newRequestsBadge" class="req-badge" style="display: ${pendingCount > 0 ? 'inline-block' : 'none'};">${pendingCount}</span>`;
     }
@@ -803,7 +820,13 @@ function showScreen(id) {
     document.getElementById(id).classList.add('active'); 
 }
 
-function makeKey(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,""); }
+function makeKey(s) { 
+    try {
+        return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,"");
+    } catch(e) {
+        return s;
+    }
+}
 
 // دالة تسجيل الخروج الفعلي ومسح الذاكرة لإيقاف الدخول المستمر
 function logout() { 
