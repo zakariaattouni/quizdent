@@ -2,524 +2,380 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مدرب التشخيص السني | د. زكريا عطوني</title>
-    
-    <!-- أيقونات PWA للشاشة الرئيسية والمتصفحات -->
-    <link rel="icon" type="image/png" sizes="192x192" href="https://img.icons8.com/fluent/192/tooth.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="https://img.icons8.com/fluent/512/tooth.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="https://img.icons8.com/fluent/180/tooth.png">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#1e4a6e">
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluent/192/tooth.png">
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Tajawal', system-ui, sans-serif; }
-        body { background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
-        .app-container { width: 100%; max-width: 580px; background: transparent; display: flex; flex-direction: column; gap: 10px; }
-        .app-header { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 15px 20px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .app-header h1 { color: white; font-size: 1.3rem; margin-bottom: 5px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .app-header p { color: rgba(255,255,255,0.9); font-size: 0.85rem; }
-        .db-status-dot { width: 10px; height: 10px; background-color: #e17055; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #e17055; transition: all 0.4s ease; }
-        .db-status-dot.connected { background-color: #00b894; box-shadow: 0 0 8px #00b894; }
-        .screen { display: none; animation: fadeSlideUp 0.3s ease-out; }
-        .active { display: block; }
-        .card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08); border: 1px solid rgba(66, 153, 225, 0.15); }
-        #studentScreen .card { min-height: 500px; display: flex; flex-direction: column; }
-        .quiz-content { flex: 1; overflow-y: auto; padding-right: 5px; margin: 15px 0; max-height: 400px; }
-        h2 { color: #1e4a6e; font-size: 1.5rem; text-align: center; margin-bottom: 10px; }
-        .question-text { font-size: 1.2rem; font-weight: 800; margin-bottom: 15px; color: #1f3e48; line-height: 1.4; }
-        .option-card { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; cursor: pointer; margin-bottom: 8px; text-align: right; font-weight: 600; font-size: 0.95rem; transition: all 0.2s ease; }
-        .correct-card { background: linear-gradient(135deg, #00b894, #009688) !important; color: white !important; border: none !important; }
-        .wrong-card { background: linear-gradient(135deg, #ff7675, #d63031) !important; color: white !important; border: none !important; }
-        .exp-box { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; font-size: 0.9rem; margin-top: 5px; color: #7a5a2a; }
-        .status-pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-        .flex-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; flex-wrap: wrap; }
-        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; }
-        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; transition: transform 0.2s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Tajawal', sans-serif; }
+        body { background: linear-gradient(135deg, #e0f2fe, #f0f9ff); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .app { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 10px; }
+        .header { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 15px 20px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.3rem; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header p { font-size: 0.85rem; opacity: 0.9; }
+        .status-dot { width: 10px; height: 10px; background: #e17055; border-radius: 50%; display: inline-block; }
+        .status-dot.ok { background: #00b894; box-shadow: 0 0 8px #00b894; }
+        .screen { display: none; animation: fade 0.3s; }
+        .screen.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        h2 { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; font-size: 1rem; }
+        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; }
         .btn:hover { transform: translateY(-2px); }
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
-        .btn-warning { background: linear-gradient(105deg, #f39c12, #e67e22); color: #000; }
-        .app-footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; font-weight: 500; }
-        .quiz-content::-webkit-scrollbar { width: 4px; }
-        .quiz-content::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 10px; }
-        @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .question-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin-bottom: 12px; border-right: 3px solid #2c9b7a; }
-        .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 6px 0; }        .batch-area { background: #f1f5f9; border-radius: 20px; padding: 10px; margin: 10px 0; }
-        textarea.batch-json { font-family: monospace; direction: ltr; text-align: left; font-size: 0.8rem; }
-        .admin-buttons { display: flex; flex-direction: column; gap: 8px; }
-        .admin-section-title { margin: 20px 0 10px 0; color: #1e4a6e; border-bottom: 2px solid #e2f0ed; padding-bottom: 5px; font-size: 1.1rem; }
-        .collapse-container { display: none; margin-top: 10px; animation: fadeSlideUp 0.2s ease-out; }
-        .collapse-container.show { display: block; }
-        .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin-bottom: 10px; border-right: 3px solid #6c5ce7; }
-        .status-tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
-        .status-active { background: #d4edda; color: #155724; }
-        .status-pending { background: #fff3cd; color: #856404; }
-        .status-suspended { background: #e2e3e5; color: #383d41; }
-        .req-badge { background-color: #d63031; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: inline-block; margin-right: 8px; animation: pulseNotification 1.5s infinite alternate; }
-        @keyframes pulseNotification { from { transform: scale(1); box-shadow: 0 0 0 0 rgba(214, 48, 49, 0.7); } to { transform: scale(1.1); box-shadow: 0 0 10px 4px rgba(214, 48, 49, 0); } }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 15px; }
-        .spinner { width: 40px; height: 40px; border: 4px solid #e2f0ed; border-top-color: #2c9b7a; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { color: #1e4a6e; font-weight: 600; text-align: center; }
-        .loading-sub { color: #666; font-size: 0.85rem; }
-        .skip-btn { margin-top: 10px; background: transparent; color: #2c9b7a; border: 1px solid #2c9b7a; padding: 8px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem; }
-        .skip-btn:hover { background: #e6f4f0; }
+        .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
+        .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
+        .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
+        .exp { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; margin-top: 10px; font-size: 0.9rem; color: #7a5a2a; display: none; }
+        .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
+        .q-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #2c9b7a; }
+        .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 5px 0; }
+        .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #6c5ce7; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+        .tag.active { background: #d4edda; color: #155724; }
+        .tag.pending { background: #fff3cd; color: #856404; }
+        .tag.suspended { background: #e2e3e5; color: #383d41; }
+        .badge { background: #d63031; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: none; }
+        .collapse { display: none; margin-top: 10px; }
+        .collapse.show { display: block; }
+        .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 12px; margin: 10px 0; font-size: 0.9rem; display: none; }
+        .error.show { display: block; }
+        #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
     </style>
-</head>
-<body>
-<div id="loadingOverlay" class="loading-overlay">
-    <div class="spinner"></div>
-    <p class="loading-text">جاري التحقق من الجلسة...</p>
-    <p class="loading-sub" id="loadingSub">يرجى الانتظار</p>
-    <button class="skip-btn" onclick="forceLogin()">تسجيل الدخول يدوياً</button>
-</div>
-<div class="app-container">
-    <div class="app-header">
-        <h1>🦷 مدرب التشخيص السني <span id="dbStatusDot" class="db-status-dot" title="جاري الاتصال..."></span></h1>
+</head><body>
+<div class="app">
+    <div class="header">
+        <h1>🦷 مدرب التشخيص السني <span id="dot" class="status-dot"></span></h1>
         <p>بإشراف د. زكريا محمد عطوني</p>
     </div>
-    
-    <div id="loginScreen" class="screen">
+
+    <div id="err" class="error"></div>
+
+    <!-- الدخول -->
+    <div id="login" class="screen active">
         <div class="card">
             <h2>🎯 تسجيل الدخول</h2>
-            <input type="text" id="username" placeholder="اسم المستخدم" autocomplete="off">
-            <input type="password" id="password" placeholder="كلمة السر">
-            <button class="btn" onclick="doLogin()">دخول</button>
-            <p style="margin-top:15px; text-align:center;">
-                <a href="#" style="color:#2c9b7a; font-size:0.85rem; text-decoration:none;" onclick="showScreen('registerScreen')">✨ إنشاء حساب طالب جديد</a>
+            <input type="text" id="user" placeholder="اسم المستخدم">
+            <input type="password" id="pass" placeholder="كلمة السر">
+            <button class="btn" onclick="login()">دخول</button>
+            <p style="text-align:center; margin-top:15px;">
+                <a href="#" style="color:#2c9b7a;" onclick="show('register')">✨ حساب جديد</a>
             </p>
         </div>
     </div>
-    
-    <div id="registerScreen" class="screen">        <div class="card">
-            <h2>📝 تسجيل جديد</h2>
+
+    <!-- تسجيل جديد -->
+    <div id="register" class="screen">
+        <div class="card">
+            <h2>📝 تسجيل طالب</h2>
             <input type="text" id="regUser" placeholder="الاسم الكامل">
             <input type="password" id="regPass" placeholder="كلمة السر">
-            <button class="btn" onclick="doRegister()">إرسال الطلب</button>
-            <button class="btn" style="background:#aaa;" onclick="showScreen('loginScreen')">رجوع</button>
+            <button class="btn" onclick="register()">إرسال</button>
+            <button class="btn" style="background:#aaa;" onclick="show('login')">رجوع</button>
         </div>
     </div>
-    
-    <div id="studentScreen" class="screen">
+
+    <!-- الطالب -->
+    <div id="student" class="screen">
         <div class="card">
-            <div class="flex-row">
-                <span class="status-pill" id="qCounter">--</span>
-                <span class="status-pill" id="scoreValue">⭐ 0</span>
+            <div class="row">
+                <span class="pill" id="qNum">--</span>
+                <span class="pill" id="score">⭐ 0</span>
             </div>
-            <div class="quiz-content" id="quizScrollArea">
-                <div id="qText" class="question-text"></div>
-                <div id="optionsGrid"></div>
-                <div id="expBox" class="exp-box" style="display:none;"></div>
+            <div id="quizArea">
+                <div id="qText" style="font-size:1.2rem; font-weight:800; color:#1f3e48; margin-bottom:15px;"></div>
+                <div id="opts"></div>
+                <div id="exp" class="exp"></div>
             </div>
             <button class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-    
-    <div id="adminScreen" class="screen">
+
+    <!-- الإدارة -->    <div id="admin" class="screen">
         <div class="card">
-            <h3 style="margin-bottom:10px; color:#5f4b8b;">🔧 لوحة الإدارة</h3>
-            <div class="quiz-content" id="adminList" style="max-height: 450px;">
-                <h4 class="admin-section-title" style="margin-top: 5px;">👥 إدارة الطلاب</h4>
-                <button class="btn btn-admin" id="toggleUsersBtn" onclick="toggleUsersPanel()" style="background: linear-gradient(105deg, #5f4b8b, #6c5ce7); display: flex; align-items: center; justify-content: center; gap: 5px;">
-                    <span>📂 عرض قائمة الطلاب</span>
-                    <span id="newRequestsBadge" class="req-badge" style="display: none;">0</span>
-                </button>
-                <div id="usersCollapsePanel" class="collapse-container">
-                    <div id="adminUsersList"></div>
+            <h3 style="color:#5f4b8b; margin-bottom:10px;">🔧 الإدارة</h3>
+            <div style="max-height:450px; overflow-y:auto;">
+                <h4 style="margin:15px 0 10px; color:#1e4a6e;">👥 الطلاب</h4>
+                <button class="btn btn-admin" onclick="toggleUsers()">📂 القائمة <span id="reqBadge" class="badge">0</span></button>
+                <div id="usersList" class="collapse"></div>
+                
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📝 الأسئلة</h4>
+                <button class="btn btn-admin" onclick="toggleJson()">📦 JSON</button>
+                <div id="jsonPanel" style="display:none; margin:10px 0;">
+                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"؟","o":["أ","ب","ج","د"],"c":"أ","e":"تفسير"}]'></textarea>
+                    <button class="btn btn-admin" onclick="addJson()">➕ إضافة</button>
                 </div>
-                <h4 class="admin-section-title">📝 إدارة الأسئلة</h4>
-                <div class="batch-area">
-                    <button class="btn btn-admin" onclick="toggleBatchJson()">📦 إضافة دفعة JSON</button>
-                    <div id="batchJsonPanel" style="display:none; margin-top:10px;">
-                        <textarea id="batchJsonInput" rows="6" class="batch-json" placeholder='[{"q":"سؤال؟","o":["أ","ب","ج","د"],"c":"أ","e":"تفسير"}]'></textarea>
-                        <button class="btn btn-admin" onclick="addBatchQuestions()">➕ إضافة</button>
-                        <button class="btn" style="background:#aaa;" onclick="toggleBatchJson()">إلغاء</button>
-                    </div>
-                </div>
-                <div class="admin-buttons">
-                    <button class="btn btn-admin" onclick="showAddSingleForm()">➕ إضافة سؤال</button>
-                    <button class="btn btn-danger" onclick="deleteAllQuestions()">🗑️ حذف الكل</button>
-                </div>
-                <div id="adminQuestionsList" style="margin-top: 15px;"></div>            </div>
-            <button class="btn" style="margin-top: 10px;" onclick="logout()">🚪 خروج</button>
+                <button class="btn btn-admin" onclick="addOne()">➕ سؤال واحد</button>
+                <button class="btn btn-danger" onclick="delAll()">🗑️ حذف الكل</button>
+                <div id="qList"></div>
+            </div>
+            <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
-    
-    <div class="app-footer">🦷 د. زكريا محمد عطوني | © 2026</div>
+
+    <div class="footer">🦷 د. زكريا عطوني | © 2026</div>
 </div>
-<div id="singleModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
-    <div class="card" style="flex:0 1 auto; width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
-        <h3 id="modalTitle">📌 إضافة سؤال</h3>
-        <input type="text" id="newQ" placeholder="نص السؤال">
-        <input type="text" id="newOpt1" placeholder="خيار 1">
-        <input type="text" id="newOpt2" placeholder="خيار 2">
-        <input type="text" id="newOpt3" placeholder="خيار 3">
-        <input type="text" id="newOpt4" placeholder="خيار 4">
-        <input type="text" id="newCorrect" placeholder="الإجابة الصحيحة" style="background:#e8f0fe;">
-        <textarea id="newExp" rows="2" placeholder="التفسير السريري"></textarea>
-        <div class="flex-row" style="margin-top:10px; gap:10px;">
-            <button class="btn" id="saveQuestionBtn">💾 حفظ</button>
+
+<!-- مودال السؤال -->
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
+    <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+        <h3 id="mTitle">سؤال</h3>
+        <input id="mQ" placeholder="السؤال">
+        <input id="m1" placeholder="خيار 1"><input id="m2" placeholder="خيار 2">
+        <input id="m3" placeholder="خيار 3"><input id="m4" placeholder="خيار 4">
+        <input id="mC" placeholder="الإجابة الصحيحة" style="background:#e8f0fe;">
+        <textarea id="mE" rows="2" placeholder="التفسير"></textarea>
+        <div class="row" style="margin-top:10px;">
+            <button class="btn" id="mSave">💾 حفظ</button>
             <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
 </div>
+
 <script>
-// ========== تهيئة فايربيس ==========
-const firebaseConfig = {
-    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
-    authDomain: "quizdental-c4d5a.firebaseapp.com",
-    projectId: "quizdental-c4d5a",
-    databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
-    storageBucket: "quizdental-c4d5a.appspot.com",
-    messagingSenderId: "750036143183",
-    appId: "1:750036143183:web:721a31ef795f973887ee3a"
-};
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+// ⚙️ Firebase
+const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
+firebase.initializeApp(cfg);
 const db = firebase.database();
-// ========== متغيرات عامة ==========
-let questionsList = [], quizQuestions = [], quizScore = 0, quizIndex = 0;
-let editModeId = null, currentPendingCount = 0, usersListener = null;
-let appReady = false; // يمنع التنفيذ المكرر
-// ========== مؤشر الاتصال ==========
-db.ref(".info/connected").on("value", snap => {
-    const dot = document.getElementById("dbStatusDot");
-    if (snap.val() === true) {
-        dot.classList.add("connected");        dot.title = "متصل ✓";
-    } else {
-        dot.classList.remove("connected");
-        dot.title = "جاري إعادة الاتصال...";
-    }
-});
-// ========== نظام التهيئة المضمون (بدون تعليق) ==========
-let initTimeout = setTimeout(() => forceLogin(), 3500); // مهلة قصوى 3.5 ثانية
-function hideOverlayAndShow(screenId) {
-    if (appReady) return;
-    appReady = true;
-    clearTimeout(initTimeout);
-    document.getElementById('loadingOverlay').style.display = 'none';
-    showScreen(screenId);
-}
-function updateLoadingStatus(msg) {
-    const el = document.getElementById('loadingSub');
-    if (el) el.innerText = msg;
-}
-// بدء التطبيق
-window.addEventListener('load', () => {
-    const u = localStorage.getItem('dentalQuizUser');
-    const p = localStorage.getItem('dentalQuizPass');
-    if (!u || !p) {
-        hideOverlayAndShow('loginScreen');
-        return;
-    }
-    updateLoadingStatus("جاري التحقق من البيانات...");
-    // دخول المدير
-    if (p === "salem1959") {
-        loadQuestions()
-            .then(() => hideOverlayAndShow('adminScreen'))
-            .catch(() => hideOverlayAndShow('loginScreen'));
-        return;
-    }
-    // دخول الطالب مع مهلة زمنية صارمة
-    let resolved = false;
-    const dbTimeout = setTimeout(() => {
-        if (!resolved) {
-            resolved = true;
-            console.warn("انتهت مهلة التحقق من قاعدة البيانات");
-            hideOverlayAndShow('loginScreen');        }
-    }, 2500); // 2.5 ثانية فقط للتحقق من DB
-    db.ref('users/' + makeKey(u)).once('value')
-        .then(snap => {
-            resolved = true;
-            clearTimeout(dbTimeout);
-            const data = snap.val();
-            if (data && data.password === p && data.status === 'active') {
-                loadQuestions()
-                    .then(() => {
-                        hideOverlayAndShow('studentScreen');
-                        startStudentQuiz();
-                    })
-                    .catch(() => hideOverlayAndShow('loginScreen'));
-            } else {
-                localStorage.removeItem('dentalQuizUser');
-                localStorage.removeItem('dentalQuizPass');
-                hideOverlayAndShow('loginScreen');
-            }
-        })
-        .catch(() => {
-            resolved = true;
-            clearTimeout(dbTimeout);
-            hideOverlayAndShow('loginScreen');
-        });
-});
-function forceLogin() {
-    hideOverlayAndShow('loginScreen');
-}
-// ========== دوال الدخول والتسجيل ==========
-async function doLogin() {
-    const u = document.getElementById('username').value.trim();
-    const p = document.getElementById('password').value.trim();
-    await handleLoginLogic(u, p, false);
-}
-async function handleLoginLogic(u, p, isAuto) {
-    if (!p) { if (!isAuto) alert("❌ أدخل كلمة السر"); return; }
-    
-    if (p === "salem1959") {
-        localStorage.setItem('dentalQuizUser', u);
-        localStorage.setItem('dentalQuizPass', p);
-        await loadQuestions();
-        hideOverlayAndShow('adminScreen');
-        showAdminPanel();
-        return;
-    }
+
+// 🔗 حالة الاتصال
+db.ref('.info/connected').on('value', s => {
+    document.getElementById('dot').className = 'status-dot' + (s.val()?' ok':'');});
+
+// 🗃️ متغيرات
+let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null;
+
+// 🔐 مفاتيح التخزين
+const K = { U:'dq_u', P:'dq_p' };
+
+// 🚀 البدء - بدون انتظار!
+window.onload = () => {
+    show('login');
+    // محاولة الدخول التلقائي في الخلفية
+    autoLogin().catch(()=>{});
+};
+
+// 🔁 الدخول التلقائي
+async function autoLogin() {
+    const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
+    if (!u || !p) return;
     try {
-        const snap = await db.ref('users/' + makeKey(u)).once('value');
-        const data = snap.val();
-        if (data && data.password === p && data.status === 'active') {
-            localStorage.setItem('dentalQuizUser', u);
-            localStorage.setItem('dentalQuizPass', p);
-            await loadQuestions();
-            hideOverlayAndShow('studentScreen');
-            startStudentQuiz();
-        } else if (!isAuto) {
-            if (data?.status === 'pending') alert("⏳ حسابك قيد المراجعة");
-            else if (data?.status === 'suspended') alert("🚫 حسابك موقوف");
-            else alert("❌ بيانات الدخول غير صحيحة");
+        if (p === 'salem1959') { await loadQs(); show('admin'); renderAdmin(); listenUsers(); return true; }
+        const snap = await db.ref('users/'+key(u)).once('value');
+        const d = snap.val();
+        if (d && d.password === p && d.status === 'active') {
+            await loadQs(); startQuiz(); return true;
         }
-    } catch (e) {
-        console.error("خطأ:", e);
-        if (!isAuto) alert("⚠️ خطأ في الاتصال، تحقق من الإنترنت");
+    } catch(e) { console.log('Auto-login failed:', e.message); }
+    return false;
+}
+
+// 🎯 تسجيل الدخول
+async function login() {
+    const u = document.getElementById('user').value.trim();
+    const p = document.getElementById('pass').value.trim();
+    if (!u || !p) return alert('أدخل البيانات');
+    
+    try {
+        if (p === 'salem1959') {
+            localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); return;
+        }
+        const snap = await db.ref('users/'+key(u)).once('value');
+        const d = snap.val();
+        if (d && d.password === p && d.status === 'active') {
+            localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
+            await loadQs(); startQuiz();
+        } else {
+            alert(d?.status === 'pending' ? '⏳ الحساب قيد المراجعة' : d?.status === 'suspended' ? '🚫 الحساب موقوف' : '❌ بيانات غير صحيحة');
+        }
+    } catch (e) {        showError('⚠️ خطأ في الاتصال: ' + e.message);
     }
 }
-async function doRegister() {
-    const u = document.getElementById('regUser').value.trim();
+
+// 📝 تسجيل جديد
+async function register() {
+    const n = document.getElementById('regUser').value.trim();
     const p = document.getElementById('regPass').value.trim();
-    if (!u || !p) return alert("❌ املأ جميع الحقول");
-    
-    await db.ref('users/' + makeKey(u)).set({
-        name: u, password: p, status: 'pending',
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-    });
-    alert("✅ تم إرسال الطلب، سيتم تفعيله من المدير");
-    showScreen('loginScreen');
-    document.getElementById('regUser').value = '';
-    document.getElementById('regPass').value = '';
-}
-// ========== إدارة الأسئلة ==========
-async function loadQuestions() {
+    if (!n || !p) return alert('أكمل البيانات');
     try {
-        const snap = await db.ref('questions').once('value');
-        const data = snap.val();
-        questionsList = data ? Object.entries(data).map(([id, q]) => ({...q, firebaseId: id})) : [];
-    } catch (e) { questionsList = []; }
+        await db.ref('users/'+key(n)).set({ name:n, password:p, status:'pending', at:Date.now() });
+        alert('✅ تم الإرسال'); show('login');
+    } catch(e) { alert('❌ '+e.message); }
 }
-function startStudentQuiz() {
-    if (!questionsList.length) { alert("⚠️ لا توجد أسئلة حالياً"); logout(); return; }
-    quizQuestions = [...questionsList].sort(() => Math.random() - 0.5);
-    quizScore = 0; quizIndex = 0;
-    showScreen('studentScreen');    renderQuiz();
+
+// 📥 تحميل الأسئلة
+async function loadQs() {
+    const snap = await db.ref('questions').once('value');
+    const d = snap.val();
+    Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
-function renderQuiz() {
-    if (quizIndex >= quizQuestions.length) {
-        alert(`🎉 أكملت الاختبار!\n⭐ نتيجتك: ${quizScore}`);
-        startStudentQuiz(); return;
-    }
-    const q = quizQuestions[quizIndex];
-    document.getElementById('qCounter').innerText = `س ${quizIndex + 1}/${quizQuestions.length}`;
-    document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;
+
+// 🎮 بدء الاختبار
+function startQuiz() {
+    if (!Qs.length) { alert('لا توجد أسئلة'); logout(); return; }
+    quiz = [...Qs].sort(()=>Math.random()-0.5);
+    score = 0; qi = 0; show('student'); renderQ();
+}
+
+// 🖥️ عرض السؤال
+function renderQ() {
+    if (qi >= quiz.length) { alert(`🎉 انتهى! نتيجتك: ${score}/${quiz.length*10}`); startQuiz(); return; }
+    const q = quiz[qi];
+    document.getElementById('qNum').innerText = `س ${qi+1}/${quiz.length}`;
+    document.getElementById('score').innerText = `⭐ ${score}`;
     document.getElementById('qText').innerText = q.q;
-    document.getElementById('expBox').style.display = 'none';
-    
-    const grid = document.getElementById('optionsGrid');
-    grid.innerHTML = "";
-    const shuffled = [...q.o].sort(() => Math.random() - 0.5);
-    
-    shuffled.forEach(opt => {
+    document.getElementById('exp').style.display = 'none';
+    const opts = document.getElementById('opts'); opts.innerHTML = '';
+    [...q.o].sort(()=>Math.random()-0.5).forEach(opt => {
         const div = document.createElement('div');
-        div.className = 'option-card';
-        div.innerText = opt;
-        div.onclick = function () {
-            if (document.querySelector('.correct-card') || document.querySelector('.wrong-card')) return;
-            if (opt === q.c) {
-                quizScore += 10;
-                div.classList.add('correct-card');
-            } else {
-                div.classList.add('wrong-card');
-                Array.from(grid.children).forEach(ch => {
-                    if (ch.innerText === q.c) ch.classList.add('correct-card');
-                });
-            }
-            document.getElementById('scoreValue').innerHTML = `⭐ ${quizScore}`;
-            document.getElementById('expBox').innerHTML = `<b>📘 التفسير:</b><br>${q.e || "لا يوجد"}`;
-            document.getElementById('expBox').style.display = 'block';
-            setTimeout(() => { quizIndex++; renderQuiz(); }, 2000);
-        };
-        grid.appendChild(div);
+        div.className = 'option'; div.innerText = opt;
+        div.onclick = () => {
+            if (opts.querySelector('.correct,.wrong')) return;
+            if (opt === q.c) { score += 10; div.classList.add('correct'); }
+            else { div.classList.add('wrong'); [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); }); }
+            document.getElementById('score').innerText = `⭐ ${score}`;
+            const exp = document.getElementById('exp');
+            exp.innerHTML = `<b>📘 التفسير:</b><br>${q.e}`; exp.style.display = 'block';
+            setTimeout(()=>{ qi++; renderQ(); }, 1800);
+        };        opts.appendChild(div);
     });
 }
-// ========== لوحة الإدارة ==========
-function showAdminPanel() {
-    showScreen('adminScreen');
-    renderAdminList();
-    listenToUsers();
+
+// 🔧 الإدارة
+function showAdmin() { show('admin'); renderAdmin(); listenUsers(); }
+
+function renderAdmin() {
+    const c = document.getElementById('qList');
+    if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888">📭 لا توجد أسئلة</p>'; return; }
+    c.innerHTML = '';
+    Qs.forEach((q,i) => {
+        const div = document.createElement('div'); div.className = 'q-item';
+        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong></div><div class="correct-badge">✅ ${q.c}</div>
+        <div class="row" style="margin-top:8px;">
+            <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;" onclick="editQ('${q.id}')">✏️</button>
+            <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;" onclick="delQ('${q.id}')">🗑️</button>
+        </div>`;
+        c.appendChild(div);
+    });
 }
-function renderAdminList() {    const container = document.getElementById('adminQuestionsList');
-    if (!container) return;
-    if (!questionsList.length) {
-        container.innerHTML = "<p style='text-align:center;color:#888;padding:20px'>📭 أضف أسئلة جديدة</p>";
-        return;
-    }
-    container.innerHTML = "";
-    questionsList.forEach((q, idx) => {
-        const div = document.createElement('div');
-        div.className = "question-item";
-        div.innerHTML = `
-            <div style="margin-bottom:8px"><strong>${idx + 1}. ${q.q}</strong></div>
-            <div class="correct-badge">✅ ${q.c}</div>
-            <div class="flex-row" style="margin-top:8px">
-                <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;font-size:0.85rem" onclick="editQuestion('${q.firebaseId}')">✏️</button>
-                <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;font-size:0.85rem" onclick="deleteQuestion('${q.firebaseId}')">🗑️</button>
+
+// 👥 المستخدمين
+function listenUsers() {
+    if (usersRef) db.ref('users').off('value', usersRef);
+    usersRef = db.ref('users').on('value', snap => {
+        const d = snap.val(), c = document.getElementById('usersList');
+        if (!c) return;
+        if (!d) { c.innerHTML = '<p style="text-align:center;color:#888">📭 لا يوجد طلاب</p>'; pending = 0; updBadge(); return; }
+        pending = 0; c.innerHTML = '';
+        Object.entries(d).forEach(([k,u]) => {
+            if (u.status === 'pending') pending++;
+            const st = {active:['✅ نشط','active'],pending:['⏳ انتظار','pending'],suspended:['⏸️ موقوف','suspended']}[u.status]||['؟',''];
+            const div = document.createElement('div'); div.className = 'user-item';
+            div.innerHTML = `<div class="row"><strong>👤 ${u.name}</strong><span class="tag ${st[1]}">${st[0]}</span></div>
+            <div style="font-size:0.85rem;color:#666;margin:8px 0;">🔐 ${u.password}</div>
+            <div class="row" style="gap:5px;">
+                ${u.status!=='active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','active')">✅</button>`:''}
+                ${u.status!=='suspended' ? `<button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','suspended')">⏸️</button>`:''}
+                <button class="btn" style="background:#d63031;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="delU('${k}','${u.name}')">🗑️</button>
             </div>`;
-        container.appendChild(div);
-    });
-}
-function toggleUsersPanel() {
-    document.getElementById('usersCollapsePanel').classList.toggle('show');
-    updateToggleButtonText(currentPendingCount);
-}
-function updateToggleButtonText(pendingCount) {
-    const panel = document.getElementById('usersCollapsePanel');
-    const btn = document.getElementById('toggleUsersBtn');
-    if (panel.classList.contains('show')) btn.innerHTML = `📁 طي القائمة`;
-    else btn.innerHTML = `📂 عرض الطلاب <span id="newRequestsBadge" class="req-badge" style="display:${pendingCount > 0 ? 'inline-block' : 'none'}">${pendingCount}</span>`;
-}
-function listenToUsers() {
-    if (usersListener) db.ref('users').off('value', usersListener);
-    usersListener = db.ref('users').on('value', snap => {
-        const data = snap.val();
-        const container = document.getElementById('adminUsersList');
-        const badge = document.getElementById('newRequestsBadge');
-        if (!container) return;
-        if (!data) {
-            container.innerHTML = "<p style='text-align:center;color:#888;padding:20px'>📭 لا يوجد طلاب</p>";
-            currentPendingCount = 0; updateToggleButtonText(0); if (badge) badge.style.display = 'none'; return;
-        }
-        let pending = 0; container.innerHTML = "";
-        Object.entries(data).sort((a, b) => {
-            if (a[1].status === 'pending' && b[1].status !== 'pending') return -1;
-            if (a[1].status !== 'pending' && b[1].status === 'pending') return 1; return 0;
-        }).forEach(([key, user]) => {
-            const st = { pending: ["قيد الانتظار", "status-pending"], active: ["✅ نشط", "status-active"], suspended: ["🚫 موقوف", "status-suspended"] };            const [txt, cls] = st[user.status] || ["غير معروف", ""];
-            if (user.status === 'pending') pending++;
-            const div = document.createElement('div');
-            div.className = "user-item";
-            div.innerHTML = `
-                <div class="flex-row"><strong>👤 ${user.name}</strong><span class="status-tag ${cls}">${txt}</span></div>
-                <div style="font-size:0.8rem;color:#666;margin:5px 0;direction:ltr;text-align:left">🔑 ${user.password}</div>
-                <div class="flex-row" style="gap:5px;flex-wrap:wrap">
-                    <button class="btn" style="background:#00b894;width:auto;padding:5px 12px;font-size:0.8rem" onclick="updateUserStatus('${key}','active')">✅</button>
-                    <button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 12px;font-size:0.8rem" onclick="updateUserStatus('${key}','pending')">⏳</button>
-                    <button class="btn" style="background:#d63031;width:auto;padding:5px 12px;font-size:0.8rem" onclick="deleteUser('${key}','${user.name}')">🗑️</button>
-                </div>`;
-            container.appendChild(div);
+            c.appendChild(div);
         });
-        currentPendingCount = pending;
-        updateToggleButtonText(pending);
-        if (badge) { badge.innerText = pending; badge.style.display = pending > 0 ? 'inline-block' : 'none'; }
+        updBadge();
     });
 }
-async function updateUserStatus(key, status) {
-    if (confirm(`تعديل حالة المستخدم إلى "${status}"؟`)) await db.ref('users/' + key).update({ status });
-}
-async function deleteUser(key, name) {
-    if (confirm(`⚠️ حذف حساب "${name}" نهائياً؟`)) await db.ref('users/' + key).remove();
-}
-async function deleteQuestion(id) {
-    if (confirm("حذف هذا السؤال؟")) { await db.ref('questions/' + id).remove(); await loadQuestions(); renderAdminList(); }
-}
-async function deleteAllQuestions() {
-    if (!questionsList.length) return alert("📭 لا توجد أسئلة");
-    if (!confirm(`⚠️ حذف جميع الأسئلة (${questionsList.length})؟`)) return;
-    const updates = {};
-    questionsList.forEach(q => updates[`questions/${q.firebaseId}`] = null);
-    await db.ref().update(updates);
-    await loadQuestions(); renderAdminList();
-    alert("✅ تم الحذف");
-}
-function toggleBatchJson() {
-    const p = document.getElementById('batchJsonPanel');
-    p.style.display = p.style.display === 'none' ? 'block' : 'none';
-    if (p.style.display === 'block') { document.getElementById('batchJsonInput').value = ''; document.getElementById('batchJsonInput').focus(); }
-}
-async function addBatchQuestions() {
-    const txt = document.getElementById('batchJsonInput').value.trim();    if (!txt) return alert("❌ ألصق بيانات JSON");
-    let batch;
-    try { batch = JSON.parse(txt); } catch (e) { return alert("❌ خطأ JSON: " + e.message); }
-    if (!Array.isArray(batch)) return alert("❌ يجب أن تكون مصفوفة");
-    let added = 0, errors = 0;
-    for (let item of batch) {
-        if (!item.q || !item.o || !item.c || !item.e || !Array.isArray(item.o) || item.o.length !== 4 || !item.o.includes(item.c)) { errors++; continue; }
-        await db.ref('questions').push({ q: item.q.trim(), o: item.o.map(o => o.trim()), c: item.c.trim(), e: item.e.trim(), addedAt: firebase.database.ServerValue.TIMESTAMP });
-        added++;
+
+function updBadge() {
+    const b = document.getElementById('reqBadge');
+    b.innerText = pending; b.style.display = pending>0?'inline-block':'none';}
+
+function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
+
+async function setSt(k, st) { if (confirm('تأكيد؟')) await db.ref('users/'+k).update({status:st}); }
+async function delU(k, n) { if (confirm(`حذف "${n}"؟`)) await db.ref('users/'+k).remove(); }
+
+// ❓ الأسئلة
+async function delQ(id) { if (confirm('حذف؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
+async function delAll() { if (!confirm(`حذف جميع الأسئلة (${Qs.length})؟`)) return; 
+    const up = {}; Qs.forEach(q=>up[`questions/${q.id}`]=null); await db.ref().update(up); await loadQs(); renderAdmin(); alert('✅ تم'); }
+
+function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
+
+async function addJson() {
+    const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('ألصق JSON');
+    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('❌ '+e.message); }
+    if (!Array.isArray(arr)) return alert('يجب أن تكون مصفوفة [...]');
+    let ok = 0, err = 0;
+    for (const it of arr) {
+        if (!it.q || !it.o || !it.c || !it.e || !Array.isArray(it.o) || it.o.length!==4 || !it.o.includes(it.c)) { err++; continue; }
+        try { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e}); ok++; } catch { err++; }
     }
-    alert(`✅ أضيف ${added} سؤال${errors ? `\n❌ فشل ${errors}` : ''}`);
-    toggleBatchJson(); await loadQuestions(); renderAdminList();
+    alert(`✅ ${ok} | ❌ ${err}`); toggleJson(); await loadQs(); renderAdmin();
 }
-function showAddSingleForm() {
-    editModeId = null;
-    document.getElementById('modalTitle').innerText = "➕ إضافة سؤال";
-    ['newQ', 'newOpt1', 'newOpt2', 'newOpt3', 'newOpt4', 'newCorrect', 'newExp'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('singleModal').style.display = 'flex';
-    document.getElementById('saveQuestionBtn').onclick = () => addSingleQuestion();
+
+// ➕ سؤال واحد
+function addOne() {
+    editId = null; document.getElementById('mTitle').innerText = '➕ جديد';
+    ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('mSave').onclick = saveOne;
 }
-async function addSingleQuestion() {
-    const q = document.getElementById('newQ').value.trim();
-    const o = ['newOpt1', 'newOpt2', 'newOpt3', 'newOpt4'].map(id => document.getElementById(id).value.trim());
-    const c = document.getElementById('newCorrect').value.trim();
-    const e = document.getElementById('newExp').value.trim();
-    if (!q || o.some(v => !v) || !c || !e) return alert("❌ املأ جميع الحقول");
-    if (!o.includes(c)) return alert("⚠️ الإجابة يجب أن تكون في الخيارات");
-    await db.ref('questions').push({ q, o, c, e, addedAt: firebase.database.ServerValue.TIMESTAMP });
-    alert("✅ تمت الإضافة"); closeModal(); await loadQuestions(); renderAdminList();
+
+async function saveOne() {
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim();
+    const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('أكمل الحقول');
+    if (!o.includes(c)) return alert('الإجابة يجب أن تكون في الخيارات');
+    try {
+        await db.ref('questions').push({q,o,c,e});
+        alert('✅ تمت'); closeModal(); await loadQs(); if (document.getElementById('admin').classList.contains('active')) renderAdmin();
+    } catch(err) { alert('❌ '+err.message); }
 }
-function editQuestion(id) {
-    const q = questionsList.find(x => x.firebaseId === id);
-    if (!q) return;
-    editModeId = id;
-    document.getElementById('modalTitle').innerText = "✏️ تعديل";
-    document.getElementById('newQ').value = q.q;
-    q.o.forEach((v, i) => document.getElementById('newOpt' + (i + 1)).value = v);
-    document.getElementById('newCorrect').value = q.c;
-    document.getElementById('newExp').value = q.e;
-    document.getElementById('singleModal').style.display = 'flex';
-    document.getElementById('saveQuestionBtn').onclick = () => updateQuestion(id);
+
+// ✏️ تعديل
+function editQ(id) {
+    const q = Qs.find(x=>x.id===id); if (!q) return;    editId = id; document.getElementById('mTitle').innerText = '✏️ تعديل';
+    document.getElementById('mQ').value = q.q;
+    q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value = v);
+    document.getElementById('mC').value = q.c; document.getElementById('mE').value = q.e;
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('mSave').onclick = () => updQ(id);
 }
-async function updateQuestion(id) {
-    const q = document.getElementById('newQ').value.trim();
-    const o = ['newOpt1', 'newOpt2', 'newOpt3', 'newOpt4'].map(id => document.getElementById(id).value.trim());
-    const c = document.getElementById('newCorrect').value.trim();    const e = document.getElementById('newExp').value.trim();
-    if (!q || o.some(v => !v) || !c || !e) return alert("❌ املأ جميع الحقول");
-    if (!o.includes(c)) return alert("⚠️ الإجابة في الخيارات");
-    await db.ref('questions/' + id).set({ q, o, c, e, updatedAt: firebase.database.ServerValue.TIMESTAMP });
-    alert("✅ تم التعديل"); closeModal(); await loadQuestions(); renderAdminList();
+
+async function updQ(id) {
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim();
+    const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('أكمل الحقول');
+    if (!o.includes(c)) return alert('الإجابة في الخيارات');
+    try {
+        await db.ref('questions/'+id).set({q,o,c,e});
+        alert('✅ تم'); closeModal(); await loadQs(); renderAdmin();
+    } catch(err) { alert('❌ '+err.message); }
 }
-function closeModal() { document.getElementById('singleModal').style.display = 'none'; editModeId = null; }
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function makeKey(s) { try { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g, ""); } catch (e) { return s.replace(/[^a-zA-Z0-9]/g, '_'); } }
+
+function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
+
+// 🧭 أدوات
+function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
+function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 4000); }
+
+// 🚪 الخروج
 function logout() {
-    if (usersListener) { db.ref('users').off('value', usersListener); usersListener = null; }
-    db.ref(".info/connected").off();
-    localStorage.removeItem('dentalQuizUser');
-    localStorage.removeItem('dentalQuizPass');
-    questionsList = []; quizQuestions = [];
-    showScreen('loginScreen');
-    location.reload();
+    if (usersRef) db.ref('users').off('value', usersRef);
+    localStorage.removeItem(K.U); localStorage.removeItem(K.P);
+    Qs = []; quiz = []; score = 0; qi = 0;
+    show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
 }
-window.addEventListener('popstate', () => {
-    if (document.querySelector('.screen.active')?.id !== 'loginScreen') history.pushState(null, null, location.href);
-});
 </script>
 </body>
 </html>
