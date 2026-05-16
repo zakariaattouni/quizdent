@@ -34,25 +34,7 @@
         .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
         .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
         .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
-        
-        /* --- تحسينات صندوق التفسير لمنع التراكب --- */
-        .exp { 
-            background: #fff7e5; 
-            border-right: 4px solid #f4b942; 
-            padding: 15px; 
-            border-radius: 15px; 
-            margin-top: 20px; 
-            margin-bottom: 15px; 
-            font-size: 0.95rem; 
-            color: #7a5a2a; 
-            display: none; 
-            position: relative; 
-            clear: both;             line-height: 1.8; 
-            z-index: 10;
-            box-shadow: 0 2px 8px rgba(244, 185, 66, 0.1);
-        }
-        /* ----------------------------------------- */
-        
+        .exp { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; margin-top: 10px; font-size: 0.9rem; color: #7a5a2a; display: none; }
         .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
         .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
@@ -96,7 +78,8 @@
             <span id="dot" class="status-dot"></span>
             <span id="onlineCountBox" class="online-count"></span>
         </h1>
-        <p>بإشراف الدكتور زكريا محمد عطوني</p>    </div>
+        <p>بإشراف الدكتور زكريا محمد عطوني</p>
+    </div>
     <div id="err" class="error"></div>
     
     <!-- الدخول الثلاثي المستقل -->
@@ -145,7 +128,8 @@
                 <div class="report-box">
                     <div style="font-size:1.1rem; font-weight:bold; color:#166534;" id="repScore"></div>
                     <div style="font-size:0.9rem; color:#4b5563;" id="repPercent"></div>
-                </div>                <h4 style="color:#c53030; margin-bottom:8px; text-align:right;" id="repWrongTitle">أسئلة تحتاج مراجعة وتدقيق علمي:</h4>
+                </div>
+                <h4 style="color:#c53030; margin-bottom:8px; text-align:right;" id="repWrongTitle">أسئلة تحتاج مراجعة وتدقيق علمي:</h4>
                 <div id="wrongList"></div>
             </div>
             <button id="quizActionBtn" class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">خروج من الحساب</button>
@@ -194,13 +178,14 @@
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
 <!-- نافذة إضافة وتعديل الأسئلة المفردة -->
-<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">    <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
+    <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
         <h3 id="mTitle">نموذج السؤال</h3>
         <input id="mQ" placeholder="نص السؤال العلمي">
         <input id="m1" placeholder="الخيار الأول"><input id="m2" placeholder="الخيار الثاني">
         <input id="m3" placeholder="الخيار الثالث"><input id="m4" placeholder="الخيار الرابع">
         <input id="mC" placeholder="نسخة مطابقة من الخيار الصحيح تماما" style="background:#e8f0fe;">
-        <textarea id="mE" rows="3" placeholder="اكتب هنا التفسير العلمي الموسع والمفيد للطالب..."></textarea>
+        <textarea id="mE" rows="2" placeholder="الشرح والتفسير العلمي المرتبط بالسؤال"></textarea>
         <div class="row" style="margin-top:10px;">
             <button class="btn" id="mSave">حفظ البيانات</button>
             <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء الأمر</button>
@@ -243,7 +228,8 @@ function stopListeningOnlineCount() {
     if (box) { box.style.display = 'none'; box.innerText = ''; }
     if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
 }
-async function autoLogin() {    const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
+async function autoLogin() {
+    const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
     if (!u || !p) return;
     try {
         if (p === 'salem1959') { 
@@ -292,7 +278,8 @@ async function loadQs() {
 }
 function checkSavedProgress() {
     show('student');
-    document.getElementById('quizContent').style.display = 'block';    document.getElementById('reportArea').style.display = 'none';
+    document.getElementById('quizContent').style.display = 'block';
+    document.getElementById('reportArea').style.display = 'none';
     document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
     document.getElementById('quizActionBtn').onclick = logout;
     const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
@@ -341,7 +328,8 @@ function renderQ() {
     
     const q = quiz[qi];
     document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
-    document.getElementById('score').innerText = `النقاط: ${score}`;    document.getElementById('qText').innerText = q.q;
+    document.getElementById('score').innerText = `النقاط: ${score}`;
+    document.getElementById('qText').innerText = q.q;
     document.getElementById('exp').style.display = 'none';
     const opts = document.getElementById('opts'); opts.innerHTML = '';
     
@@ -358,13 +346,8 @@ function renderQ() {
             }
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
-            
-            // --- تم التعديل: عرض التفسير الموسع فقط دون نصائح إضافية ---
-            exp.innerHTML = `<b>📋 التفسير العلمي والتفصيلي:</b><br><span style="display:block; margin-top:10px; line-height:1.9; font-weight:500;">${q.e}</span>`; 
-            exp.style.display = 'block';
-            
-            // زمن العرض 8 ثواني (8000 ميلي ثانية)
-            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, 8000);
+            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
+            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, 1800);
         };        
         opts.appendChild(div);
     });
@@ -390,7 +373,8 @@ function showFinalReport() {
             wrongList.appendChild(div);
         });
     }
-    const actionBtn = document.getElementById('quizActionBtn');    actionBtn.innerText = 'بدء جولة اختبار وتدريب جديدة';
+    const actionBtn = document.getElementById('quizActionBtn');
+    actionBtn.innerText = 'بدء جولة اختبار وتدريب جديدة';
     actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
     actionBtn.onclick = checkSavedProgress;
 }
@@ -439,7 +423,8 @@ async function delU(k, n) { if (confirm(`هل ترغب فعلا في حذف حس
 async function delQ(id) { if (confirm('هل أنت متأكد من رغبتك في حذف هذا السؤال نهائيا؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
 function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
 async function addJson() {
-    const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('يرجى لصق بيانات نص JSON أولا');    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('خطأ في تركيب ملف الـ JSON: '+e.message); }
+    const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('يرجى لصق بيانات نص JSON أولا');
+    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('خطأ في تركيب ملف الـ JSON: '+e.message); }
     if (!Array.isArray(arr)) return alert('يجب أن تكون المدخلات عبارة عن مصفوفة تحتوي على كائنات متعددة');
     let ok = 0, err = 0;
     for (const it of arr) {
@@ -457,8 +442,8 @@ async function saveOne() {
     const q = document.getElementById('mQ').value.trim();
     const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
     const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
-    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى ملء جميع الحقول المطلوبة للسؤال أولاً');
-    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يتطابق حرفياً مع أحد الخيارات الأربعة المدرجة');
+    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى ملء جميع الحقول المطلوبة للسؤال أولا');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يتطابق حرفيا مع أحد الخيارات الأربعة المدرجة');
     try {
         await db.ref('questions').push({q,o,c,e});
         alert('تم حفظ السؤال بنجاح وإدراجه في بنك الأسئلة'); closeModal(); await loadQs(); if (document.getElementById('admin').classList.contains('active')) renderAdmin();
@@ -475,7 +460,7 @@ async function updQ(id) {
     const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
     const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
     if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى إكمال تعبئة البيانات');
-    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يطابق تماماً أحد الخيارات الأربعة المكتوبة');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يطابق تماما أحد الخيارات الأربعة المكتوبة');
     try {
         await db.ref('questions/'+id).set({q,o,c,e});
         alert('تم تحديث السؤال بنجاح'); closeModal(); await loadQs(); renderAdmin();
@@ -488,7 +473,8 @@ function buildNoticeManagerUI() {
     const container = document.getElementById('noticeListContainer');
     if (!container) return;
     container.innerHTML = '';
-        noticeLines.forEach((item, idx) => {
+    
+    noticeLines.forEach((item, idx) => {
         const row = document.createElement('div');
         row.className = 'notice-row-item';
         row.innerHTML = `
@@ -537,7 +523,8 @@ function displayNoticeContent(targetBox, noticeObj) {
     const displayDuration = noticeObj.time ? noticeObj.time * 1000 : 4000;
     
     if (checkIsImage(noticeObj.content)) {
-        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية...</div>            <img id="noticeImg" src="${noticeObj.content}" alt="إعلان" style="display:none;">`;
+        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية...</div>
+            <img id="noticeImg" src="${noticeObj.content}" alt="إعلان" style="display:none;">`;
         const img = document.getElementById('noticeImg'); const txt = document.getElementById('noticeTxt');
         
         let fallbackTimeout = setTimeout(() => { nextNotice(); }, displayDuration + 2000);
@@ -586,7 +573,8 @@ function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
     stopListeningOnlineCount(); localStorage.removeItem(K.U); localStorage.removeItem(K.P);
     Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = [];
-    show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';}
+    show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
+}
 </script>
 </body>
 </html>
