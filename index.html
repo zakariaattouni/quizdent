@@ -52,7 +52,6 @@
         .error.show { display: block; }
         #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
         
-        /* تنسيق زر الانتقال للتطبيق الأكبر */
         .main-app-btn { background: linear-gradient(105deg, #3b82f6, #1d4ed8); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 24px; font-weight: 700; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); transition: 0.2s; font-size: 1rem; margin-top: 5px; }
         .main-app-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(29, 78, 216, 0.4); }
 
@@ -65,6 +64,14 @@
 
         .report-box { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 16px; text-align: center; }
         .wrong-review-item { background: #fff5f5; border-right: 4px solid #f56565; padding: 12px; border-radius: 14px; margin-bottom: 10px; text-align: right; font-size: 0.9rem; }
+
+        /* تنسيقات إدارة الإعلانات المنفصلة والمريحة */
+        .notice-manager-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-top: 10px; }
+        .notice-row-item { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .notice-row-fields { display: flex; gap: 8px; align-items: center; }
+        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; }
+        .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; text-align: center; margin: 0; }
+        .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
     </style>
 </head><body>
 <div class="app">
@@ -139,12 +146,22 @@
             <h3 style="color:#5f4b8b; margin-bottom:10px;">لوحة التحكم بالإدارة</h3>
             <div style="max-height:450px; overflow-y:auto;">
                 
-                <h4 style="margin:10px 0 5px; color:#1e4a6e;">قائمة الإعلانات التدويرية (نص أو رابط صورة في سطر منفرد)</h4>
-                <textarea id="adminNoticeInput" rows="4" style="font-size:0.9rem;" placeholder="اكتب جملة نصية هنا&#10;https://example.com/image.png&#10;اكتب جملة إعلانية أخرى..."></textarea>
-                <button class="btn btn-admin" style="margin-bottom:15px;" onclick="saveNotice()">حفظ وتحديث الإعلانات</button>
-                <hr style="border:0; border-top:1px dashed #dceaf2; margin:10px 0;">
+                <!-- إضافة ميزة الطي البرمجي لقسم إدارة الإعلانات لمنع التشتت والارتباك -->
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الإعلانات واللافتات التدويرية</h4>
+                <button class="btn btn-admin" onclick="toggleNoticePanel()">عرض نافذة التحكم بالإعلانات</button>
+                <div id="noticeCollapsePanel" class="collapse">
+                    <div class="notice-manager-panel">
+                        <div id="noticeListContainer">
+                            <!-- يتم توليد الحقول هنا تلقائياً -->
+                        </div>
+                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة حقل إعلان أو صورة جديد</button>
+                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">حفظ وتحديث قائمة الإعلانات نهائياً</button>
+                    </div>
+                </div>
 
-                <h4 style="margin:15px 0 10px; color:#1e4a6e;">إدارة الطلاب المسجلين</h4>
+                <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
+
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الطلاب المسجلين</h4>
                 <button class="btn btn-admin" onclick="toggleUsers()">عرض القائمة الكاملة <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
                 
@@ -152,7 +169,7 @@
                 <button class="btn btn-admin" onclick="toggleJson()">إضافة جماعية عبر JSON</button>
                 <div id="jsonPanel" style="display:none; margin:10px 0;">
                     <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
-                    <button class="btn btn-admin" onclick="addJson()">إضافة المصفوفة</button>
+                    <button class="btn btn-admin" onclick="addJson()">إضافة مصفوفة الأسئلة</button>
                 </div>
                 <button class="btn btn-admin" onclick="addOne()">إضافة سؤال مفرد</button>
                 <div id="qList"></div>
@@ -163,9 +180,7 @@
     
     <div id="appNoticeBox" class="admin-notice-box"></div>
 
-    <!-- زر الانتقال لتطبيق الدكتور زكريا الأكبر المضاف حديثاً -->
     <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">الانتقال إلى تطبيق تشخيص أمراض الفم والأسنان</a>
-
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
@@ -233,12 +248,7 @@ async function autoLogin() {
     if (!u || !p) return;
     try {
         if (p === 'salem1959') { 
-            await loadQs(); 
-            show('admin'); 
-            renderAdmin(); 
-            listenUsers(); 
-            startListeningOnlineCount();
-            return true; 
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return true; 
         }
         const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
@@ -257,9 +267,7 @@ async function login() {
     try {
         if (p === 'salem1959') {
             localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
-            await loadQs(); show('admin'); renderAdmin(); listenUsers(); 
-            startListeningOnlineCount();
-            return;
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return;
         }
         const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
@@ -269,9 +277,7 @@ async function login() {
         } else {
             alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
         }
-    } catch (e) {        
-        showError('خطأ في الاتصال بالشبكة: ' + e.message);
-    }
+    } catch (e) { showError('خطأ في الاتصال بالشبكة: ' + e.message); }
 }
 
 async function register() {
@@ -286,8 +292,7 @@ async function register() {
 
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
-    const d = snap.val();
-    Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
+    const d = snap.val(); Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
 
 function checkSavedProgress() {
@@ -312,15 +317,10 @@ function checkSavedProgress() {
 function startQuiz(forceNew = true) {
     if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
     if (forceNew) {
-        clearProgressStorage();
-        document.getElementById('resumeBtn').style.display = 'none';
-        quiz = [...Qs].sort(()=>Math.random()-0.5);
-        score = 0; qi = 0; wrongAnswersHistory = [];
-        renderQ();
+        clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
     } else {
-        quiz = [...Qs].sort(()=>Math.random()-0.5);
-        score = 0; qi = 0; wrongAnswersHistory = [];
-        renderQ();
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
     }
 }
 
@@ -333,8 +333,7 @@ function resumeSession() {
 
         if (savedQuiz && savedQuiz.length > 0) {
             quiz = savedQuiz; qi = savedIndex; score = savedScore; wrongAnswersHistory = savedWrong;
-            document.getElementById('resumeBtn').style.display = 'none';
-            renderQ();
+            document.getElementById('resumeBtn').style.display = 'none'; renderQ();
         }
     } catch (e) { console.log("Error resuming session", e); startQuiz(true); }
 }
@@ -347,10 +346,8 @@ function saveCurrentProgressToStorage() {
 }
 
 function clearProgressStorage() {
-    localStorage.removeItem(K.PROGRESS_QUIZ);
-    localStorage.removeItem(K.PROGRESS_INDEX);
-    localStorage.removeItem(K.PROGRESS_SCORE);
-    localStorage.removeItem(K.PROGRESS_WRONG);
+    localStorage.removeItem(K.PROGRESS_QUIZ); localStorage.removeItem(K.PROGRESS_INDEX);
+    localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
 }
 
 function renderQ() {
@@ -365,8 +362,7 @@ function renderQ() {
     
     const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
     mixedOptions.forEach(opt => {
-        const div = document.createElement('div');
-        div.className = 'option'; div.innerText = opt;
+        const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
         div.onclick = () => {
             if (opts.querySelector('.correct,.wrong')) return;
             if (opt === q.c) { score += 10; div.classList.add('correct'); }
@@ -387,8 +383,7 @@ function renderQ() {
 function showFinalReport() {
     document.getElementById('quizContent').style.display = 'none';
     document.getElementById('reportArea').style.display = 'block';
-    const maxScore = quiz.length * 10;
-    const percent = Math.round((score / maxScore) * 100) || 0;
+    const maxScore = quiz.length * 10; const percent = Math.round((score / maxScore) * 100) || 0;
     
     document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية هي: ${score} من أصل ${maxScore} نقطة`;
     document.getElementById('repPercent').innerText = `نسبة التشخيص الصحيحة الإجمالية: ${percent}%`;
@@ -453,6 +448,8 @@ function listenUsers() {
 
 function updBadge() { const b = document.getElementById('reqBadge'); b.innerText = pending; b.style.display = pending>0?'inline-block':'none'; }
 function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
+function toggleNoticePanel() { document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
+
 async function setSt(k, st) { if (confirm('هل أنت متأكد من تغيير حالة هذا الحساب؟')) await db.ref('users/'+k).update({status:st}); }
 async function delU(k, n) { if (confirm(`هل ترغب فعلا في حذف حساب الطالب "${n}" بشكل كامل؟`)) await db.ref('users/'+k).remove(); }
 
@@ -510,41 +507,109 @@ async function updQ(id) {
 
 function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
 
+// --- ميزة إدارة الإعلانات المنفصلة والمطوية بالكامل من لوحة الإدارة ---
 let noticeTimeout = null; let currentNoticeIndex = 0; let noticeLines = [];
 
-async function saveNotice() {
-    const text = document.getElementById('adminNoticeInput').value;
-    try { await db.ref('app_notice').set(text); alert('تم تحديث وحفظ بيانات قائمة الإعلانات التدويرية بنجاح'); } catch(e) { alert('فشل الحفظ: ' + e.message); }
+function buildNoticeManagerUI() {
+    const container = document.getElementById('noticeListContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    noticeLines.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'notice-row-item';
+        row.innerHTML = `
+            <div class="notice-row-fields">
+                <input type="text" class="notice-input-content" value="${item.content}" placeholder="نص الإعلان أو رابط الصورة الفعلي">
+                <input type="number" class="notice-input-time" value="${item.time || 4}" placeholder="الثواني" title="زمن العرض بالثواني">
+                <button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+}
+
+function addNewNoticeRow() {
+    noticeLines.push({ content: '', time: 4 });
+    buildNoticeManagerUI();
+}
+
+function removeNoticeRow(idx) {
+    noticeLines.splice(idx, 1);
+    buildNoticeManagerUI();
+}
+
+async function saveAllNoticesFromManager() {
+    const container = document.getElementById('noticeListContainer');
+    const rows = container.getElementsByClassName('notice-row-item');
+    let resultStrings = [];
+    
+    for (let row of rows) {
+        const content = row.querySelector('.notice-input-content').value.trim();
+        const time = parseInt(row.querySelector('.notice-input-time').value.trim());
+        if (content) {
+            const seconds = isNaN(time) || time <= 0 ? 4 : time;
+            resultStrings.push(`${content} * ${seconds}`);
+        }
+    }
+    
+    const dbTextValue = resultStrings.join('\n');
+    try { 
+        await db.ref('app_notice').set(dbTextValue); 
+        alert('تم حفظ البيانات بنجاح وتحديث نظام شاشات الإعلانات التدويرية!'); 
+    } catch(e) { 
+        alert('فشل الحفظ: ' + e.message); 
+    }
 }
 
 function checkIsImage(content) { return /\.(jpeg|jpg|gif|png|webp)$/i.test(content.toLowerCase()) || content.startsWith('data:image/'); }
 
-function displayNoticeContent(targetBox, content) {
+function displayNoticeContent(targetBox, noticeObj) {
     if (noticeTimeout) clearTimeout(noticeTimeout);
-    if (checkIsImage(content)) {
-        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية الحالية من الخادم...</div>
-            <img id="noticeImg" src="${content}" alt="إعلان" style="display:none;">`;
+    const displayDuration = noticeObj.time ? noticeObj.time * 1000 : 4000;
+    
+    if (checkIsImage(noticeObj.content)) {
+        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية...</div>
+            <img id="noticeImg" src="${noticeObj.content}" alt="إعلان" style="display:none;">`;
         const img = document.getElementById('noticeImg'); const txt = document.getElementById('noticeTxt');
-        let fallbackTimeout = setTimeout(() => { nextNotice(); }, 6000);
-        img.onload = () => { clearTimeout(fallbackTimeout); txt.style.display = 'none'; img.style.display = 'block'; noticeTimeout = setTimeout(nextNotice, 8000); };
+        
+        let fallbackTimeout = setTimeout(() => { nextNotice(); }, displayDuration + 2000);
+        
+        img.onload = () => { 
+            clearTimeout(fallbackTimeout); txt.style.display = 'none'; img.style.display = 'block'; 
+            noticeTimeout = setTimeout(nextNotice, displayDuration); 
+        };
         img.onerror = () => { clearTimeout(fallbackTimeout); nextNotice(); };
     } else {
-        targetBox.innerHTML = `<span class="admin-notice-text">${content}</span>`;
-        noticeTimeout = setTimeout(nextNotice, 4000);
+        targetBox.innerHTML = `<span class="admin-notice-text">${noticeObj.content}</span>`;
+        noticeTimeout = setTimeout(nextNotice, displayDuration);
     }
 }
 
 function nextNotice() {
     if (noticeLines.length <= 1) return;
     const box = document.getElementById('appNoticeBox');
-    currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length; displayNoticeContent(box, noticeLines[currentNoticeIndex]);
+    currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length; 
+    displayNoticeContent(box, noticeLines[currentNoticeIndex]);
 }
 
 function listenToNotice() {
     db.ref('app_notice').on('value', snap => {
-        const rawText = snap.val() || ""; const box = document.getElementById('appNoticeBox'); const input = document.getElementById('adminNoticeInput');
-        if(input) input.value = rawText;
-        noticeLines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
+        const rawText = snap.val() || ""; const box = document.getElementById('appNoticeBox');
+        
+        const lines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
+        noticeLines = lines.map(line => {
+            if (line.includes('*')) {
+                const parts = line.split('*');
+                const content = parts[0].trim();
+                const time = parseInt(parts[1].trim());
+                return { content: content, time: isNaN(time) ? null : time };
+            }
+            return { content: line, time: null };
+        });
+        
+        buildNoticeManagerUI();
+        
         if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex = 0;
         if (noticeLines.length > 0) { box.style.display = 'block'; displayNoticeContent(box, noticeLines[0]); } else { box.style.display = 'none'; }
     });
