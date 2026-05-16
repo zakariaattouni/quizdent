@@ -17,7 +17,6 @@
         .status-dot { width: 10px; height: 10px; background: #e17055; border-radius: 50%; display: inline-block; }
         .status-dot.ok { background: #00b894; box-shadow: 0 0 8px #00b894; }
         
-        /* تنسيق نص المتصلين الآن الخاص بالمدير */
         .online-count { font-size: 0.85rem; background: rgba(255, 255, 255, 0.2); padding: 2px 10px; border-radius: 12px; margin-right: 8px; font-weight: bold; display: none; }
         
         .screen { display: none; animation: fade 0.3s; }
@@ -30,6 +29,8 @@
         .btn:hover { transform: translateY(-2px); }
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
+        .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
+        
         .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
         .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
         .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
@@ -56,6 +57,10 @@
         .admin-notice-box { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 18px; padding: 0px; text-align: center; color: #0369a1; font-weight: 800; font-size: 0.95rem; line-height: 1.5; display: none; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.05); overflow: hidden; width: 100%; }
         .admin-notice-box img { width: 100%; max-height: 250px; object-fit: contain; display: none; margin: 0 auto; background: #fff; }
         .admin-notice-text { padding: 15px; display: block; }
+
+        /* تنسيقات تقرير المراجعة النهائي للمخطئين */
+        .report-box { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 16px; text-align: center; }
+        .wrong-review-item { background: #fff5f5; border-right: 4px solid #f56565; padding: 12px; border-radius: 14px; margin-bottom: 10px; text-align: right; font-size: 0.9rem; }
     </style>
 </head><body>
 <div class="app">
@@ -63,7 +68,6 @@
         <h1>
             مدرب التشخيص السني 
             <span id="dot" class="status-dot"></span>
-            <!-- مكان ظهور عدد المتصلين الآن للمدير فقط -->
             <span id="onlineCountBox" class="online-count"></span>
         </h1>
         <p>بإشراف الدكتور زكريا محمد عطوني</p>
@@ -97,16 +101,33 @@
     <!-- شاشة اختبار الطالب -->
     <div id="student" class="screen">
         <div class="card">
-            <div class="row">
-                <span class="pill" id="qNum">--</span>
-                <span class="pill" id="score">النقاط: 0</span>
+            <!-- زر استئناف الجلسة التلقائي في حال وجود تقدم محفوظ -->
+            <button id="resumeBtn" class="btn btn-resume" onclick="resumeSession()">استئناف الجلسة السابقة المتبقية</button>
+            
+            <div id="quizContent">
+                <div class="row">
+                    <span class="pill" id="qNum">--</span>
+                    <span class="pill" id="score">النقاط: 0</span>
+                </div>
+                <div id="quizArea">
+                    <div id="qText" style="font-size:1.2rem; font-weight:800; color:#1f3e48; margin-bottom:15px;"></div>
+                    <div id="opts"></div>
+                    <div id="exp" class="exp"></div>
+                </div>
             </div>
-            <div id="quizArea">
-                <div id="qText" style="font-size:1.2rem; font-weight:800; color:#1f3e48; margin-bottom:15px;"></div>
-                <div id="opts"></div>
-                <div id="exp" class="exp"></div>
+            
+            <!-- لوحة التقرير النهائي والمراجعة الذكية للأسئلة الخاطئة -->
+            <div id="reportArea" style="display:none; max-height:400px; overflow-y:auto; margin-bottom:15px;">
+                <h2>تقرير الأداء والمراجعة</h2>
+                <div class="report-box">
+                    <div style="font-size:1.1rem; font-weight:bold; color:#166534;" id="repScore"></div>
+                    <div style="font-size:0.9rem; color:#4b5563;" id="repPercent"></div>
+                </div>
+                <h4 style="color:#c53030; margin-bottom:8px; text-align:right;" id="repWrongTitle">أسئلة تحتاج مراجعة وتدقيق علمي:</h4>
+                <div id="wrongList"></div>
             </div>
-            <button class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">خروج من الحساب</button>
+
+            <button id="quizActionBtn" class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">خروج من الحساب</button>
         </div>
     </div>
     
@@ -138,7 +159,6 @@
         </div>
     </div>
     
-    <!-- صندوق عرض الإعلانات المتبدلة المشروط بالتحميل الفعلي -->
     <div id="appNoticeBox" class="admin-notice-box"></div>
 
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
@@ -162,19 +182,17 @@
 </div>
 
 <script>
-// الإعدادات الخاصة بقاعدة بيانات الفايربيس
 const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
 firebase.initializeApp(cfg);
 const db = firebase.database();
 
 let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
-const K = { U:'dq_u', P:'dq_p' };
+let wrongAnswersHistory = []; // مصفوفة لتتبع وحفظ الأخطاء خلال الاختبار الحالي لإعداد التقرير للمدير والطالب
+const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
 
-// مراقبة حالة الاتصال وتحديث التواجد الفوري
 db.ref('.info/connected').on('value', s => {
     const isConnected = s.val();
     document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
-    
     if (isConnected) {
         const myPresenceRef = db.ref('online_status').push();
         myPresenceRef.set(true);
@@ -188,12 +206,10 @@ window.onload = () => {
     listenToNotice();
 };
 
-// تفعيل حساب ومراقبة المتصلين بشكل فوري وتلقائي عند دخول المدير
 function startListeningOnlineCount() {
     const box = document.getElementById('onlineCountBox');
     if (!box) return;
     box.style.display = 'inline-block';
-    
     if (onlineRef) db.ref('online_status').off('value', onlineRef);
     onlineRef = db.ref('online_status').on('value', snap => {
         const count = snap.numChildren() || 0;
@@ -207,7 +223,6 @@ function stopListeningOnlineCount() {
     if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
 }
 
-// الدخول التلقائي المستند على ذاكرة المتصفح المحلية المحفوظة
 async function autoLogin() {
     const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
     if (!u || !p) return;
@@ -223,13 +238,12 @@ async function autoLogin() {
         const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
         if (d && d.password === p && d.status === 'active') {
-            await loadQs(); startQuiz(); return true;
+            await loadQs(); checkSavedProgress(); return true;
         }
     } catch(e) { console.log('Auto-login failed:', e.message); }
     return false;
 }
 
-// معالجة عملية تسجيل الدخول الثلاثي المفصل
 async function login() {
     const u = document.getElementById('user').value.trim();
     const p = document.getElementById('pass').value.trim();
@@ -246,7 +260,7 @@ async function login() {
         const d = snap.val();
         if (d && d.password === p && d.status === 'active') {
             localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
-            await loadQs(); startQuiz();
+            await loadQs(); checkSavedProgress();
         } else {
             alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
         }
@@ -255,7 +269,6 @@ async function login() {
     }
 }
 
-// تقديم طلب تسجيل طالب جديد في النظام
 async function register() {
     const n = document.getElementById('regUser').value.trim();
     const p = document.getElementById('regPass').value.trim();
@@ -266,23 +279,95 @@ async function register() {
     } catch(e) { alert('فشل الإرسال: '+e.message); }
 }
 
-// جلب الأسئلة من الفايربيس وتخزينها في المصفوفة العامة للعمل
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
     const d = snap.val();
     Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
 
-// تدوير الأسئلة وبدء الجلسة الاختيارية للطالب
-function startQuiz() {
-    if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
-    quiz = [...Qs].sort(()=>Math.random()-0.5);
-    score = 0; qi = 0; show('student'); renderQ();
+// ميزة فحص التقدم التلقائي المحفوظ للطالب
+function checkSavedProgress() {
+    show('student');
+    document.getElementById('quizContent').style.display = 'block';
+    document.getElementById('reportArea').style.display = 'none';
+    document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
+    document.getElementById('quizActionBtn').onclick = logout;
+
+    const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
+    const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
+    const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
+    const savedWrong = localStorage.getItem(K.PROGRESS_WRONG);
+
+    if (savedQuiz && savedIndex && savedScore) {
+        const resumeBtn = document.getElementById('resumeBtn');
+        resumeBtn.style.display = 'block';
+        resumeBtn.innerText = `استئناف الجلسة السابقة (سؤال رقم ${parseInt(savedIndex) + 1})`;
+    }
+    startQuiz(false); 
 }
 
-// عرض السؤال الحالي وخياراته العشوائية مع التفسير عند الضغط
+// تعديل دالة بدء الجلسة لتقبل بدء نظيف أو تجاهل المحفوظ
+function startQuiz(forceNew = true) {
+    if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
+    
+    if (forceNew) {
+        clearProgressStorage();
+        document.getElementById('resumeBtn').style.display = 'none';
+        quiz = [...Qs].sort(()=>Math.random()-0.5);
+        score = 0; qi = 0; wrongAnswersHistory = [];
+        renderQ();
+    } else {
+        // إذا كنا لا نريد الإجبار، نعرض السؤال الأول كإعداد افتراضي لحين اختيار الطالب الاستئناف أو المتابعة عادي
+        quiz = [...Qs].sort(()=>Math.random()-0.5);
+        score = 0; qi = 0; wrongAnswersHistory = [];
+        renderQ();
+    }
+}
+
+// ميزة استدعاء التقدم التلقائي المخزن ومتابعة الاختبار
+function resumeSession() {
+    try {
+        const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
+        const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
+        const savedScore = parseInt(localStorage.getItem(K.PROGRESS_SCORE));
+        const savedWrong = JSON.parse(localStorage.getItem(K.PROGRESS_WRONG)) || [];
+
+        if (savedQuiz && savedQuiz.length > 0) {
+            quiz = savedQuiz;
+            qi = savedIndex;
+            score = savedScore;
+            wrongAnswersHistory = savedWrong;
+            document.getElementById('resumeBtn').style.display = 'none';
+            renderQ();
+        }
+    } catch (e) {
+        console.log("Error resuming session", e);
+        startQuiz(true);
+    }
+}
+
+function saveCurrentProgressToStorage() {
+    localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
+    localStorage.setItem(K.PROGRESS_INDEX, qi);
+    localStorage.setItem(K.PROGRESS_SCORE, score);
+    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
+}
+
+function clearProgressStorage() {
+    localStorage.removeItem(K.PROGRESS_QUIZ);
+    localStorage.removeItem(K.PROGRESS_INDEX);
+    localStorage.removeItem(K.PROGRESS_SCORE);
+    localStorage.removeItem(K.PROGRESS_WRONG);
+}
+
 function renderQ() {
-    if (qi >= quiz.length) { alert(`انتهت الأسئلة المتاحة، نتيجتك النهائية هي: ${score}/${quiz.length*10}`); startQuiz(); return; }
+    // ميزة إصدار التقرير الشامل الذكي عند نهاية الأسئلة المتاحة
+    if (qi >= quiz.length) {
+        clearProgressStorage();
+        showFinalReport();
+        return;
+    }
+    
     const q = quiz[qi];
     document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
     document.getElementById('score').innerText = `النقاط: ${score}`;
@@ -290,23 +375,77 @@ function renderQ() {
     document.getElementById('exp').style.display = 'none';
     const opts = document.getElementById('opts'); opts.innerHTML = '';
     
-    [...q.o].sort(()=>Math.random()-0.5).forEach(opt => {
+    // خلط الأجوبة عشوائياً للطالب
+    const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
+    
+    mixedOptions.forEach(opt => {
         const div = document.createElement('div');
         div.className = 'option'; div.innerText = opt;
         div.onclick = () => {
             if (opts.querySelector('.correct,.wrong')) return;
-            if (opt === q.c) { score += 10; div.classList.add('correct'); }
-            else { div.classList.add('wrong'); [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); }); }
+            if (opt === q.c) { 
+                score += 10; 
+                div.classList.add('correct'); 
+            } else { 
+                div.classList.add('wrong'); 
+                [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
+                // تخزين السؤال الخاطئ مع الإجابة والتفسير للتقرير
+                wrongAnswersHistory.push({ q: q.q, c: q.c, e: q.e });
+            }
+            
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
-            exp.innerHTML = `<b>التفسير العلمي:</b><br>${q.e}`; exp.style.display = 'block';
-            setTimeout(()=>{ qi++; renderQ(); }, 1800);
+            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
+            
+            // حفظ التقدم تلقائياً بعد الإجابة والانتقال للسؤال التالي
+            setTimeout(()=>{ 
+                qi++; 
+                saveCurrentProgressToStorage();
+                renderQ(); 
+            }, 1800);
         };        
         opts.appendChild(div);
     });
 }
 
-// عرض قائمة الأسئلة في لوحة الإدارة للتحكم بها والتعديل أو الحذف
+// ميزة بناء وعرض تقرير الأداء الشامل وقائمة المراجعة الذكية للطلاب مفردي الحالات
+function showFinalReport() {
+    document.getElementById('quizContent').style.display = 'none';
+    document.getElementById('reportArea').style.display = 'block';
+    
+    const maxScore = quiz.length * 10;
+    const percent = Math.round((score / maxScore) * 100) || 0;
+    
+    document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية هي: ${score} من أصل ${maxScore} نقطة`;
+    document.getElementById('repPercent').innerText = `نسبة التشخيص الصحيحة الإجمالية: ${percent}%`;
+    
+    const wrongList = document.getElementById('wrongList');
+    wrongList.innerHTML = '';
+    
+    if (wrongAnswersHistory.length === 0) {
+        document.getElementById('repWrongTitle').innerText = "رائع ومذهل! تشخيصاتك الطبية سليمة بنسبة 100% في هذه الجولة.";
+    } else {
+        document.getElementById('repWrongTitle').innerText = "أسئلة وحالات تعثرت بها تحتاج مراجعة علمية وتدقيق دكتور:";
+        wrongAnswersHistory.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'wrong-review-item';
+            div.innerHTML = `
+                <div><strong>حالة رقم (${index + 1}):</strong> ${item.q}</div>
+                <div style="color:#155724; font-weight:bold; margin-top:4px;">الجواب العلمي الصحيح: ${item.c}</div>
+                <div style="color:#7a5a2a; margin-top:4px; font-size:0.85rem; background:#fffdf5; padding:5px; border-radius:8px;">💡 التفسير: ${item.e}</div>
+            `;
+            wrongList.appendChild(div);
+        });
+    }
+    
+    // تحويل زر الخروج ليصبح خيار إعادة اختبار وتنشيط جديد
+    const actionBtn = document.getElementById('quizActionBtn');
+    actionBtn.innerText = 'بدء جولة اختبار وتدريب جديدة';
+    actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)';
+    actionBtn.style.color = 'white';
+    actionBtn.onclick = checkSavedProgress;
+}
+
 function renderAdmin() {
     const c = document.getElementById('qList');
     if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;padding:15px;">لا توجد أسئلة مضافة في البنك حاليا</p>'; return; }
@@ -322,7 +461,6 @@ function renderAdmin() {
     });
 }
 
-// الاستماع المباشر لقائمة الطلاب وإدارة الطلبات الواردة
 function listenUsers() {
     if (usersRef) db.ref('users').off('value', usersRef);
     usersRef = db.ref('users').on('value', snap => {
@@ -356,7 +494,6 @@ function toggleUsers() { document.getElementById('usersList').classList.toggle('
 async function setSt(k, st) { if (confirm('هل أنت متأكد من تغيير حالة هذا الحساب؟')) await db.ref('users/'+k).update({status:st}); }
 async function delU(k, n) { if (confirm(`هل ترغب فعلا في حذف حساب الطالب "${n}" بشكل كامل؟`)) await db.ref('users/'+k).remove(); }
 
-// عمليات حذف وإضافة الأسئلة بصيغة الجماعية أو الفردية
 async function delQ(id) { if (confirm('هل أنت متأكد من رغبتك في حذف هذا السؤال نهائيا؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
 function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
 
@@ -416,7 +553,6 @@ async function updQ(id) {
 
 function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
 
-// نظام تدوير الإعلانات المقاوم للإنترنت الضعيف والمشروط بالتحميل الحقيقي الكامل
 let noticeTimeout = null;
 let currentNoticeIndex = 0;
 let noticeLines = [];
@@ -445,15 +581,12 @@ function displayNoticeContent(targetBox, content) {
         const img = document.getElementById('noticeImg');
         const txt = document.getElementById('noticeTxt');
         
-        let fallbackTimeout = setTimeout(() => {
-            nextNotice();
-        }, 6000);
+        let fallbackTimeout = setTimeout(() => { nextNotice(); }, 6000);
 
         img.onload = () => {
             clearTimeout(fallbackTimeout);
             txt.style.display = 'none';
             img.style.display = 'block';
-            
             noticeTimeout = setTimeout(nextNotice, 8000);
         };
         
@@ -483,7 +616,6 @@ function listenToNotice() {
         if(input) input.value = rawText;
         
         noticeLines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
-        
         if(noticeTimeout) clearTimeout(noticeTimeout);
         currentNoticeIndex = 0;
         
@@ -504,7 +636,7 @@ function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
     stopListeningOnlineCount();
     localStorage.removeItem(K.U); localStorage.removeItem(K.P);
-    Qs = []; quiz = []; score = 0; qi = 0;
+    Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = [];
     show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
 }
 </script>
