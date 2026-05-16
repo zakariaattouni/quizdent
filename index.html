@@ -16,6 +16,10 @@
         .header p { font-size: 0.85rem; opacity: 0.9; }
         .status-dot { width: 10px; height: 10px; background: #e17055; border-radius: 50%; display: inline-block; }
         .status-dot.ok { background: #00b894; box-shadow: 0 0 8px #00b894; }
+        
+        /* تنسيق نص المتصلين الآن الخاص بالمدير */
+        .online-count { font-size: 0.85rem; background: rgba(255, 255, 255, 0.2); padding: 2px 10px; border-radius: 12px; margin-right: 8px; font-weight: bold; display: none; }
+        
         .screen { display: none; animation: fade 0.3s; }
         .screen.active { display: block; }
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -56,7 +60,12 @@
 </head><body>
 <div class="app">
     <div class="header">
-        <h1>مدرب التشخيص السني <span id="dot" class="status-dot"></span></h1>
+        <h1>
+            مدرب التشخيص السني 
+            <span id="dot" class="status-dot"></span>
+            <!-- مكان ظهور عدد المتصلين الآن للمدير فقط -->
+            <span id="onlineCountBox" class="online-count"></span>
+        </h1>
         <p>بإشراف الدكتور زكريا محمد عطوني</p>
     </div>
     <div id="err" class="error"></div>
@@ -158,13 +167,20 @@ const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quiz
 firebase.initializeApp(cfg);
 const db = firebase.database();
 
-// مراقبة حالة الاتصال مع الخادم وعرض المؤشر اللحظي
-db.ref('.info/connected').on('value', s => {
-    document.getElementById('dot').className = 'status-dot' + (s.val()?' ok':'');
-});
-
-let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null;
+let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
 const K = { U:'dq_u', P:'dq_p' };
+
+// مراقبة حالة الاتصال وتحديث التواجد الفوري
+db.ref('.info/connected').on('value', s => {
+    const isConnected = s.val();
+    document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
+    
+    if (isConnected) {
+        const myPresenceRef = db.ref('online_status').push();
+        myPresenceRef.set(true);
+        myPresenceRef.onDisconnect().remove();
+    }
+});
 
 window.onload = () => {
     show('login');
@@ -172,12 +188,38 @@ window.onload = () => {
     listenToNotice();
 };
 
+// تفعيل حساب ومراقبة المتصلين بشكل فوري وتلقائي عند دخول المدير
+function startListeningOnlineCount() {
+    const box = document.getElementById('onlineCountBox');
+    if (!box) return;
+    box.style.display = 'inline-block';
+    
+    if (onlineRef) db.ref('online_status').off('value', onlineRef);
+    onlineRef = db.ref('online_status').on('value', snap => {
+        const count = snap.numChildren() || 0;
+        box.innerText = 'المتصلون الآن: ' + count;
+    });
+}
+
+function stopListeningOnlineCount() {
+    const box = document.getElementById('onlineCountBox');
+    if (box) { box.style.display = 'none'; box.innerText = ''; }
+    if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
+}
+
 // الدخول التلقائي المستند على ذاكرة المتصفح المحلية المحفوظة
 async function autoLogin() {
     const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
     if (!u || !p) return;
     try {
-        if (p === 'salem1959') { await loadQs(); show('admin'); renderAdmin(); listenUsers(); return true; }
+        if (p === 'salem1959') { 
+            await loadQs(); 
+            show('admin'); 
+            renderAdmin(); 
+            listenUsers(); 
+            startListeningOnlineCount();
+            return true; 
+        }
         const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
         if (d && d.password === p && d.status === 'active') {
@@ -196,7 +238,9 @@ async function login() {
     try {
         if (p === 'salem1959') {
             localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
-            await loadQs(); show('admin'); renderAdmin(); listenUsers(); return;
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); 
+            startListeningOnlineCount();
+            return;
         }
         const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
@@ -458,6 +502,7 @@ function showError(m) { const e = document.getElementById('err'); e.innerText = 
 
 function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
+    stopListeningOnlineCount();
     localStorage.removeItem(K.U); localStorage.removeItem(K.P);
     Qs = []; quiz = []; score = 0; qi = 0;
     show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
