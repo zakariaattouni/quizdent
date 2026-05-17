@@ -73,7 +73,7 @@
             مدرب التشخيص السني 
             <span id="dot" class="status-dot"></span>
             <span id="onlineCountBox" class="online-count"></span>
-            <span id="visitorCountBox" class="visitor-count">الزوار: 11310</span>
+            <span id="visitorCountBox" class="visitor-count">الزوار: 0</span>
         </h1>
         <p>بإشراف الدكتور زكريا محمد عطوني</p>
     </div>
@@ -166,6 +166,7 @@
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
+
 <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
     <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
         <h3 id="mTitle">نموذج السؤال</h3>
@@ -180,6 +181,7 @@
         </div>
     </div>
 </div>
+
 <script>
 const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
 firebase.initializeApp(cfg);
@@ -187,10 +189,11 @@ const db = firebase.database();
 let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
 let wrongAnswersHistory = []; 
 let isDailyChallengeMode = false;
-let myPresenceRef = null; // مرجع الاتصال الخاص
-let isAdminLoggedIn = false; // متغير لمنع تسجيل المدير في العداد
+let myPresenceRef = null;
+let isAdminLoggedIn = false;
 
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
+
 // ==========================================
 // نظام السجلات اليومية - شعلة الإنجاز 🔥
 // ==========================================
@@ -309,62 +312,48 @@ const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', P
 // نظام المتصلين (يحتسب الجميع باستثناء المدير)
 // ==========================================
 function setupOnlinePresence() {
-    // إزالة أي مرجع سابق
     if (myPresenceRef) {
         myPresenceRef.remove();
         myPresenceRef = null;
     }
-    
-    // إذا كان المدير مسجل الدخول، لا نضيفه إلى قائمة المتصلين
     if (isAdminLoggedIn) {
         console.log("Admin logged in - skipping online presence");
         return;
     }
-    
-    // إضافة المستخدم الحالي (طالب أو زائر) إلى قائمة المتصلين
     myPresenceRef = db.ref('online_status').push();
     myPresenceRef.set(true);
     myPresenceRef.onDisconnect().remove();
-    console.log("Added to online users");
 }
 
 // ==========================================
-// عداد الزوار (يحتسب الجميع باستثناء المدير)
+// عداد الزوار - يعمل بشكل حقيقي 100%
 // ==========================================
 function setupVisitorCounter() {
-    // التحقق مما إذا كان هذا المتصفح قد سجل زيارة بالفعل خلال 24 ساعة
-    const lastVisit = localStorage.getItem('last_visit_timestamp');
-    const now = Date.now();
-    const oneDay = 24 * 60 * 60 * 1000;
-    
     // إذا كان المدير مسجل الدخول، لا نزيد العداد
     if (isAdminLoggedIn) {
-        console.log("Admin logged in - skipping visitor count");
         // فقط نعرض العداد الحالي دون تعديل
         db.ref('visitor_counter').on('value', snap => {
-            const count = snap.val() || 11310;
+            const count = snap.val() || 0;
             const box = document.getElementById('visitorCountBox');
             if (box) box.innerText = 'الزوار: ' + count;
-        }, { onlyOnce: true });
+        });
         return;
     }
     
-    // منطق زيادة العداد للزوار العاديين والطلاب
-    if (!lastVisit || (now - parseInt(lastVisit)) > oneDay) {
-        // زيادة العداد بمقدار 1
-        db.ref('visitor_counter').transaction(currentValue => {
-            let base = 11310;
-            if (currentValue === null || currentValue < base) {
-                return base;
-            }
-            return (currentValue || base) + 1;
-        });
-        localStorage.setItem('last_visit_timestamp', now.toString());
-    }
+    // زيادة العداد بشكل آني لكل زائر جديد
+    const visitorRef = db.ref('visitor_counter');
+    visitorRef.transaction(function(currentValue) {
+        // إذا كانت القيمة الحالية غير موجودة، نبدأ من 1
+        if (currentValue === null) {
+            return 1;
+        }
+        // وإلا نزيد بمقدار 1
+        return currentValue + 1;
+    });
     
     // الاستماع للتحديثات وعرض العداد
-    db.ref('visitor_counter').on('value', snap => {
-        const count = snap.val() || 11310;
+    visitorRef.on('value', function(snap) {
+        const count = snap.val() || 0;
         const box = document.getElementById('visitorCountBox');
         if (box) box.innerText = 'الزوار: ' + count;
     });
@@ -397,7 +386,6 @@ window.onload = () => {
     show('login');
     autoLogin().catch(()=>{});
     listenToNotice();
-    // لا نبدأ العداد فوراً، ننتظر تسجيل الدخول أو البقاء كزائر
 };
 
 async function autoLogin() {
@@ -411,8 +399,7 @@ async function autoLogin() {
             renderAdmin(); 
             listenUsers(); 
             startListeningOnlineCount(); 
-            setupVisitorCounter(); // يعرض العداد ولكن لا يزيده للمدير
-            // لا نضيف المدير إلى المتصلين (setupOnlinePresence لن تُستدعى)
+            setupVisitorCounter(); // للمدير (لن يزيد العداد)
             return true; 
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -423,7 +410,7 @@ async function autoLogin() {
             checkSavedProgress();
             setupOnlinePresence(); // إضافة الطالب إلى المتصلين
             startListeningOnlineCount();
-            setupVisitorCounter(); // إضافة الطالب إلى عداد الزوار إذا لزم الأمر
+            setupVisitorCounter(); // إضافة الطالب إلى عداد الزوار
             return true;
         }
     } catch(e) { console.log('Auto-login failed:', e.message); }
@@ -451,7 +438,6 @@ async function login() {
             listenUsers(); 
             startListeningOnlineCount(); 
             setupVisitorCounter(); // للمدير (لن يزيد العداد)
-            // لا نضيف المدير إلى المتصلين
             return;
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -827,7 +813,6 @@ function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.
 function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
 function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 4000); }
 function logout() {
-    // إزالة مرجع الاتصال الخاص بالمستخدم قبل الخروج
     if (myPresenceRef) {
         myPresenceRef.remove();
         myPresenceRef = null;
@@ -847,7 +832,6 @@ function logout() {
     document.getElementById('user').value = ''; 
     document.getElementById('pass').value = '';
     
-    // إعادة تفعيل العداد للزوار العاديين بعد الخروج
     startListeningOnlineCount();
     setupOnlinePresence();
     setupVisitorCounter();
