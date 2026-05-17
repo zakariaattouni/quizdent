@@ -12,12 +12,13 @@
         body { background: linear-gradient(135deg, #e0f2fe, #f0f9ff); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
         .app { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 10px; }
         .header { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 15px 20px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header h1 { font-size: 1.3rem; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .header h1 { font-size: 1.3rem; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .header p { font-size: 0.85rem; opacity: 0.9; }
         .status-dot { width: 10px; height: 10px; background: #e17055; border-radius: 50%; display: inline-block; }
         .status-dot.ok { background: #00b894; box-shadow: 0 0 8px #00b894; }
+        
         .online-count { font-size: 0.85rem; background: rgba(255, 255, 255, 0.2); padding: 2px 10px; border-radius: 12px; margin-right: 8px; font-weight: bold; display: none; }
-        .visitor-count { font-size: 0.85rem; background: rgba(255, 255, 255, 0.15); padding: 2px 10px; border-radius: 12px; font-weight: bold; margin-left: 8px; display: inline-block; border: 1px solid rgba(255, 255, 255, 0.2); }
+        
         .screen { display: none; animation: fade 0.3s; }
         .screen.active { display: block; }
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -29,6 +30,7 @@
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
+        
         .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
         .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
         .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
@@ -49,77 +51,66 @@
         .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 12px; margin: 10px 0; font-size: 0.9rem; display: none; }
         .error.show { display: block; }
         #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
+        
         .main-app-btn { background: linear-gradient(105deg, #3b82f6, #1d4ed8); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 24px; font-weight: 700; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); transition: 0.2s; font-size: 1rem; margin-top: 5px; }
         .main-app-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(29, 78, 216, 0.4); }
         .whatsapp-btn { background: linear-gradient(105deg, #25D366, #128C7E); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 24px; font-weight: 700; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.2); transition: 0.2s; font-size: 1rem; }
         .whatsapp-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 211, 102, 0.3); }
+        
         .admin-notice-box { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 18px; padding: 0px; text-align: center; color: #0369a1; font-weight: 800; font-size: 0.95rem; line-height: 1.5; display: none; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.05); overflow: hidden; width: 100%; }
         .admin-notice-box img { width: 100%; max-height: 250px; object-fit: contain; display: none; margin: 0 auto; background: #fff; }
         .admin-notice-text { padding: 15px; display: block; }
         .report-box { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 16px; text-align: center; }
         .wrong-review-item { background: #fff5f5; border-right: 4px solid #f56565; padding: 12px; border-radius: 14px; margin-bottom: 10px; text-align: right; font-size: 0.9rem; }
+        /* تنسيقات إدارة الإعلانات المنفصلة والمريحة */
         .notice-manager-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-top: 10px; }
         .notice-row-item { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-        .notice-row-fields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; min-width: 150px; }
+        .notice-row-fields { display: flex; gap: 8px; align-items: center; }
+        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; }
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; text-align: center; margin: 0; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        body[dir="ltr"] .option,
-        body[dir="ltr"] .q-item,
-        body[dir="ltr"] .user-item {
-            text-align: left;
-            border-left: 3px solid #2c9b7a;
-            border-right: none;
-        }
-        body[dir="ltr"] .wrong-review-item {
-            text-align: left;
-            border-left: 4px solid #f56565;
-            border-right: none;
-        }
-        .lang-switch-btn { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 5px 12px; border-radius: 20px; cursor: pointer; font-size: 0.8rem; margin-right: 10px; transition: 0.2s; }
-        .lang-switch-btn:hover { background: rgba(255,255,255,0.3); }
-        .translation-progress { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #1e4a6e; color: white; padding: 12px; border-radius: 12px; text-align: center; font-size: 0.9rem; z-index: 1000; display: none; }
     </style>
-</head>
-<body>
+</head><body>
 <div class="app">
     <div class="header">
         <h1>
-            <span id="headerTitle">مدرب التشخيص السني - الدكتور زكريا عطوني</span>
+            مدرب التشخيص السني 
             <span id="dot" class="status-dot"></span>
             <span id="onlineCountBox" class="online-count"></span>
-            <span id="visitorCountBox" class="visitor-count">الزوار: 11310</span>
-            <button class="lang-switch-btn" onclick="toggleLanguage()" id="langSwitchBtn">English</button>
         </h1>
-        <p id="headerSub">بإشراف الدكتور زكريا محمد عطوني</p>
+        <p>بإشراف الدكتور زكريا محمد عطوني</p>
     </div>
     <div id="err" class="error"></div>
     
+    <!-- الدخول الثلاثي المستقل -->
     <div id="login" class="screen active">
         <div class="card">
-            <h2 id="loginTitle">تسجيل الدخول</h2>
+            <h2>تسجيل الدخول</h2>
             <input type="text" id="user" placeholder="اسم المستخدم">
             <input type="password" id="pass" placeholder="كلمة السر">
-            <button class="btn" onclick="login()" id="loginBtn">دخول</button>
+            <button class="btn" onclick="login()">دخول</button>
             <p style="text-align:center; margin-top:15px;">
-                <a href="#" style="color:#2c9b7a;" onclick="show('register')" id="registerLink">حساب جديد للاستخدام</a>
+                <a href="#" style="color:#2c9b7a;" onclick="show('register')">حساب جديد للاستخدام</a>
             </p>
         </div>
     </div>
     
+    <!-- تسجيل طالب جديد -->
     <div id="register" class="screen">
         <div class="card">
-            <h2 id="regTitle">تسجيل طالب جديد</h2>
+            <h2>تسجيل طالب جديد</h2>
             <input type="text" id="regUser" placeholder="الاسم الكامل">
             <input type="password" id="regPass" placeholder="كلمة السر">
-            <button class="btn" onclick="register()" id="submitRegBtn">إرسال الطلب</button>
-            <button class="btn" style="background:#aaa;" onclick="show('login')" id="backBtn">رجوع</button>
+            <button class="btn" onclick="register()">إرسال الطلب</button>
+            <button class="btn" style="background:#aaa;" onclick="show('login')">رجوع</button>
         </div>
     </div>
     
+    <!-- شاشة اختبار الطالب -->
     <div id="student" class="screen">
         <div class="card">
             <button id="resumeBtn" class="btn btn-resume" onclick="resumeSession()">استئناف الجلسة السابقة المتبقية</button>
+            
             <div id="quizContent">
                 <div class="row">
                     <span class="pill" id="qNum">--</span>
@@ -131,8 +122,9 @@
                     <div id="exp" class="exp"></div>
                 </div>
             </div>
+            
             <div id="reportArea" style="display:none; max-height:400px; overflow-y:auto; margin-bottom:15px;">
-                <h2 id="reportTitle">تقرير الأداء والمراجعة</h2>
+                <h2>تقرير الأداء والمراجعة</h2>
                 <div class="report-box">
                     <div style="font-size:1.1rem; font-weight:bold; color:#166534;" id="repScore"></div>
                     <div style="font-size:0.9rem; color:#4b5563;" id="repPercent"></div>
@@ -144,570 +136,106 @@
         </div>
     </div>
     
+    <!-- لوحة الإدارة الشاملة -->
     <div id="admin" class="screen">
         <div class="card">
-            <h3 style="color:#5f4b8b; margin-bottom:10px;" id="adminPanelTitle">لوحة التحكم بالإدارة</h3>
+            <h3 style="color:#5f4b8b; margin-bottom:10px;">لوحة التحكم بالإدارة</h3>
             <div style="max-height:450px; overflow-y:auto;">
-                <h4 style="margin:10px 0 5px; color:#1e4a6e;" id="manageAdsTitle">إدارة الإعلانات واللافتات التدويرية</h4>
-                <button class="btn btn-admin" onclick="toggleNoticePanel()" id="showAdsBtn">عرض نافذة التحكم بالإعلانات</button>
+                
+                <!-- إضافة ميزة الطي البرمجي لقسم إدارة الإعلانات لمنع التشتت والارتباك -->
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الإعلانات واللافتات التدويرية</h4>
+                <button class="btn btn-admin" onclick="toggleNoticePanel()">عرض نافذة التحكم بالإعلانات</button>
                 <div id="noticeCollapsePanel" class="collapse">
                     <div class="notice-manager-panel">
-                        <div id="noticeListContainer"></div>
-                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()" id="addNoticeBtn">+ إضافة حقل إعلان أو صورة جديد</button>
-                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()" id="saveNoticesBtn">حفظ وتحديث قائمة الإعلانات نهائياً</button>
+                        <div id="noticeListContainer">
+                            <!-- يتم توليد الحقول هنا تلقائياً -->
+                        </div>
+                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة حقل إعلان أو صورة جديد</button>
+                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">حفظ وتحديث قائمة الإعلانات نهائياً</button>
                     </div>
                 </div>
                 <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
-                <h4 style="margin:10px 0 5px; color:#1e4a6e;" id="manageStudentsTitle">إدارة الطلاب المسجلين</h4>
-                <button class="btn btn-admin" onclick="toggleUsers()" id="showUsersBtn">عرض القائمة الكاملة <span id="reqBadge" class="badge">0</span></button>
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الطلاب المسجلين</h4>
+                <button class="btn btn-admin" onclick="toggleUsers()">عرض القائمة الكاملة <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
                 
-                <h4 style="margin:20px 0 10px; color:#1e4a6e;" id="manageQuestionsTitle">إدارة بنك الأسئلة</h4>
-                <button class="btn btn-admin" onclick="toggleJson()" id="addJsonBtn">إضافة جماعية عبر JSON</button>
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">إدارة بنك الأسئلة</h4>
+                <button class="btn btn-admin" onclick="toggleJson()">إضافة جماعية عبر JSON</button>
                 <div id="jsonPanel" style="display:none; margin:10px 0;">
-                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q_ar":"السؤال","q_en":"Question","o_ar":["أ","ب","ج","د"],"o_en":["A","B","C","D"],"c_ar":"أ","c_en":"A","e_ar":"التفسير","e_en":"Explanation"}]'></textarea>
-                    <button class="btn btn-admin" onclick="addJson()" id="confirmJsonBtn">إضافة مصفوفة الأسئلة</button>
+                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
+                    <button class="btn btn-admin" onclick="addJson()">إضافة مصفوفة الأسئلة</button>
                 </div>
-                <button class="btn btn-admin" onclick="addOne()" id="addOneBtn">إضافة سؤال مفرد</button>
+                <button class="btn btn-admin" onclick="addOne()">إضافة سؤال مفرد</button>
                 <div id="qList"></div>
             </div>
-            <button class="btn" style="margin-top:10px;" onclick="logout()" id="adminLogoutBtn">خروج من الإدارة</button>
+            <button class="btn" style="margin-top:10px;" onclick="logout()">خروج من الإدارة</button>
         </div>
     </div>
     
     <div id="appNoticeBox" class="admin-notice-box"></div>
-    <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn" id="mainAppLink">الانتقال إلى تطبيق تشخيص أمراض الفم والأسنان</a>
-    <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn" id="whatsappLink">تواصل معنا عبر واتساب</a>
-    <div class="footer" id="footerText">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
+    <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">الانتقال إلى تطبيق تشخيص أمراض الفم والأسنان</a>
+    <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
+    <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
-<div id="translationProgress" class="translation-progress"></div>
-
+<!-- نافذة إضافة وتعديل الأسئلة المفردة -->
 <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
-    <div class="card" style="width:100%; max-width:550px; max-height:90vh; overflow-y:auto;">
-        <h3 id="mTitle">نموذج السؤال (عربي + إنجليزي)</h3>
-        <input id="mQ_ar" placeholder="السؤال بالعربية">
-        <input id="mQ_en" placeholder="Question in English">
-        <input id="m1_ar" placeholder="الخيار الأول (عربي)"><input id="m1_en" placeholder="Option 1 (English)">
-        <input id="m2_ar" placeholder="الخيار الثاني (عربي)"><input id="m2_en" placeholder="Option 2 (English)">
-        <input id="m3_ar" placeholder="الخيار الثالث (عربي)"><input id="m3_en" placeholder="Option 3 (English)">
-        <input id="m4_ar" placeholder="الخيار الرابع (عربي)"><input id="m4_en" placeholder="Option 4 (English)">
-        <input id="mC_ar" placeholder="الإجابة الصحيحة (عربي)" style="background:#e8f0fe;">
-        <input id="mC_en" placeholder="Correct Answer (English)" style="background:#e8f0fe;">
-        <textarea id="mE_ar" rows="2" placeholder="التفسير العلمي (عربي)"></textarea>
-        <textarea id="mE_en" rows="2" placeholder="Scientific Explanation (English)"></textarea>
+    <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+        <h3 id="mTitle">نموذج السؤال</h3>
+        <input id="mQ" placeholder="نص السؤال العلمي">
+        <input id="m1" placeholder="الخيار الأول"><input id="m2" placeholder="الخيار الثاني">
+        <input id="m3" placeholder="الخيار الثالث"><input id="m4" placeholder="الخيار الرابع">
+        <input id="mC" placeholder="نسخة مطابقة من الخيار الصحيح تماما" style="background:#e8f0fe;">
+        <textarea id="mE" rows="2" placeholder="الشرح والتفسير العلمي المرتبط بالسؤال"></textarea>
         <div class="row" style="margin-top:10px;">
             <button class="btn" id="mSave">حفظ البيانات</button>
             <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء الأمر</button>
         </div>
     </div>
 </div>
-
 <script>
-// ============================================================
-// تكوين Firebase
-// ============================================================
-const cfg = { 
-    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", 
-    authDomain: "quizdental-c4d5a.firebaseapp.com", 
-    projectId: "quizdental-c4d5a", 
-    databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/", 
-    storageBucket: "quizdental-c4d5a.appspot.com", 
-    messagingSenderId: "750036143183", 
-    appId: "1:750036143183:web:721a31ef795f973887ee3a" 
-};
+const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
 firebase.initializeApp(cfg);
 const db = firebase.database();
-
-// ============================================================
-// المتغيرات العامة
-// ============================================================
 let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
-let wrongAnswersHistory = [];
-let currentLanguage = 'ar';
-let isTranslating = false;
-const K = { U: 'dq_u', P: 'dq_p', PROGRESS_QUIZ: 'dq_pq', PROGRESS_INDEX: 'dq_pi', PROGRESS_SCORE: 'dq_ps', PROGRESS_WRONG: 'dq_pw', LANG: 'dq_lang', TRANS_DONE: 'dq_trans_done' };
-
-// ============================================================
-// قاموس الترجمة للواجهة
-// ============================================================
-const uiTranslations = {
-    ar: {
-        headerTitle: "مدرب التشخيص السني - الدكتور زكريا عطوني",
-        headerSub: "بإشراف الدكتور زكريا محمد عطوني",
-        loginTitle: "تسجيل الدخول",
-        loginBtn: "دخول",
-        registerLink: "حساب جديد للاستخدام",
-        regTitle: "تسجيل طالب جديد",
-        submitRegBtn: "إرسال الطلب",
-        backBtn: "رجوع",
-        resumeBtn: "استئناف الجلسة السابقة المتبقية",
-        reportTitle: "تقرير الأداء والمراجعة",
-        repWrongTitle: "أسئلة تحتاج مراجعة وتدقيق علمي:",
-        quizActionBtn: "خروج من الحساب",
-        newQuizBtn: "بدء جولة اختبار وتدريب جديدة",
-        adminPanelTitle: "لوحة التحكم بالإدارة",
-        manageAdsTitle: "إدارة الإعلانات واللافتات التدويرية",
-        showAdsBtn: "عرض نافذة التحكم بالإعلانات",
-        addNoticeBtn: "+ إضافة حقل إعلان أو صورة جديد",
-        saveNoticesBtn: "حفظ وتحديث قائمة الإعلانات نهائياً",
-        manageStudentsTitle: "إدارة الطلاب المسجلين",
-        showUsersBtn: "عرض القائمة الكاملة",
-        manageQuestionsTitle: "إدارة بنك الأسئلة",
-        addJsonBtn: "إضافة جماعية عبر JSON",
-        confirmJsonBtn: "إضافة مصفوفة الأسئلة",
-        addOneBtn: "إضافة سؤال مفرد",
-        adminLogoutBtn: "خروج من الإدارة",
-        mainAppLink: "الانتقال إلى تطبيق تشخيص أمراض الفم والأسنان",
-        whatsappLink: "تواصل معنا عبر واتساب",
-        footerText: "إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026",
-        score: "النقاط:",
-        logout: "خروج من الحساب",
-        question: "سؤال رقم"
-    },
-    en: {
-        headerTitle: "Orthodontic Diagnosis Trainer - Dr. Zakaria Attouni",
-        headerSub: "Supervised by Dr. Zakaria Mohammad Attouni",
-        loginTitle: "Login",
-        loginBtn: "Enter",
-        registerLink: "New user? Register",
-        regTitle: "New Student Registration",
-        submitRegBtn: "Submit Request",
-        backBtn: "Back",
-        resumeBtn: "Resume Previous Session",
-        reportTitle: "Performance Report & Review",
-        repWrongTitle: "Questions to Review (Clinical Focus):",
-        quizActionBtn: "Logout",
-        newQuizBtn: "Start New Test & Training Session",
-        adminPanelTitle: "Admin Control Panel",
-        manageAdsTitle: "Manage Rotating Banners & Announcements",
-        showAdsBtn: "Show Announcements Manager",
-        addNoticeBtn: "+ Add New Ad or Image Field",
-        saveNoticesBtn: "Save & Update Announcements List",
-        manageStudentsTitle: "Manage Registered Students",
-        showUsersBtn: "Show Full List",
-        manageQuestionsTitle: "Manage Question Bank",
-        addJsonBtn: "Bulk Add via JSON",
-        confirmJsonBtn: "Add Questions Array",
-        addOneBtn: "Add Single Question",
-        adminLogoutBtn: "Logout from Admin",
-        mainAppLink: "Go to Oral & Dental Diagnosis App",
-        whatsappLink: "Contact us on WhatsApp",
-        footerText: "Prepared by Dr. Zakaria Mohammad Attouni | Copyright 2026",
-        score: "Score:",
-        logout: "Logout",
-        question: "Question"
+let wrongAnswersHistory = []; 
+const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
+db.ref('.info/connected').on('value', s => {
+    const isConnected = s.val();
+    document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
+    if (isConnected) {
+        const myPresenceRef = db.ref('online_status').push();
+        myPresenceRef.set(true);
+        myPresenceRef.onDisconnect().remove();
     }
+});
+window.onload = () => {
+    show('login');
+    autoLogin().catch(()=>{});
+    listenToNotice();
 };
-
-// ============================================================
-// دوال الترجمة التلقائية الفورية للأسئلة
-// ============================================================
-function showTranslationProgress(message) {
-    const progressDiv = document.getElementById('translationProgress');
-    progressDiv.innerText = message;
-    progressDiv.style.display = 'block';
-}
-
-function hideTranslationProgress() {
-    const progressDiv = document.getElementById('translationProgress');
-    progressDiv.style.display = 'none';
-}
-
-async function translateText(text, targetLang = 'en') {
-    if (!text || text.trim() === '') return text;
-    
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ar&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
-    
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        if (data && data[0]) {
-            return data[0].map(item => item[0]).join('');
-        }
-        return text;
-    } catch (error) {
-        console.warn(`Translation failed for: ${text.substring(0, 30)}...`);
-        return text;
-    }
-}
-
-async function autoTranslateAllQuestions() {
-    // التحقق إذا تمت الترجمة مسبقاً
-    const translationDone = localStorage.getItem(K.TRANS_DONE);
-    if (translationDone === 'yes') {
-        console.log('✅ الترجمة تمت مسبقاً');
-        return;
-    }
-    
-    if (isTranslating) return;
-    isTranslating = true;
-    
-    try {
-        showTranslationProgress('🌐 جاري تحميل الأسئلة من قاعدة البيانات...');
-        
-        const questionsRef = db.ref('questions');
-        const snapshot = await questionsRef.once('value');
-        const questions = snapshot.val();
-        
-        if (!questions) {
-            console.log('📭 لا توجد أسئلة');
-            hideTranslationProgress();
-            isTranslating = false;
-            return;
-        }
-        
-        const totalQuestions = Object.keys(questions).length;
-        let translatedCount = 0;
-        let needsTranslation = [];
-        
-        // تحديد الأسئلة التي تحتاج ترجمة
-        for (const [id, q] of Object.entries(questions)) {
-            if (q.q && !q.q_ar) {
-                needsTranslation.push({ id, q, type: 'old' });
-            } else if (q.q_ar && !q.q_en) {
-                needsTranslation.push({ id, q, type: 'new' });
-            }
-        }
-        
-        if (needsTranslation.length === 0) {
-            console.log('✅ جميع الأسئلة مترجمة بالفعل');
-            localStorage.setItem(K.TRANS_DONE, 'yes');
-            hideTranslationProgress();
-            isTranslating = false;
-            return;
-        }
-        
-        showTranslationProgress(`🔄 جاري ترجمة ${needsTranslation.length} سؤال... قد يستغرق دقيقة`);
-        
-        for (let i = 0; i < needsTranslation.length; i++) {
-            const item = needsTranslation[i];
-            const { id, q, type } = item;
-            
-            showTranslationProgress(`📝 جاري الترجمة (${i+1}/${needsTranslation.length}): ${(type === 'old' ? q.q : q.q_ar).substring(0, 40)}...`);
-            
-            if (type === 'old') {
-                // ترجمة السؤال القديم
-                const translatedQ = await translateText(q.q);
-                const translatedOptions = [];
-                for (const opt of q.o) {
-                    translatedOptions.push(await translateText(opt));
-                }
-                const translatedAnswer = await translateText(q.c);
-                const translatedExplanation = await translateText(q.e);
-                
-                await db.ref('questions/' + id).update({
-                    q_ar: q.q,
-                    q_en: translatedQ,
-                    o_ar: q.o,
-                    o_en: translatedOptions,
-                    c_ar: q.c,
-                    c_en: translatedAnswer,
-                    e_ar: q.e,
-                    e_en: translatedExplanation,
-                    auto_translated: true
-                });
-            } else {
-                // ترجمة السؤال الجديد بدون إنجليزية
-                const translatedQ = await translateText(q.q_ar);
-                const translatedOptions = [];
-                for (const opt of q.o_ar) {
-                    translatedOptions.push(await translateText(opt));
-                }
-                const translatedAnswer = await translateText(q.c_ar);
-                const translatedExplanation = await translateText(q.e_ar);
-                
-                await db.ref('questions/' + id).update({
-                    q_en: translatedQ,
-                    o_en: translatedOptions,
-                    c_en: translatedAnswer,
-                    e_en: translatedExplanation,
-                    auto_translated: true
-                });
-            }
-            
-            translatedCount++;
-            
-            // تأخير بسيط لتجنب الحظر
-            await new Promise(resolve => setTimeout(resolve, 300));
-        }
-        
-        console.log(`✅ اكتملت الترجمة! تم ترجمة ${translatedCount} سؤال`);
-        localStorage.setItem(K.TRANS_DONE, 'yes');
-        showTranslationProgress(`🎉 اكتملت الترجمة! تم ترجمة ${translatedCount} سؤال. سيتم تحديث الصفحة...`);
-        
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        hideTranslationProgress();
-        
-        // إعادة تحميل الأسئلة
-        await loadQs();
-        
-    } catch (error) {
-        console.error('❌ خطأ في الترجمة:', error);
-        showTranslationProgress('⚠️ حدث خطأ في الترجمة. سيتم المحاولة لاحقاً.');
-        await new Promise(resolve => setTimeout(resolve, 3000));
-        hideTranslationProgress();
-    } finally {
-        isTranslating = false;
-    }
-}
-
-// ============================================================
-// دوال اللغة والواجهة
-// ============================================================
-function applyUILanguage() {
-    const t = uiTranslations[currentLanguage];
-    if (!t) return;
-    
-    document.getElementById('headerTitle').innerText = t.headerTitle;
-    document.getElementById('headerSub').innerText = t.headerSub;
-    document.getElementById('loginTitle').innerText = t.loginTitle;
-    document.getElementById('loginBtn').innerText = t.loginBtn;
-    document.getElementById('registerLink').innerText = t.registerLink;
-    document.getElementById('regTitle').innerText = t.regTitle;
-    document.getElementById('submitRegBtn').innerText = t.submitRegBtn;
-    document.getElementById('backBtn').innerText = t.backBtn;
-    document.getElementById('resumeBtn').innerText = t.resumeBtn;
-    document.getElementById('reportTitle').innerText = t.reportTitle;
-    document.getElementById('repWrongTitle').innerText = t.repWrongTitle;
-    document.getElementById('adminPanelTitle').innerText = t.adminPanelTitle;
-    document.getElementById('manageAdsTitle').innerText = t.manageAdsTitle;
-    document.getElementById('showAdsBtn').innerText = t.showAdsBtn;
-    document.getElementById('addNoticeBtn').innerText = t.addNoticeBtn;
-    document.getElementById('saveNoticesBtn').innerText = t.saveNoticesBtn;
-    document.getElementById('manageStudentsTitle').innerText = t.manageStudentsTitle;
-    document.getElementById('showUsersBtn').innerHTML = t.showUsersBtn + ' <span id="reqBadge" class="badge">0</span>';
-    document.getElementById('manageQuestionsTitle').innerText = t.manageQuestionsTitle;
-    document.getElementById('addJsonBtn').innerText = t.addJsonBtn;
-    document.getElementById('confirmJsonBtn').innerText = t.confirmJsonBtn;
-    document.getElementById('addOneBtn').innerText = t.addOneBtn;
-    document.getElementById('adminLogoutBtn').innerText = t.adminLogoutBtn;
-    document.getElementById('mainAppLink').innerText = t.mainAppLink;
-    document.getElementById('whatsappLink').innerText = t.whatsappLink;
-    document.getElementById('footerText').innerText = t.footerText;
-    
-    const quizActionBtn = document.getElementById('quizActionBtn');
-    if (quizActionBtn && (quizActionBtn.innerText.includes('خروج') || quizActionBtn.innerText.includes('Logout'))) {
-        quizActionBtn.innerText = t.quizActionBtn;
-    }
-    
-    document.getElementById('langSwitchBtn').innerText = currentLanguage === 'ar' ? 'English' : 'العربية';
-    
-    if (currentLanguage === 'ar') {
-        document.body.dir = "rtl";
-        document.documentElement.lang = "ar";
-    } else {
-        document.body.dir = "ltr";
-        document.documentElement.lang = "en";
-    }
-}
-
-function toggleLanguage() {
-    currentLanguage = currentLanguage === 'ar' ? 'en' : 'ar';
-    localStorage.setItem(K.LANG, currentLanguage);
-    applyUILanguage();
-    if (document.getElementById('student').classList.contains('active') && quiz.length > 0 && qi < quiz.length) {
-        renderCurrentQuestion();
-    }
-}
-
-function getLocalizedText(q, field) {
-    if (!q) return '';
-    const fieldAr = field + '_ar';
-    const fieldEn = field + '_en';
-    if (currentLanguage === 'ar') {
-        return q[fieldAr] || q[field] || '';
-    } else {
-        return q[fieldEn] || q[field] || '';
-    }
-}
-
-// ============================================================
-// دوال عرض الأسئلة
-// ============================================================
-function renderCurrentQuestion() {
-    if (qi >= quiz.length) return;
-    const q = quiz[qi];
-    const t = uiTranslations[currentLanguage];
-    document.getElementById('qNum').innerText = `${t.question}: ${qi+1}/${quiz.length}`;
-    document.getElementById('score').innerText = `${t.score} ${score}`;
-    document.getElementById('qText').innerText = getLocalizedText(q, 'q');
-    document.getElementById('exp').style.display = 'none';
-    
-    const opts = document.getElementById('opts');
-    opts.innerHTML = '';
-    
-    const options = currentLanguage === 'ar' ? (q.o_ar || q.o || []) : (q.o_en || q.o || []);
-    const correctAnswer = currentLanguage === 'ar' ? (q.c_ar || q.c) : (q.c_en || q.c);
-    
-    const mixedOptions = [...options].sort(() => Math.random() - 0.5);
-    mixedOptions.forEach(opt => {
-        const div = document.createElement('div');
-        div.className = 'option';
-        div.innerText = opt;
-        div.onclick = () => {
-            if (opts.querySelector('.correct,.wrong')) return;
-            if (opt === correctAnswer) {
-                score += 10;
-                div.classList.add('correct');
-            } else {
-                div.classList.add('wrong');
-                [...opts.children].forEach(c => {
-                    if (c.innerText === correctAnswer) c.classList.add('correct');
-                });
-                wrongAnswersHistory.push({
-                    q: getLocalizedText(q, 'q'),
-                    c: correctAnswer,
-                    e: getLocalizedText(q, 'e')
-                });
-            }
-            document.getElementById('score').innerText = `${t.score} ${score}`;
-            const exp = document.getElementById('exp');
-            exp.innerHTML = `<b>${currentLanguage === 'ar' ? 'التفسير العلمي للعيادة:' : 'Clinical Explanation:'}</b><br>${getLocalizedText(q, 'e')}`;
-            exp.style.display = 'block';
-            setTimeout(() => { qi++; saveCurrentProgressToStorage(); renderCurrentQuestion(); }, 1800);
-        };
-        opts.appendChild(div);
+function startListeningOnlineCount() {
+    const box = document.getElementById('onlineCountBox');
+    if (!box) return;
+    box.style.display = 'inline-block';
+    if (onlineRef) db.ref('online_status').off('value', onlineRef);
+    onlineRef = db.ref('online_status').on('value', snap => {
+        const count = snap.numChildren() || 0;
+        box.innerText = 'المتصلون الآن: ' + count;
     });
 }
-
-function renderQ() {
-    if (qi >= quiz.length) {
-        clearProgressStorage();
-        showFinalReport();
-        return;
-    }
-    renderCurrentQuestion();
+function stopListeningOnlineCount() {
+    const box = document.getElementById('onlineCountBox');
+    if (box) { box.style.display = 'none'; box.innerText = ''; }
+    if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
 }
-
-function showFinalReport() {
-    document.getElementById('quizContent').style.display = 'none';
-    document.getElementById('reportArea').style.display = 'block';
-    const maxScore = quiz.length * 10;
-    const percent = Math.round((score / maxScore) * 100) || 0;
-    const t = uiTranslations[currentLanguage];
-    
-    const resultText = currentLanguage === 'ar' ? 'نتيجة طبيبنا النهائية هي' : 'Your Final Score is';
-    const percentText = currentLanguage === 'ar' ? 'نسبة التشخيص الصحيحة الإجمالية' : 'Overall Diagnostic Accuracy';
-    document.getElementById('repScore').innerHTML = `${resultText}: ${score} / ${maxScore}`;
-    document.getElementById('repPercent').innerHTML = `${percentText}: ${percent}%`;
-    
-    const wrongList = document.getElementById('wrongList');
-    wrongList.innerHTML = '';
-    if (wrongAnswersHistory.length === 0) {
-        document.getElementById('repWrongTitle').innerText = currentLanguage === 'ar' ? "رائع ومذهل! تشخيصاتك الطبية سليمة بنسبة 100% في هذه الجولة." : "Excellent! Your medical diagnoses are 100% correct in this round.";
-    } else {
-        wrongAnswersHistory.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'wrong-review-item';
-            const caseText = currentLanguage === 'ar' ? 'حالة رقم' : 'Case';
-            const correctText = currentLanguage === 'ar' ? 'الجواب العلمي الصحيح' : 'Correct Answer';
-            const explanationText = currentLanguage === 'ar' ? 'التفسير' : 'Explanation';
-            div.innerHTML = `<div><strong>${caseText} ${index + 1}:</strong> ${item.q}</div>
-                <div style="color:#155724; font-weight:bold; margin-top:4px;">${correctText}: ${item.c}</div>
-                <div style="color:#7a5a2a; margin-top:4px; font-size:0.85rem; background:#fffdf5; padding:5px; border-radius:8px;">💡 ${explanationText}: ${item.e}</div>`;
-            wrongList.appendChild(div);
-        });
-    }
-    const actionBtn = document.getElementById('quizActionBtn');
-    actionBtn.innerText = t.newQuizBtn;
-    actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)';
-    actionBtn.style.color = 'white';
-    actionBtn.onclick = () => checkSavedProgress();
-}
-
-// ============================================================
-// دوال Firebase والبيانات
-// ============================================================
-async function loadQs() {
-    const snap = await db.ref('questions').once('value');
-    const d = snap.val();
-    Qs = d ? Object.entries(d).map(([id, q]) => ({ ...q, id })) : [];
-    console.log(`📚 تم تحميل ${Qs.length} سؤال`);
-}
-
-function saveCurrentProgressToStorage() {
-    localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
-    localStorage.setItem(K.PROGRESS_INDEX, qi);
-    localStorage.setItem(K.PROGRESS_SCORE, score);
-    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
-}
-
-function clearProgressStorage() {
-    localStorage.removeItem(K.PROGRESS_QUIZ);
-    localStorage.removeItem(K.PROGRESS_INDEX);
-    localStorage.removeItem(K.PROGRESS_SCORE);
-    localStorage.removeItem(K.PROGRESS_WRONG);
-}
-
-function checkSavedProgress() {
-    show('student');
-    document.getElementById('quizContent').style.display = 'block';
-    document.getElementById('reportArea').style.display = 'none';
-    const t = uiTranslations[currentLanguage];
-    document.getElementById('quizActionBtn').innerText = t.quizActionBtn;
-    document.getElementById('quizActionBtn').onclick = logout;
-    const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
-    const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
-    const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
-    if (savedQuiz && savedIndex && savedScore) {
-        const resumeBtn = document.getElementById('resumeBtn');
-        resumeBtn.style.display = 'block';
-        resumeBtn.innerText = `${t.resumeBtn} (${t.question} ${parseInt(savedIndex) + 1})`;
-    }
-    startQuiz(false);
-}
-
-function startQuiz(forceNew = true) {
-    if (!Qs.length) { 
-        alert(currentLanguage === 'ar' ? 'بنك الأسئلة فارغ حاليا' : 'Question bank is empty'); 
-        logout(); 
-        return; 
-    }
-    if (forceNew) {
-        clearProgressStorage();
-        document.getElementById('resumeBtn').style.display = 'none';
-        quiz = [...Qs].sort(() => Math.random() - 0.5);
-        score = 0;
-        qi = 0;
-        wrongAnswersHistory = [];
-        renderQ();
-    } else {
-        quiz = [...Qs].sort(() => Math.random() - 0.5);
-        score = 0;
-        qi = 0;
-        wrongAnswersHistory = [];
-        renderQ();
-    }
-}
-
-function resumeSession() {
-    try {
-        const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
-        const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
-        const savedScore = parseInt(localStorage.getItem(K.PROGRESS_SCORE));
-        const savedWrong = JSON.parse(localStorage.getItem(K.PROGRESS_WRONG)) || [];
-        if (savedQuiz && savedQuiz.length > 0) {
-            quiz = savedQuiz;
-            qi = savedIndex;
-            score = savedScore;
-            wrongAnswersHistory = savedWrong;
-            document.getElementById('resumeBtn').style.display = 'none';
-            renderQ();
-        }
-    } catch (e) { console.log("Error resuming session", e); startQuiz(true); }
-}
-
-// ============================================================
-// دوال المصادقة والإدارة
-// ============================================================
 async function autoLogin() {
     const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
     if (!u || !p) return;
     try {
-        if (p === 'salem1959') {
-            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return true;
+        if (p === 'salem1959') { 
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return true; 
         }
-        const snap = await db.ref('users/' + key(u)).once('value');
+        const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
         if (d && d.password === p && d.status === 'active') {
             await loadQs(); checkSavedProgress(); return true;
@@ -715,251 +243,263 @@ async function autoLogin() {
     } catch(e) { console.log('Auto-login failed:', e.message); }
     return false;
 }
-
 async function login() {
     const u = document.getElementById('user').value.trim();
     const p = document.getElementById('pass').value.trim();
-    if (!u || !p) return alert(currentLanguage === 'ar' ? 'يرجى كتابة اسم المستخدم وكلمة السر' : 'Please enter username and password');
+    if (!u || !p) return alert('يرجى كتابة اسم المستخدم وكلمة السر');
     
     try {
         if (p === 'salem1959') {
             localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
             await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return;
         }
-        const snap = await db.ref('users/' + key(u)).once('value');
+        const snap = await db.ref('users/'+key(u)).once('value');
         const d = snap.val();
         if (d && d.password === p && d.status === 'active') {
             localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
             await loadQs(); checkSavedProgress();
         } else {
-            alert(d?.status === 'pending' ? (currentLanguage === 'ar' ? 'الحساب قيد المراجعة والقبول من الإدارة' : 'Account pending admin approval') : d?.status === 'suspended' ? (currentLanguage === 'ar' ? 'هذا الحساب تم توقيفه مؤقتا' : 'Account suspended') : (currentLanguage === 'ar' ? 'البيانات المدخلة غير صحيحة' : 'Invalid credentials'));
+            alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
         }
-    } catch (e) { showError((currentLanguage === 'ar' ? 'خطأ في الاتصال بالشبكة: ' : 'Network error: ') + e.message); }
+    } catch (e) { showError('خطأ في الاتصال بالشبكة: ' + e.message); }
 }
-
 async function register() {
     const n = document.getElementById('regUser').value.trim();
     const p = document.getElementById('regPass').value.trim();
-    if (!n || !p) return alert(currentLanguage === 'ar' ? 'يرجى ملء كافة حقول التسجيل أولا' : 'Please fill all registration fields');
+    if (!n || !p) return alert('يرجى ملء كافة حقول التسجيل أولا');
     try {
-        await db.ref('users/' + key(n)).set({ name: n, password: p, status: 'pending', at: Date.now() });
-        alert(currentLanguage === 'ar' ? 'تم إرسال طلبك بنجاح وهو قيد الانتظار للموافقة' : 'Request submitted successfully, pending approval');
-        show('login');
-    } catch(e) { alert((currentLanguage === 'ar' ? 'فشل الإرسال: ' : 'Submission failed: ') + e.message); }
+        await db.ref('users/'+key(n)).set({ name:n, password:p, status:'pending', at:Date.now() });
+        alert('تم إرسال طلبك بنجاح وهو قيد الانتظار للموافقة'); show('login');
+    } catch(e) { alert('فشل الإرسال: '+e.message); }
 }
-
+async function loadQs() {
+    const snap = await db.ref('questions').once('value');
+    const d = snap.val(); Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
+}
+function checkSavedProgress() {
+    show('student');
+    document.getElementById('quizContent').style.display = 'block';
+    document.getElementById('reportArea').style.display = 'none';
+    document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
+    document.getElementById('quizActionBtn').onclick = logout;
+    const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
+    const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
+    const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
+    if (savedQuiz && savedIndex && savedScore) {
+        const resumeBtn = document.getElementById('resumeBtn');
+        resumeBtn.style.display = 'block';
+        resumeBtn.innerText = `استئناف الجلسة السابقة (سؤال رقم ${parseInt(savedIndex) + 1})`;
+    }
+    startQuiz(false); 
+}
+function startQuiz(forceNew = true) {
+    if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
+    if (forceNew) {
+        clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
+    } else {
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
+    }
+}
+function resumeSession() {
+    try {
+        const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
+        const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
+        const savedScore = parseInt(localStorage.getItem(K.PROGRESS_SCORE));
+        const savedWrong = JSON.parse(localStorage.getItem(K.PROGRESS_WRONG)) || [];
+        if (savedQuiz && savedQuiz.length > 0) {
+            quiz = savedQuiz; qi = savedIndex; score = savedScore; wrongAnswersHistory = savedWrong;
+            document.getElementById('resumeBtn').style.display = 'none'; renderQ();
+        }
+    } catch (e) { console.log("Error resuming session", e); startQuiz(true); }
+}
+function saveCurrentProgressToStorage() {
+    localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
+    localStorage.setItem(K.PROGRESS_INDEX, qi);
+    localStorage.setItem(K.PROGRESS_SCORE, score);
+    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
+}
+function clearProgressStorage() {
+    localStorage.removeItem(K.PROGRESS_QUIZ); localStorage.removeItem(K.PROGRESS_INDEX);
+    localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
+}
+function renderQ() {
+    if (qi >= quiz.length) { clearProgressStorage(); showFinalReport(); return; }
+    
+    const q = quiz[qi];
+    document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
+    document.getElementById('score').innerText = `النقاط: ${score}`;
+    document.getElementById('qText').innerText = q.q;
+    document.getElementById('exp').style.display = 'none';
+    const opts = document.getElementById('opts'); opts.innerHTML = '';
+    
+    const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
+    mixedOptions.forEach(opt => {
+        const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
+        div.onclick = () => {
+            if (opts.querySelector('.correct,.wrong')) return;
+            if (opt === q.c) { score += 10; div.classList.add('correct'); }
+            else { 
+                div.classList.add('wrong'); 
+                [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
+                wrongAnswersHistory.push({ q: q.q, c: q.c, e: q.e });
+            }
+            document.getElementById('score').innerText = `النقاط: ${score}`;
+            const exp = document.getElementById('exp');
+            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
+            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, 1800);
+        };        
+        opts.appendChild(div);
+    });
+}
+function showFinalReport() {
+    document.getElementById('quizContent').style.display = 'none';
+    document.getElementById('reportArea').style.display = 'block';
+    const maxScore = quiz.length * 10; const percent = Math.round((score / maxScore) * 100) || 0;
+    
+    document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية هي: ${score} من أصل ${maxScore} نقطة`;
+    document.getElementById('repPercent').innerText = `نسبة التشخيص الصحيحة الإجمالية: ${percent}%`;
+    
+    const wrongList = document.getElementById('wrongList'); wrongList.innerHTML = '';
+    if (wrongAnswersHistory.length === 0) {
+        document.getElementById('repWrongTitle').innerText = "رائع ومذهل! تشخيصاتك الطبية سليمة بنسبة 100% في هذه الجولة.";
+    } else {
+        document.getElementById('repWrongTitle').innerText = "أسئلة وحالات تعثرت بها تحتاج مراجعة علمية وتدقيق دكتور:";
+        wrongAnswersHistory.forEach((item, index) => {
+            const div = document.createElement('div'); div.className = 'wrong-review-item';
+            div.innerHTML = `<div><strong>حالة رقم (${index + 1}):</strong> ${item.q}</div>
+                <div style="color:#155724; font-weight:bold; margin-top:4px;">الجواب العلمي الصحيح: ${item.c}</div>
+                <div style="color:#7a5a2a; margin-top:4px; font-size:0.85rem; background:#fffdf5; padding:5px; border-radius:8px;">💡 التفسير: ${item.e}</div>`;
+            wrongList.appendChild(div);
+        });
+    }
+    const actionBtn = document.getElementById('quizActionBtn');
+    actionBtn.innerText = 'بدء جولة اختبار وتدريب جديدة';
+    actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
+    actionBtn.onclick = checkSavedProgress;
+}
 function renderAdmin() {
     const c = document.getElementById('qList');
-    if (!Qs.length) {
-        c.innerHTML = `<p style="text-align:center;color:#888;padding:15px;">${currentLanguage === 'ar' ? 'لا توجد أسئلة مضافة في البنك حاليا' : 'No questions in the bank yet'}</p>`;
-        return;
-    }
+    if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;padding:15px;">لا توجد أسئلة مضافة في البنك حاليا</p>'; return; }
     c.innerHTML = '';
-    Qs.forEach((q, i) => {
-        const div = document.createElement('div');
-        div.className = 'q-item';
-        const qText = currentLanguage === 'ar' ? (q.q_ar || q.q) : (q.q_en || q.q);
-        div.innerHTML = `<div><strong>${i + 1}. ${qText}</strong></div>
-        <div class="correct-badge">${currentLanguage === 'ar' ? 'الجواب الصحيح' : 'Correct Answer'}: ${currentLanguage === 'ar' ? (q.c_ar || q.c) : (q.c_en || q.c)}</div>
+    Qs.forEach((q,i) => {
+        const div = document.createElement('div'); div.className = 'q-item';
+        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong></div><div class="correct-badge">الجواب الصحيح:  ${q.c}</div>
         <div class="row" style="margin-top:8px;">
-            <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;" onclick="editQ('${q.id}')">${currentLanguage === 'ar' ? 'تعديل' : 'Edit'}</button>
-            <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;" onclick="delQ('${q.id}')">${currentLanguage === 'ar' ? 'حذف' : 'Delete'}</button>
+            <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;" onclick="editQ('${q.id}')">تعديل</button>
+            <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;" onclick="delQ('${q.id}')">حذف</button>
         </div>`;
         c.appendChild(div);
     });
 }
-
 function listenUsers() {
     if (usersRef) db.ref('users').off('value', usersRef);
     usersRef = db.ref('users').on('value', snap => {
         const d = snap.val(), c = document.getElementById('usersList');
         if (!c) return;
-        if (!d) {
-            c.innerHTML = `<p style="text-align:center;color:#888;padding:10px;">${currentLanguage === 'ar' ? 'لا يوجد سجل للطلاب حاليا' : 'No student records'}</p>`;
-            pending = 0;
-            updBadge();
-            return;
-        }
-        pending = 0;
-        c.innerHTML = '';
-        Object.entries(d).forEach(([k, u]) => {
+        if (!d) { c.innerHTML = '<p style="text-align:center;color:#888;padding:10px;">لا يوجد سجل للطلاب حاليا</p>'; pending = 0; updBadge(); return; }
+        pending = 0; c.innerHTML = '';
+        Object.entries(d).forEach(([k,u]) => {
             if (u.status === 'pending') pending++;
-            const statusText = { active: (currentLanguage === 'ar' ? 'نشط مقبل' : 'Active'), pending: (currentLanguage === 'ar' ? 'قيد الانتظار' : 'Pending'), suspended: (currentLanguage === 'ar' ? 'موقوف مؤقتا' : 'Suspended') }[u.status] || '';
-            const statusClass = { active: 'active', pending: 'pending', suspended: 'suspended' }[u.status] || '';
-            const div = document.createElement('div');
-            div.className = 'user-item';
-            div.innerHTML = `<div class="row"><strong>${currentLanguage === 'ar' ? 'الطالب' : 'Student'}: ${u.name}</strong><span class="tag ${statusClass}">${statusText}</span></div>
-            <div style="font-size:0.85rem;color:#666;margin:8px 0;">${currentLanguage === 'ar' ? 'كلمة السر' : 'Password'}: ${u.password}</div>
+            const st = {active:['نشط مقبل','active'],pending:['قيد الانتظار','pending'],suspended:['موقوف مؤقتا','suspended']}[u.status]||['مجهول',''];
+            const div = document.createElement('div'); div.className = 'user-item';
+            div.innerHTML = `<div class="row"><strong>الطالب:  ${u.name}</strong><span class="tag ${st[1]}">${st[0]}</span></div>
+            <div style="font-size:0.85rem;color:#666;margin:8px 0;">كلمة السر:  ${u.password}</div>
             <div class="row" style="gap:5px;">
-                ${u.status !== 'active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','active')">${currentLanguage === 'ar' ? 'تنشيط الحساب' : 'Activate'}</button>` : ''}
-                ${u.status !== 'suspended' ? `<button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','suspended')">${currentLanguage === 'ar' ? 'إيقاف مؤقت' : 'Suspend'}</button>` : ''}
-                <button class="btn" style="background:#d63031;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="delU('${k}','${u.name}')">${currentLanguage === 'ar' ? 'حذف نهائي' : 'Delete'}</button>
+                ${u.status!=='active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','active')">تنشيط الحساب</button>`:''}
+                ${u.status!=='suspended' ? `<button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','suspended')">إيقاف مؤقت</button>`:''}
+                <button class="btn" style="background:#d63031;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="delU('${k}','${u.name}')">حذف نهائي</button>
             </div>`;
             c.appendChild(div);
         });
         updBadge();
     });
 }
-
-function updBadge() {
-    const b = document.getElementById('reqBadge');
-    if (b) {
-        b.innerText = pending;
-        b.style.display = pending > 0 ? 'inline-block' : 'none';
-    }
-}
-
+function updBadge() { const b = document.getElementById('reqBadge'); b.innerText = pending; b.style.display = pending>0?'inline-block':'none'; }
 function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
 function toggleNoticePanel() { document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
-async function setSt(k, st) { if (confirm(currentLanguage === 'ar' ? 'هل أنت متأكد من تغيير حالة هذا الحساب؟' : 'Are you sure you want to change this account status?')) await db.ref('users/' + k).update({ status: st }); }
-async function delU(k, n) { if (confirm(currentLanguage === 'ar' ? `هل ترغب فعلا في حذف حساب الطالب "${n}" بشكل كامل؟` : `Are you sure you want to delete student "${n}" permanently?`)) await db.ref('users/' + k).remove(); }
-async function delQ(id) { if (confirm(currentLanguage === 'ar' ? 'هل أنت متأكد من رغبتك في حذف هذا السؤال نهائيا؟' : 'Are you sure you want to delete this question permanently?')) { await db.ref('questions/' + id).remove(); await loadQs(); renderAdmin(); } }
-function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display === 'none' ? 'block' : 'none'; }
-
+async function setSt(k, st) { if (confirm('هل أنت متأكد من تغيير حالة هذا الحساب؟')) await db.ref('users/'+k).update({status:st}); }
+async function delU(k, n) { if (confirm(`هل ترغب فعلا في حذف حساب الطالب "${n}" بشكل كامل؟`)) await db.ref('users/'+k).remove(); }
+async function delQ(id) { if (confirm('هل أنت متأكد من رغبتك في حذف هذا السؤال نهائيا؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
+function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
 async function addJson() {
-    const t = document.getElementById('jsonInput').value.trim();
-    if (!t) return alert(currentLanguage === 'ar' ? 'يرجى لصق بيانات نص JSON أولا' : 'Please paste JSON data first');
-    let arr;
-    try { arr = JSON.parse(t); } catch(e) { return alert((currentLanguage === 'ar' ? 'خطأ في تركيب ملف الـ JSON: ' : 'JSON parsing error: ') + e.message); }
-    if (!Array.isArray(arr)) return alert(currentLanguage === 'ar' ? 'يجب أن تكون المدخلات عبارة عن مصفوفة' : 'Input must be an array');
+    const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('يرجى لصق بيانات نص JSON أولا');
+    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('خطأ في تركيب ملف الـ JSON: '+e.message); }
+    if (!Array.isArray(arr)) return alert('يجب أن تكون المدخلات عبارة عن مصفوفة تحتوي على كائنات متعددة');
     let ok = 0, err = 0;
     for (const it of arr) {
-        if (!it.q_ar || !it.q_en || !it.o_ar || !it.o_en || !it.c_ar || !it.c_en || !it.e_ar || !it.e_en) { err++; continue; }
-        if (!Array.isArray(it.o_ar) || it.o_ar.length !== 4 || !Array.isArray(it.o_en) || it.o_en.length !== 4) { err++; continue; }
-        try {
-            await db.ref('questions').push({
-                q_ar: it.q_ar, q_en: it.q_en,
-                o_ar: it.o_ar, o_en: it.o_en,
-                c_ar: it.c_ar, c_en: it.c_en,
-                e_ar: it.e_ar, e_en: it.e_en
-            });
-            ok++;
-        } catch { err++; }
+        if (!it.q || !it.o || !it.c || !it.e || !Array.isArray(it.o) || it.o.length!==4 || !it.o.includes(it.c)) { err++; continue; }
+        try { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e}); ok++; } catch { err++; }
     }
-    alert(`${currentLanguage === 'ar' ? 'تمت المعالجة. المقبولة' : 'Processed. Accepted'}: ${ok} | ${currentLanguage === 'ar' ? 'المرفوضة' : 'Rejected'}: ${err}`);
-    toggleJson();
-    await loadQs();
-    renderAdmin();
+    alert(`عملية المعالجة تمت بنجاح. المقبولة: ${ok} | المرفوضة لعدم مطابقة المعايير: ${err}`); toggleJson(); await loadQs(); renderAdmin();
 }
-
 function addOne() {
-    editId = null;
-    document.getElementById('mTitle').innerText = currentLanguage === 'ar' ? 'إضافة سؤال فردي جديد (عربي + إنجليزي)' : 'Add New Single Question (Arabic + English)';
-    ['mQ_ar', 'mQ_en', 'm1_ar', 'm1_en', 'm2_ar', 'm2_en', 'm3_ar', 'm3_en', 'm4_ar', 'm4_en', 'mC_ar', 'mC_en', 'mE_ar', 'mE_en'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('mSave').onclick = saveOne;
+    editId = null; document.getElementById('mTitle').innerText = 'إضافة سؤال فردي جديد';
+    ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('modal').style.display = 'flex'; document.getElementById('mSave').onclick = saveOne;
 }
-
 async function saveOne() {
-    const q_ar = document.getElementById('mQ_ar').value.trim();
-    const q_en = document.getElementById('mQ_en').value.trim();
-    const o_ar = [1, 2, 3, 4].map(i => document.getElementById('m' + i + '_ar').value.trim());
-    const o_en = [1, 2, 3, 4].map(i => document.getElementById('m' + i + '_en').value.trim());
-    const c_ar = document.getElementById('mC_ar').value.trim();
-    const c_en = document.getElementById('mC_en').value.trim();
-    const e_ar = document.getElementById('mE_ar').value.trim();
-    const e_en = document.getElementById('mE_en').value.trim();
-    
-    if (!q_ar || !q_en || o_ar.some(v => !v) || o_en.some(v => !v) || !c_ar || !c_en || !e_ar || !e_en) {
-        return alert(currentLanguage === 'ar' ? 'يرجى ملء جميع الحقول المطلوبة (عربي وإنجليزي)' : 'Please fill all required fields (Arabic and English)');
-    }
-    if (!o_ar.includes(c_ar)) return alert(currentLanguage === 'ar' ? 'الإجابة الصحيحة بالعربية يجب أن تطابق أحد الخيارات' : 'Correct answer (Arabic) must match one of the options');
-    if (!o_en.includes(c_en)) return alert(currentLanguage === 'ar' ? 'الإجابة الصحيحة بالإنجليزية يجب أن تطابق أحد الخيارات' : 'Correct answer (English) must match one of the options');
-    
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى ملء جميع الحقول المطلوبة للسؤال أولا');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يتطابق حرفيا مع أحد الخيارات الأربعة المدرجة');
     try {
-        await db.ref('questions').push({ q_ar, q_en, o_ar, o_en, c_ar, c_en, e_ar, e_en });
-        alert(currentLanguage === 'ar' ? 'تم حفظ السؤال بنجاح' : 'Question saved successfully');
-        closeModal();
-        // إعادة تعيين علامة الترجمة لأن هناك أسئلة جديدة
-        localStorage.removeItem(K.TRANS_DONE);
-        await loadQs();
-        if (document.getElementById('admin').classList.contains('active')) renderAdmin();
-    } catch(err) { alert((currentLanguage === 'ar' ? 'فشل الحفظ: ' : 'Save failed: ') + err.message); }
+        await db.ref('questions').push({q,o,c,e});
+        alert('تم حفظ السؤال بنجاح وإدراجه في بنك الأسئلة'); closeModal(); await loadQs(); if (document.getElementById('admin').classList.contains('active')) renderAdmin();
+    } catch(err) { alert('فشل الحفظ في قاعدة البيانات: '+err.message); }
 }
-
 function editQ(id) {
-    const q = Qs.find(x => x.id === id);
-    if (!q) return;
-    editId = id;
-    document.getElementById('mTitle').innerText = currentLanguage === 'ar' ? 'تعديل بيانات السؤال' : 'Edit Question';
-    document.getElementById('mQ_ar').value = q.q_ar || '';
-    document.getElementById('mQ_en').value = q.q_en || '';
-    [1, 2, 3, 4].forEach(i => {
-        document.getElementById('m' + i + '_ar').value = (q.o_ar || [])[i - 1] || '';
-        document.getElementById('m' + i + '_en').value = (q.o_en || [])[i - 1] || '';
-    });
-    document.getElementById('mC_ar').value = q.c_ar || '';
-    document.getElementById('mC_en').value = q.c_en || '';
-    document.getElementById('mE_ar').value = q.e_ar || '';
-    document.getElementById('mE_en').value = q.e_en || '';
-    document.getElementById('modal').style.display = 'flex';
-    document.getElementById('mSave').onclick = () => updQ(id);
+    const q = Qs.find(x=>x.id===id); if (!q) return; editId = id; document.getElementById('mTitle').innerText = 'تعديل بيانات السؤال الحالي';
+    document.getElementById('mQ').value = q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value = v);
+    document.getElementById('mC').value = q.c; document.getElementById('mE').value = q.e;
+    document.getElementById('modal').style.display = 'flex'; document.getElementById('mSave').onclick = () => updQ(id);
 }
-
 async function updQ(id) {
-    const q_ar = document.getElementById('mQ_ar').value.trim();
-    const q_en = document.getElementById('mQ_en').value.trim();
-    const o_ar = [1, 2, 3, 4].map(i => document.getElementById('m' + i + '_ar').value.trim());
-    const o_en = [1, 2, 3, 4].map(i => document.getElementById('m' + i + '_en').value.trim());
-    const c_ar = document.getElementById('mC_ar').value.trim();
-    const c_en = document.getElementById('mC_en').value.trim();
-    const e_ar = document.getElementById('mE_ar').value.trim();
-    const e_en = document.getElementById('mE_en').value.trim();
-    
-    if (!q_ar || !q_en || o_ar.some(v => !v) || o_en.some(v => !v) || !c_ar || !c_en || !e_ar || !e_en) {
-        return alert(currentLanguage === 'ar' ? 'يرجى ملء جميع الحقول' : 'Please fill all fields');
-    }
-    if (!o_ar.includes(c_ar)) return alert(currentLanguage === 'ar' ? 'الإجابة الصحيحة بالعربية غير مطابقة' : 'Arabic correct answer does not match');
-    if (!o_en.includes(c_en)) return alert(currentLanguage === 'ar' ? 'الإجابة الصحيحة بالإنجليزية غير مطابقة' : 'English correct answer does not match');
-    
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى إكمال تعبئة البيانات');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يطابق تماما أحد الخيارات الأربعة المكتوبة');
     try {
-        await db.ref('questions/' + id).set({ q_ar, q_en, o_ar, o_en, c_ar, c_en, e_ar, e_en });
-        alert(currentLanguage === 'ar' ? 'تم تحديث السؤال' : 'Question updated');
-        closeModal();
-        await loadQs();
-        renderAdmin();
-    } catch(err) { alert((currentLanguage === 'ar' ? 'فشل التحديث: ' : 'Update failed: ') + err.message); }
+        await db.ref('questions/'+id).set({q,o,c,e});
+        alert('تم تحديث السؤال بنجاح'); closeModal(); await loadQs(); renderAdmin();
+    } catch(err) { alert('فشل إرسال التحديث: '+err.message); }
 }
-
 function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
-
-// ============================================================
-// إدارة الإعلانات
-// ============================================================
-let noticeTimeout = null;
-let currentNoticeIndex = 0;
-let noticeLines = [];
-
+// --- ميزة إدارة الإعلانات المنفصلة والمطوية بالكامل من لوحة الإدارة ---
+let noticeTimeout = null; let currentNoticeIndex = 0; let noticeLines = [];
 function buildNoticeManagerUI() {
     const container = document.getElementById('noticeListContainer');
     if (!container) return;
     container.innerHTML = '';
+    
     noticeLines.forEach((item, idx) => {
         const row = document.createElement('div');
         row.className = 'notice-row-item';
-        row.innerHTML = `<div class="notice-row-fields">
-            <input type="text" class="notice-input-content" value="${item.content.replace(/"/g, '&quot;')}" placeholder="${currentLanguage === 'ar' ? 'نص الإعلان أو رابط الصورة' : 'Ad text or image URL'}">
-            <input type="number" class="notice-input-time" value="${item.time || 4}" placeholder="${currentLanguage === 'ar' ? 'ثواني' : 'seconds'}">
-            <button class="notice-btn-del" onclick="removeNoticeRow(${idx})">${currentLanguage === 'ar' ? 'حذف' : 'Delete'}</button>
-        </div>`;
+        row.innerHTML = `
+            <div class="notice-row-fields">
+                <input type="text" class="notice-input-content" value="${item.content}" placeholder="نص الإعلان أو رابط الصورة الفعلي">
+                <input type="number" class="notice-input-time" value="${item.time || 4}" placeholder="الثواني" title="زمن العرض بالثواني">
+                <button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button>
+            </div>
+        `;
         container.appendChild(row);
     });
 }
-
 function addNewNoticeRow() {
     noticeLines.push({ content: '', time: 4 });
     buildNoticeManagerUI();
 }
-
 function removeNoticeRow(idx) {
     noticeLines.splice(idx, 1);
     buildNoticeManagerUI();
 }
-
 async function saveAllNoticesFromManager() {
     const container = document.getElementById('noticeListContainer');
     const rows = container.getElementsByClassName('notice-row-item');
     let resultStrings = [];
+    
     for (let row of rows) {
         const content = row.querySelector('.notice-input-content').value.trim();
         const time = parseInt(row.querySelector('.notice-input-time').value.trim());
@@ -968,28 +508,30 @@ async function saveAllNoticesFromManager() {
             resultStrings.push(`${content} * ${seconds}`);
         }
     }
+    
     const dbTextValue = resultStrings.join('\n');
-    try {
-        await db.ref('app_notice').set(dbTextValue);
-        alert(currentLanguage === 'ar' ? 'تم حفظ الإعلانات بنجاح!' : 'Announcements saved successfully!');
-    } catch(e) { alert((currentLanguage === 'ar' ? 'فشل الحفظ: ' : 'Save failed: ') + e.message); }
+    try { 
+        await db.ref('app_notice').set(dbTextValue); 
+        alert('تم حفظ البيانات بنجاح وتحديث نظام شاشات الإعلانات التدويرية!'); 
+    } catch(e) { 
+        alert('فشل الحفظ: ' + e.message); 
+    }
 }
-
 function checkIsImage(content) { return /\.(jpeg|jpg|gif|png|webp)$/i.test(content.toLowerCase()) || content.startsWith('data:image/'); }
-
 function displayNoticeContent(targetBox, noticeObj) {
     if (noticeTimeout) clearTimeout(noticeTimeout);
     const displayDuration = noticeObj.time ? noticeObj.time * 1000 : 4000;
+    
     if (checkIsImage(noticeObj.content)) {
-        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">${currentLanguage === 'ar' ? 'جاري تحميل الصورة الإعلانية...' : 'Loading advertisement image...'}</div><img id="noticeImg" src="${noticeObj.content}" alt="Ad" style="display:none;">`;
-        const img = document.getElementById('noticeImg');
-        const txt = document.getElementById('noticeTxt');
+        targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية...</div>
+            <img id="noticeImg" src="${noticeObj.content}" alt="إعلان" style="display:none;">`;
+        const img = document.getElementById('noticeImg'); const txt = document.getElementById('noticeTxt');
+        
         let fallbackTimeout = setTimeout(() => { nextNotice(); }, displayDuration + 2000);
-        img.onload = () => {
-            clearTimeout(fallbackTimeout);
-            txt.style.display = 'none';
-            img.style.display = 'block';
-            noticeTimeout = setTimeout(nextNotice, displayDuration);
+        
+        img.onload = () => { 
+            clearTimeout(fallbackTimeout); txt.style.display = 'none'; img.style.display = 'block'; 
+            noticeTimeout = setTimeout(nextNotice, displayDuration); 
         };
         img.onerror = () => { clearTimeout(fallbackTimeout); nextNotice(); };
     } else {
@@ -997,18 +539,16 @@ function displayNoticeContent(targetBox, noticeObj) {
         noticeTimeout = setTimeout(nextNotice, displayDuration);
     }
 }
-
 function nextNotice() {
     if (noticeLines.length <= 1) return;
     const box = document.getElementById('appNoticeBox');
-    currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length;
+    currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length; 
     displayNoticeContent(box, noticeLines[currentNoticeIndex]);
 }
-
 function listenToNotice() {
     db.ref('app_notice').on('value', snap => {
-        const rawText = snap.val() || "";
-        const box = document.getElementById('appNoticeBox');
+        const rawText = snap.val() || ""; const box = document.getElementById('appNoticeBox');
+        
         const lines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
         noticeLines = lines.map(line => {
             if (line.includes('*')) {
@@ -1019,104 +559,22 @@ function listenToNotice() {
             }
             return { content: line, time: null };
         });
+        
         buildNoticeManagerUI();
-        if (noticeTimeout) clearTimeout(noticeTimeout);
-        currentNoticeIndex = 0;
-        if (noticeLines.length > 0) {
-            box.style.display = 'block';
-            displayNoticeContent(box, noticeLines[0]);
-        } else {
-            box.style.display = 'none';
-        }
+        
+        if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex = 0;
+        if (noticeLines.length > 0) { box.style.display = 'block'; displayNoticeContent(box, noticeLines[0]); } else { box.style.display = 'none'; }
     });
 }
-
-// ============================================================
-// دوال عامة
-// ============================================================
-function startListeningOnlineCount() {
-    const box = document.getElementById('onlineCountBox');
-    if (!box) return;
-    box.style.display = 'inline-block';
-    if (onlineRef) db.ref('online_status').off('value', onlineRef);
-    onlineRef = db.ref('online_status').on('value', snap => {
-        const count = snap.numChildren() || 0;
-        box.innerText = `${currentLanguage === 'ar' ? 'المتصلون الآن' : 'Online now'}: ${count}`;
-    });
-}
-
-function stopListeningOnlineCount() {
-    const box = document.getElementById('onlineCountBox');
-    if (box) { box.style.display = 'none'; box.innerText = ''; }
-    if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
-}
-
-function setupVisitorCounter() {
-    const counterRef = db.ref('visitor_counter');
-    counterRef.transaction(currentValue => {
-        if (currentValue === null || currentValue < 11310) return 11310;
-        return currentValue + 1;
-    });
-    counterRef.on('value', snap => {
-        const count = snap.val() || 11310;
-        const box = document.getElementById('visitorCountBox');
-        if (box) box.innerText = `${currentLanguage === 'ar' ? 'الزوار' : 'Visitors'}: ${count}`;
-    });
-}
-
-db.ref('.info/connected').on('value', s => {
-    const isConnected = s.val();
-    document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
-    if (isConnected) {
-        const myPresenceRef = db.ref('online_status').push();
-        myPresenceRef.set(true);
-        myPresenceRef.onDisconnect().remove();
-    }
-});
-
-function show(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g, ''); }
-function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(() => e.classList.remove('show'), 4000); }
-
+function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
+function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 4000); }
 function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
-    stopListeningOnlineCount();
-    localStorage.removeItem(K.U);
-    localStorage.removeItem(K.P);
-    Qs = [];
-    quiz = [];
-    score = 0;
-    qi = 0;
-    wrongAnswersHistory = [];
-    show('login');
-    document.getElementById('user').value = '';
-    document.getElementById('pass').value = '';
+    stopListeningOnlineCount(); localStorage.removeItem(K.U); localStorage.removeItem(K.P);
+    Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = [];
+    show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
 }
-
-// ============================================================
-// تشغيل التطبيق
-// ============================================================
-window.onload = async () => {
-    // استعادة اللغة المحفوظة
-    const savedLang = localStorage.getItem(K.LANG);
-    if (savedLang && (savedLang === 'ar' || savedLang === 'en')) {
-        currentLanguage = savedLang;
-    } else {
-        const browserLang = (navigator.language || 'ar').toLowerCase();
-        currentLanguage = browserLang.startsWith('ar') ? 'ar' : 'en';
-    }
-    applyUILanguage();
-    
-    show('login');
-    await autoLogin().catch(() => {});
-    listenToNotice();
-    setupVisitorCounter();
-    
-    // تشغيل الترجمة التلقائية بعد تحميل الصفحة
-    setTimeout(() => {
-        autoTranslateAllQuestions();
-    }, 2000);
-};
 </script>
 </body>
 </html>
