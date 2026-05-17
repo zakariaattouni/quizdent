@@ -24,9 +24,11 @@
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
         h2 { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
-        
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; font-size: 1rem; }
         .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; }
         .btn:hover { transform: translateY(-2px); }
+        .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
+        .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
         
         .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
@@ -36,6 +38,16 @@
         .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
         .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
+        .q-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #2c9b7a; }
+        .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 5px 0; }
+        .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #6c5ce7; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+        .tag.active { background: #d4edda; color: #155724; }
+        .tag.pending { background: #fff3cd; color: #856404; }
+        .tag.suspended { background: #e2e3e5; color: #383d41; }
+        .badge { background: #d63031; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: none; }
+        .collapse { display: none; margin-top: 10px; }
+        .collapse.show { display: block; }
         .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 12px; margin: 10px 0; font-size: 0.9rem; display: none; }
         .error.show { display: block; }
         #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
@@ -50,9 +62,15 @@
         .admin-notice-text { padding: 15px; display: block; }
         .report-box { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 16px; text-align: center; }
         .wrong-review-item { background: #fff5f5; border-right: 4px solid #f56565; padding: 12px; border-radius: 14px; margin-bottom: 10px; text-align: right; font-size: 0.9rem; }
+        /* تنسيقات إدارة الإعلانات المنفصلة والمريحة */
+        .notice-manager-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-top: 10px; }
+        .notice-row-item { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .notice-row-fields { display: flex; gap: 8px; align-items: center; }
+        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; }
+        .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; text-align: center; margin: 0; }
+        .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
     </style>
-</head>
-<body>
+</head><body>
 <div class="app">
     <div class="header">
         <h1>
@@ -64,8 +82,32 @@
     </div>
     <div id="err" class="error"></div>
     
-    <!-- شاشة اختبار الطالب المباشرة -->
-    <div id="student" class="screen active">
+    <!-- الدخول الثلاثي المستقل -->
+    <div id="login" class="screen active">
+        <div class="card">
+            <h2>تسجيل الدخول</h2>
+            <input type="text" id="user" placeholder="اسم المستخدم">
+            <input type="password" id="pass" placeholder="كلمة السر">
+            <button class="btn" onclick="login()">دخول</button>
+            <p style="text-align:center; margin-top:15px;">
+                <a href="#" style="color:#2c9b7a;" onclick="show('register')">حساب جديد للاستخدام</a>
+            </p>
+        </div>
+    </div>
+    
+    <!-- تسجيل طالب جديد -->
+    <div id="register" class="screen">
+        <div class="card">
+            <h2>تسجيل طالب جديد</h2>
+            <input type="text" id="regUser" placeholder="الاسم الكامل">
+            <input type="password" id="regPass" placeholder="كلمة السر">
+            <button class="btn" onclick="register()">إرسال الطلب</button>
+            <button class="btn" style="background:#aaa;" onclick="show('login')">رجوع</button>
+        </div>
+    </div>
+    
+    <!-- شاشة اختبار الطالب -->
+    <div id="student" class="screen">
         <div class="card">
             <button id="resumeBtn" class="btn btn-resume" onclick="resumeSession()">استئناف الجلسة السابقة المتبقية</button>
             
@@ -90,7 +132,43 @@
                 <h4 style="color:#c53030; margin-bottom:8px; text-align:right;" id="repWrongTitle">أسئلة تحتاج مراجعة وتدقيق علمي:</h4>
                 <div id="wrongList"></div>
             </div>
-            <button id="quizActionBtn" class="btn" style="background:#e2edf0; color:#4a5568;" onclick="resetCurrentQuiz()">إعادة تصفير البدء من جديد</button>
+            <button id="quizActionBtn" class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">خروج من الحساب</button>
+        </div>
+    </div>
+    
+    <!-- لوحة الإدارة الشاملة -->
+    <div id="admin" class="screen">
+        <div class="card">
+            <h3 style="color:#5f4b8b; margin-bottom:10px;">لوحة التحكم بالإدارة</h3>
+            <div style="max-height:450px; overflow-y:auto;">
+                
+                <!-- إضافة ميزة الطي البرمجي لقسم إدارة الإعلانات لمنع التشتت والارتباك -->
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الإعلانات واللافتات التدويرية</h4>
+                <button class="btn btn-admin" onclick="toggleNoticePanel()">عرض نافذة التحكم بالإعلانات</button>
+                <div id="noticeCollapsePanel" class="collapse">
+                    <div class="notice-manager-panel">
+                        <div id="noticeListContainer">
+                            <!-- يتم توليد الحقول هنا تلقائياً -->
+                        </div>
+                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة حقل إعلان أو صورة جديد</button>
+                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">حفظ وتحديث قائمة الإعلانات نهائياً</button>
+                    </div>
+                </div>
+                <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الطلاب المسجلين</h4>
+                <button class="btn btn-admin" onclick="toggleUsers()">عرض القائمة الكاملة <span id="reqBadge" class="badge">0</span></button>
+                <div id="usersList" class="collapse"></div>
+                
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">إدارة بنك الأسئلة</h4>
+                <button class="btn btn-admin" onclick="toggleJson()">إضافة جماعية عبر JSON</button>
+                <div id="jsonPanel" style="display:none; margin:10px 0;">
+                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
+                    <button class="btn btn-admin" onclick="addJson()">إضافة مصفوفة الأسئلة</button>
+                </div>
+                <button class="btn btn-admin" onclick="addOne()">إضافة سؤال مفرد</button>
+                <div id="qList"></div>
+            </div>
+            <button class="btn" style="margin-top:10px;" onclick="logout()">خروج من الإدارة</button>
         </div>
     </div>
     
@@ -99,15 +177,28 @@
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
-
+<!-- نافذة إضافة وتعديل الأسئلة المفردة -->
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
+    <div class="card" style="width:100%; max-width:450px; max-height:90vh; overflow-y:auto;">
+        <h3 id="mTitle">نموذج السؤال</h3>
+        <input id="mQ" placeholder="نص السؤال العلمي">
+        <input id="m1" placeholder="الخيار الأول"><input id="m2" placeholder="الخيار الثاني">
+        <input id="m3" placeholder="الخيار الثالث"><input id="m4" placeholder="الخيار الرابع">
+        <input id="mC" placeholder="نسخة مطابقة من الخيار الصحيح تماما" style="background:#e8f0fe;">
+        <textarea id="mE" rows="2" placeholder="الشرح والتفسير العلمي المرتبط بالسؤال"></textarea>
+        <div class="row" style="margin-top:10px;">
+            <button class="btn" id="mSave">حفظ البيانات</button>
+            <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء الأمر</button>
+        </div>
+    </div>
+</div>
 <script>
 const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
 firebase.initializeApp(cfg);
 const db = firebase.database();
-let Qs = [], quiz = [], score = 0, qi = 0, onlineRef = null;
+let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
 let wrongAnswersHistory = []; 
-const K = { PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
-
+const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
 db.ref('.info/connected').on('value', s => {
     const isConnected = s.val();
     document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
@@ -117,18 +208,11 @@ db.ref('.info/connected').on('value', s => {
         myPresenceRef.onDisconnect().remove();
     }
 });
-
-window.onload = async () => {
-    try {
-        startListeningOnlineCount();
-        listenToNotice();
-        await loadQs();
-        checkSavedProgress();
-    } catch(e) {
-        showError('خطأ أثناء تحميل البيانات: ' + e.message);
-    }
+window.onload = () => {
+    show('login');
+    autoLogin().catch(()=>{});
+    listenToNotice();
 };
-
 function startListeningOnlineCount() {
     const box = document.getElementById('onlineCountBox');
     if (!box) return;
@@ -139,23 +223,68 @@ function startListeningOnlineCount() {
         box.innerText = 'المتصلون الآن: ' + count;
     });
 }
-
+function stopListeningOnlineCount() {
+    const box = document.getElementById('onlineCountBox');
+    if (box) { box.style.display = 'none'; box.innerText = ''; }
+    if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
+}
+async function autoLogin() {
+    const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
+    if (!u || !p) return;
+    try {
+        if (p === 'salem1959') { 
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return true; 
+        }
+        const snap = await db.ref('users/'+key(u)).once('value');
+        const d = snap.val();
+        if (d && d.password === p && d.status === 'active') {
+            await loadQs(); checkSavedProgress(); return true;
+        }
+    } catch(e) { console.log('Auto-login failed:', e.message); }
+    return false;
+}
+async function login() {
+    const u = document.getElementById('user').value.trim();
+    const p = document.getElementById('pass').value.trim();
+    if (!u || !p) return alert('يرجى كتابة اسم المستخدم وكلمة السر');
+    
+    try {
+        if (p === 'salem1959') {
+            localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
+            await loadQs(); show('admin'); renderAdmin(); listenUsers(); startListeningOnlineCount(); return;
+        }
+        const snap = await db.ref('users/'+key(u)).once('value');
+        const d = snap.val();
+        if (d && d.password === p && d.status === 'active') {
+            localStorage.setItem(K.U, u); localStorage.setItem(K.P, p);
+            await loadQs(); checkSavedProgress();
+        } else {
+            alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
+        }
+    } catch (e) { showError('خطأ في الاتصال بالشبكة: ' + e.message); }
+}
+async function register() {
+    const n = document.getElementById('regUser').value.trim();
+    const p = document.getElementById('regPass').value.trim();
+    if (!n || !p) return alert('يرجى ملء كافة حقول التسجيل أولا');
+    try {
+        await db.ref('users/'+key(n)).set({ name:n, password:p, status:'pending', at:Date.now() });
+        alert('تم إرسال طلبك بنجاح وهو قيد الانتظار للموافقة'); show('login');
+    } catch(e) { alert('فشل الإرسال: '+e.message); }
+}
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
-    const d = snap.val(); 
-    Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
+    const d = snap.val(); Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
-
 function checkSavedProgress() {
+    show('student');
     document.getElementById('quizContent').style.display = 'block';
     document.getElementById('reportArea').style.display = 'none';
-    document.getElementById('quizActionBtn').innerText = 'إعادة تصفير البدء من جديد';
-    document.getElementById('quizActionBtn').onclick = resetCurrentQuiz;
-    
+    document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
+    document.getElementById('quizActionBtn').onclick = logout;
     const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
     const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
     const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
-    
     if (savedQuiz && savedIndex && savedScore) {
         const resumeBtn = document.getElementById('resumeBtn');
         resumeBtn.style.display = 'block';
@@ -163,26 +292,15 @@ function checkSavedProgress() {
     }
     startQuiz(false); 
 }
-
 function startQuiz(forceNew = true) {
-    if (!Qs.length) { 
-        document.getElementById('qText').innerText = 'جاري مزامنة أسئلة العيادة السنية من السيرفر أو البنك فارغ...'; 
-        return; 
-    }
+    if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
     if (forceNew) {
-        clearProgressStorage(); 
-        document.getElementById('resumeBtn').style.display = 'none';
-        quiz = [...Qs].sort(()=>Math.random()-0.5); 
-        score = 0; qi = 0; wrongAnswersHistory = []; 
-        renderQ();
+        clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
     } else {
-        // التحضير الأولي لكن دون تصفير مخصص في حال قرر الاستئناف
-        quiz = [...Qs].sort(()=>Math.random()-0.5); 
-        score = 0; qi = 0; wrongAnswersHistory = []; 
-        renderQ();
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
     }
 }
-
 function resumeSession() {
     try {
         const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
@@ -191,92 +309,64 @@ function resumeSession() {
         const savedWrong = JSON.parse(localStorage.getItem(K.PROGRESS_WRONG)) || [];
         if (savedQuiz && savedQuiz.length > 0) {
             quiz = savedQuiz; qi = savedIndex; score = savedScore; wrongAnswersHistory = savedWrong;
-            document.getElementById('resumeBtn').style.display = 'none'; 
-            renderQ();
+            document.getElementById('resumeBtn').style.display = 'none'; renderQ();
         }
-    } catch (e) { 
-        startQuiz(true); 
-    }
+    } catch (e) { console.log("Error resuming session", e); startQuiz(true); }
 }
-
-function resetCurrentQuiz() {
-    if(confirm('هل تود التخلي عن التقدم الحالي والبدء بأسئلة عشوائية جديدة؟')) {
-        startQuiz(true);
-    }
-}
-
 function saveCurrentProgressToStorage() {
     localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
     localStorage.setItem(K.PROGRESS_INDEX, qi);
     localStorage.setItem(K.PROGRESS_SCORE, score);
     localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
 }
-
 function clearProgressStorage() {
-    localStorage.removeItem(K.PROGRESS_QUIZ); 
-    localStorage.removeItem(K.PROGRESS_INDEX);
-    localStorage.removeItem(K.PROGRESS_SCORE); 
-    localStorage.removeItem(K.PROGRESS_WRONG);
+    localStorage.removeItem(K.PROGRESS_QUIZ); localStorage.removeItem(K.PROGRESS_INDEX);
+    localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
 }
-
 function renderQ() {
-    if (qi >= quiz.length) { 
-        clearProgressStorage(); 
-        showFinalReport(); 
-        return; 
-    }
+    if (qi >= quiz.length) { clearProgressStorage(); showFinalReport(); return; }
     
     const q = quiz[qi];
     document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
     document.getElementById('score').innerText = `النقاط: ${score}`;
     document.getElementById('qText').innerText = q.q;
     document.getElementById('exp').style.display = 'none';
-    const opts = document.getElementById('opts'); 
-    opts.innerHTML = '';
+    const opts = document.getElementById('opts'); opts.innerHTML = '';
     
     const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
     mixedOptions.forEach(opt => {
-        const div = document.createElement('div'); 
-        div.className = 'option'; 
-        div.innerText = opt;
+        const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
         div.onclick = () => {
             if (opts.querySelector('.correct,.wrong')) return;
-            if (opt === q.c) { 
-                score += 10; 
-                div.classList.add('correct'); 
-            } else { 
+            if (opt === q.c) { score += 10; div.classList.add('correct'); }
+            else { 
                 div.classList.add('wrong'); 
                 [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
                 wrongAnswersHistory.push({ q: q.q, c: q.c, e: q.e });
             }
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
-            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; 
-            exp.style.display = 'block';
+            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
             setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, 1800);
         };        
         opts.appendChild(div);
     });
 }
-
 function showFinalReport() {
     document.getElementById('quizContent').style.display = 'none';
     document.getElementById('reportArea').style.display = 'block';
-    const maxScore = quiz.length * 10; 
-    const percent = Math.round((score / maxScore) * 100) || 0;
+    const maxScore = quiz.length * 10; const percent = Math.round((score / maxScore) * 100) || 0;
     
     document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية هي: ${score} من أصل ${maxScore} نقطة`;
     document.getElementById('repPercent').innerText = `نسبة التشخيص الصحيحة الإجمالية: ${percent}%`;
     
-    const wrongList = document.getElementById('wrongList'); 
-    wrongList.innerHTML = '';
+    const wrongList = document.getElementById('wrongList'); wrongList.innerHTML = '';
     if (wrongAnswersHistory.length === 0) {
         document.getElementById('repWrongTitle').innerText = "رائع ومذهل! تشخيصاتك الطبية سليمة بنسبة 100% في هذه الجولة.";
     } else {
         document.getElementById('repWrongTitle').innerText = "أسئلة وحالات تعثرت بها تحتاج مراجعة علمية وتدقيق دكتور:";
         wrongAnswersHistory.forEach((item, index) => {
-            const div = document.createElement('div'); 
-            div.className = 'wrong-review-item';
+            const div = document.createElement('div'); div.className = 'wrong-review-item';
             div.innerHTML = `<div><strong>حالة رقم (${index + 1}):</strong> ${item.q}</div>
                 <div style="color:#155724; font-weight:bold; margin-top:4px;">الجواب العلمي الصحيح: ${item.c}</div>
                 <div style="color:#7a5a2a; margin-top:4px; font-size:0.85rem; background:#fffdf5; padding:5px; border-radius:8px;">💡 التفسير: ${item.e}</div>`;
@@ -285,15 +375,149 @@ function showFinalReport() {
     }
     const actionBtn = document.getElementById('quizActionBtn');
     actionBtn.innerText = 'بدء جولة اختبار وتدريب جديدة';
-    actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; 
-    actionBtn.style.color = 'white';
-    actionBtn.onclick = () => { checkSavedProgress(); };
+    actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
+    actionBtn.onclick = checkSavedProgress;
 }
-
+function renderAdmin() {
+    const c = document.getElementById('qList');
+    if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;padding:15px;">لا توجد أسئلة مضافة في البنك حاليا</p>'; return; }
+    c.innerHTML = '';
+    Qs.forEach((q,i) => {
+        const div = document.createElement('div'); div.className = 'q-item';
+        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong></div><div class="correct-badge">الجواب الصحيح:  ${q.c}</div>
+        <div class="row" style="margin-top:8px;">
+            <button class="btn" style="background:#ffb703;color:#000;width:auto;padding:6px 15px;" onclick="editQ('${q.id}')">تعديل</button>
+            <button class="btn" style="background:#e17055;width:auto;padding:6px 15px;" onclick="delQ('${q.id}')">حذف</button>
+        </div>`;
+        c.appendChild(div);
+    });
+}
+function listenUsers() {
+    if (usersRef) db.ref('users').off('value', usersRef);
+    usersRef = db.ref('users').on('value', snap => {
+        const d = snap.val(), c = document.getElementById('usersList');
+        if (!c) return;
+        if (!d) { c.innerHTML = '<p style="text-align:center;color:#888;padding:10px;">لا يوجد سجل للطلاب حاليا</p>'; pending = 0; updBadge(); return; }
+        pending = 0; c.innerHTML = '';
+        Object.entries(d).forEach(([k,u]) => {
+            if (u.status === 'pending') pending++;
+            const st = {active:['نشط مقبل','active'],pending:['قيد الانتظار','pending'],suspended:['موقوف مؤقتا','suspended']}[u.status]||['مجهول',''];
+            const div = document.createElement('div'); div.className = 'user-item';
+            div.innerHTML = `<div class="row"><strong>الطالب:  ${u.name}</strong><span class="tag ${st[1]}">${st[0]}</span></div>
+            <div style="font-size:0.85rem;color:#666;margin:8px 0;">كلمة السر:  ${u.password}</div>
+            <div class="row" style="gap:5px;">
+                ${u.status!=='active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','active')">تنشيط الحساب</button>`:''}
+                ${u.status!=='suspended' ? `<button class="btn" style="background:#fdcb6e;color:#000;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="setSt('${k}','suspended')">إيقاف مؤقت</button>`:''}
+                <button class="btn" style="background:#d63031;width:auto;padding:5px 10px;font-size:0.8rem;" onclick="delU('${k}','${u.name}')">حذف نهائي</button>
+            </div>`;
+            c.appendChild(div);
+        });
+        updBadge();
+    });
+}
+function updBadge() { const b = document.getElementById('reqBadge'); b.innerText = pending; b.style.display = pending>0?'inline-block':'none'; }
+function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
+function toggleNoticePanel() { document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
+async function setSt(k, st) { if (confirm('هل أنت متأكد من تغيير حالة هذا الحساب؟')) await db.ref('users/'+k).update({status:st}); }
+async function delU(k, n) { if (confirm(`هل ترغب فعلا في حذف حساب الطالب "${n}" بشكل كامل؟`)) await db.ref('users/'+k).remove(); }
+async function delQ(id) { if (confirm('هل أنت متأكد من رغبتك في حذف هذا السؤال نهائيا؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
+function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
+async function addJson() {
+    const t = document.getElementById('jsonInput').value.trim(); if (!t) return alert('يرجى لصق بيانات نص JSON أولا');
+    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('خطأ في تركيب ملف الـ JSON: '+e.message); }
+    if (!Array.isArray(arr)) return alert('يجب أن تكون المدخلات عبارة عن مصفوفة تحتوي على كائنات متعددة');
+    let ok = 0, err = 0;
+    for (const it of arr) {
+        if (!it.q || !it.o || !it.c || !it.e || !Array.isArray(it.o) || it.o.length!==4 || !it.o.includes(it.c)) { err++; continue; }
+        try { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e}); ok++; } catch { err++; }
+    }
+    alert(`عملية المعالجة تمت بنجاح. المقبولة: ${ok} | المرفوضة لعدم مطابقة المعايير: ${err}`); toggleJson(); await loadQs(); renderAdmin();
+}
+function addOne() {
+    editId = null; document.getElementById('mTitle').innerText = 'إضافة سؤال فردي جديد';
+    ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('modal').style.display = 'flex'; document.getElementById('mSave').onclick = saveOne;
+}
+async function saveOne() {
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى ملء جميع الحقول المطلوبة للسؤال أولا');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يتطابق حرفيا مع أحد الخيارات الأربعة المدرجة');
+    try {
+        await db.ref('questions').push({q,o,c,e});
+        alert('تم حفظ السؤال بنجاح وإدراجه في بنك الأسئلة'); closeModal(); await loadQs(); if (document.getElementById('admin').classList.contains('active')) renderAdmin();
+    } catch(err) { alert('فشل الحفظ في قاعدة البيانات: '+err.message); }
+}
+function editQ(id) {
+    const q = Qs.find(x=>x.id===id); if (!q) return; editId = id; document.getElementById('mTitle').innerText = 'تعديل بيانات السؤال الحالي';
+    document.getElementById('mQ').value = q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value = v);
+    document.getElementById('mC').value = q.c; document.getElementById('mE').value = q.e;
+    document.getElementById('modal').style.display = 'flex'; document.getElementById('mSave').onclick = () => updQ(id);
+}
+async function updQ(id) {
+    const q = document.getElementById('mQ').value.trim();
+    const o = [1,2,3,4].map(i=>document.getElementById('m'+i).value.trim());
+    const c = document.getElementById('mC').value.trim(); const e = document.getElementById('mE').value.trim();
+    if (!q || o.some(v=>!v) || !c || !e) return alert('يرجى إكمال تعبئة البيانات');
+    if (!o.includes(c)) return alert('نص الإجابة الصحيحة يجب أن يطابق تماما أحد الخيارات الأربعة المكتوبة');
+    try {
+        await db.ref('questions/'+id).set({q,o,c,e});
+        alert('تم تحديث السؤال بنجاح'); closeModal(); await loadQs(); renderAdmin();
+    } catch(err) { alert('فشل إرسال التحديث: '+err.message); }
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; editId = null; }
+// --- ميزة إدارة الإعلانات المنفصلة والمطوية بالكامل من لوحة الإدارة ---
 let noticeTimeout = null; let currentNoticeIndex = 0; let noticeLines = [];
-
+function buildNoticeManagerUI() {
+    const container = document.getElementById('noticeListContainer');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    noticeLines.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'notice-row-item';
+        row.innerHTML = `
+            <div class="notice-row-fields">
+                <input type="text" class="notice-input-content" value="${item.content}" placeholder="نص الإعلان أو رابط الصورة الفعلي">
+                <input type="number" class="notice-input-time" value="${item.time || 4}" placeholder="الثواني" title="زمن العرض بالثواني">
+                <button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+}
+function addNewNoticeRow() {
+    noticeLines.push({ content: '', time: 4 });
+    buildNoticeManagerUI();
+}
+function removeNoticeRow(idx) {
+    noticeLines.splice(idx, 1);
+    buildNoticeManagerUI();
+}
+async function saveAllNoticesFromManager() {
+    const container = document.getElementById('noticeListContainer');
+    const rows = container.getElementsByClassName('notice-row-item');
+    let resultStrings = [];
+    
+    for (let row of rows) {
+        const content = row.querySelector('.notice-input-content').value.trim();
+        const time = parseInt(row.querySelector('.notice-input-time').value.trim());
+        if (content) {
+            const seconds = isNaN(time) || time <= 0 ? 4 : time;
+            resultStrings.push(`${content} * ${seconds}`);
+        }
+    }
+    
+    const dbTextValue = resultStrings.join('\n');
+    try { 
+        await db.ref('app_notice').set(dbTextValue); 
+        alert('تم حفظ البيانات بنجاح وتحديث نظام شاشات الإعلانات التدويرية!'); 
+    } catch(e) { 
+        alert('فشل الحفظ: ' + e.message); 
+    }
+}
 function checkIsImage(content) { return /\.(jpeg|jpg|gif|png|webp)$/i.test(content.toLowerCase()) || content.startsWith('data:image/'); }
-
 function displayNoticeContent(targetBox, noticeObj) {
     if (noticeTimeout) clearTimeout(noticeTimeout);
     const displayDuration = noticeObj.time ? noticeObj.time * 1000 : 4000;
@@ -301,8 +525,7 @@ function displayNoticeContent(targetBox, noticeObj) {
     if (checkIsImage(noticeObj.content)) {
         targetBox.innerHTML = `<div id="noticeTxt" class="admin-notice-text">جاري تحميل الصورة الإعلانية...</div>
             <img id="noticeImg" src="${noticeObj.content}" alt="إعلان" style="display:none;">`;
-        const img = document.getElementById('noticeImg'); 
-        const txt = document.getElementById('noticeTxt');
+        const img = document.getElementById('noticeImg'); const txt = document.getElementById('noticeTxt');
         
         let fallbackTimeout = setTimeout(() => { nextNotice(); }, displayDuration + 2000);
         
@@ -316,43 +539,41 @@ function displayNoticeContent(targetBox, noticeObj) {
         noticeTimeout = setTimeout(nextNotice, displayDuration);
     }
 }
-
 function nextNotice() {
     if (noticeLines.length <= 1) return;
     const box = document.getElementById('appNoticeBox');
     currentNoticeIndex = (currentNoticeIndex + 1) % noticeLines.length; 
     displayNoticeContent(box, noticeLines[currentNoticeIndex]);
 }
-
 function listenToNotice() {
     db.ref('app_notice').on('value', snap => {
-        const rawText = snap.val() || ""; 
-        const box = document.getElementById('appNoticeBox');
-        const lines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
+        const rawText = snap.val() || ""; const box = document.getElementById('appNoticeBox');
         
+        const lines = rawText.split('\n').map(line => line.trim()).filter(line => line !== "");
         noticeLines = lines.map(line => {
             if (line.includes('*')) {
                 const parts = line.split('*');
-                return { content: parts[0].trim(), time: parseInt(parts[1].trim()) || null };
+                const content = parts[0].trim();
+                const time = parseInt(parts[1].trim());
+                return { content: content, time: isNaN(time) ? null : time };
             }
             return { content: line, time: null };
         });
         
-        if(noticeTimeout) clearTimeout(noticeTimeout); 
-        currentNoticeIndex = 0;
-        if (noticeLines.length > 0) { 
-            box.style.display = 'block'; 
-            displayNoticeContent(box, noticeLines[0]); 
-        } else { 
-            box.style.display = 'none'; 
-        }
+        buildNoticeManagerUI();
+        
+        if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex = 0;
+        if (noticeLines.length > 0) { box.style.display = 'block'; displayNoticeContent(box, noticeLines[0]); } else { box.style.display = 'none'; }
     });
 }
-
-function showError(m) { 
-    const e = document.getElementById('err'); 
-    e.innerText = m; e.classList.add('show'); 
-    setTimeout(()=>e.classList.remove('show'), 4000); 
+function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
+function showError(m) { const e = document.getElementById('err'); e.innerText = m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'), 4000); }
+function logout() {
+    if (usersRef) db.ref('users').off('value', usersRef);
+    stopListeningOnlineCount(); localStorage.removeItem(K.U); localStorage.removeItem(K.P);
+    Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = [];
+    show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
 }
 </script>
 </body>
