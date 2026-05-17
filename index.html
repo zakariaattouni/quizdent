@@ -188,6 +188,7 @@ firebase.initializeApp(cfg);
 const db = firebase.database();
 let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null, onlineRef = null;
 let wrongAnswersHistory = []; 
+let isDailyChallengeMode = false; // متغير لتحديد ما إذا كنا في وضع حالة اليوم الإجبارية
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
 
 // ==========================================
@@ -411,18 +412,44 @@ function checkSavedProgress() {
     document.getElementById('reportArea').style.display = 'none';
     document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
     document.getElementById('quizActionBtn').onclick = logout;
+    
+    const today = new Date().toDateString();
+    const hasAnsweredDaily = localStorage.getItem('daily_challenge_' + today);
     const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
-    const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
-    const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
-    if (savedQuiz && savedIndex && savedScore) {
+
+    // إذا لم يحمل الطالب سؤال اليوم بعد، وكان هناك أسئلة بالبنك، نفرض عليه تحدي اليوم أولاً
+    if (!hasAnsweredDaily && Qs.length > 0) {
+        document.getElementById('resumeBtn').style.display = 'none';
+        startDailyChallenge();
+    } else if (savedQuiz) {
+        // إذا كان لديه جلسة تدريب مفتوحة سابقة مخزنة
+        const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
+        const savedScore = localStorage.getItem(K.PROGRESS_SCORE);
         const resumeBtn = document.getElementById('resumeBtn');
         resumeBtn.style.display = 'block';
         resumeBtn.innerText = `استئناف الجلسة السابقة (سؤال رقم ${parseInt(savedIndex) + 1})`;
+        startQuiz(false);
+    } else {
+        startQuiz(true);
     }
-    startQuiz(false); 
+}
+
+// دالة لبدء "تحدي حالة اليوم" الإجباري والموحد لجميع الطلاب
+function startDailyChallenge() {
+    isDailyChallengeMode = true;
+    score = 0;
+    qi = 0;
+    wrongAnswersHistory = [];
+    
+    // اختيار سؤال محدد وثابت لليوم بناءً على تاريخ اليوم الحالي
+    const dailyIndex = new Date().getDate() % Qs.length;
+    quiz = [Qs[dailyIndex]]; 
+    
+    renderQ();
 }
 
 function startQuiz(forceNew = true) {
+    isDailyChallengeMode = false;
     if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
     if (forceNew) {
         clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
@@ -433,6 +460,7 @@ function startQuiz(forceNew = true) {
 }
 
 function resumeSession() {
+    isDailyChallengeMode = false;
     try {
         const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
         const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
@@ -446,6 +474,7 @@ function resumeSession() {
 }
 
 function saveCurrentProgressToStorage() {
+    if (isDailyChallengeMode) return; // لا نحتاج لحفظ تقدم التدريب إذا كنا في حالة اليوم المفردة
     localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
     localStorage.setItem(K.PROGRESS_INDEX, qi);
     localStorage.setItem(K.PROGRESS_SCORE, score);
@@ -458,17 +487,33 @@ function clearProgressStorage() {
 }
 
 function renderQ() {
-    // تحديث السجل اليومي 🔥
     if (typeof window.updateStreak === 'function') {
         window.updateStreak();
     }
     
-    if (qi >= quiz.length) { clearProgressStorage(); showFinalReport(); return; }
+    if (qi >= quiz.length) { 
+        if (isDailyChallengeMode) {
+            // عند انتهاء تحدي اليوم، نسجل أنه تم حله لتفادي تكراره
+            const today = new Date().toDateString();
+            localStorage.setItem('daily_challenge_' + today, 'true');
+            showDailyChallengeResult();
+            return;
+        }
+        clearProgressStorage(); showFinalReport(); return; 
+    }
     
     const q = quiz[qi];
-    document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
-    document.getElementById('score').innerText = `النقاط: ${score}`;
-    document.getElementById('qText').innerText = q.q;
+    
+    if (isDailyChallengeMode) {
+        document.getElementById('qNum').innerHTML = `🌟 <span style="color:#e67e22;">تحدي حالة اليوم الطبي</span>`;
+        document.getElementById('score').innerText = `النقاط الحالية: ${score}`;
+        document.getElementById('qText').innerHTML = `<div style="border-bottom: 2px dashed #e2f0ed; padding-bottom: 8px; margin-bottom: 8px; font-size: 0.9rem; color: #e67e22;">حالة سريرية مميزة تتغير كل 24 ساعة:</div> ${q.q}`;
+    } else {
+        document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
+        document.getElementById('score').innerText = `النقاط: ${score}`;
+        document.getElementById('qText').innerText = q.q;
+    }
+    
     document.getElementById('exp').style.display = 'none';
     const opts = document.getElementById('opts'); opts.innerHTML = '';
     
@@ -486,10 +531,35 @@ function renderQ() {
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
             exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
-            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, 1800);
+            
+            // زيادة المهلة الزمنية في تحدي اليوم ليتمكن الطالب من قراءة التفسير بتمعن
+            const delay = isDailyChallengeMode ? 3500 : 1800;
+            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, delay);
         };        
         opts.appendChild(div);
     });
+}
+
+// دالة تعرض كرت وسيط أنيق عند انتهاء تحدي اليوم، يوجه الطالب فوراً للتدريب الكامل
+function showDailyChallengeResult() {
+    const isCorrect = wrongAnswersHistory.length === 0;
+    const qText = document.getElementById('qText');
+    const opts = document.getElementById('opts');
+    const exp = document.getElementById('exp');
+    
+    exp.style.display = 'none';
+    
+    if (isCorrect) {
+        qText.innerHTML = `🎉 <span style="color:#009688;">أحسنت يا دكتور!</span><br><br>لقد شخصت حالة اليوم العلمية بنجاح باهر وكسبت 10 نقاط إضافية برصيدك الطائر!`;
+    } else {
+        qText.innerHTML = `🩺 <span style="color:#d63031;">محاولة جيدة يا دكتور!</span><br><br>تحدي اليوم كان يحتاج لبعض التدقيق، لكن الخطأ هنا هو طريقك للتعلم المثالي في عيادتك المستقبلية!`;
+    }
+    
+    opts.innerHTML = `
+        <button class="btn" style="background: linear-gradient(105deg, #3b82f6, #1d4ed8); margin-top:15px;" onclick="startQuiz(true)">
+            الانتقال الآن إلى التدريب المفتوح (بنك الأسئلة الكامل) 🚀
+        </button>
+    `;
 }
 
 function showFinalReport() {
@@ -692,7 +762,7 @@ function showError(m) { const e = document.getElementById('err'); e.innerText = 
 function logout() {
     if (usersRef) db.ref('users').off('value', usersRef);
     stopListeningOnlineCount(); localStorage.removeItem(K.U); localStorage.removeItem(K.P);
-    Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = [];
+    Qs = []; quiz = []; score = 0; qi = 0; wrongAnswersHistory = []; isDailyChallengeMode = false;
     show('login'); document.getElementById('user').value = ''; document.getElementById('pass').value = '';
 }
 </script>
