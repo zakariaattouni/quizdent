@@ -64,6 +64,15 @@
         .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; min-width: 150px; }
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; text-align: center; margin: 0; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .log-entry { background: #f8fafc; border-radius: 12px; padding: 10px; margin: 8px 0; border-right: 3px solid #6c5ce7; }
+        .log-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+        .log-name { font-weight: bold; color: #1e4a6e; }
+        .log-time { font-size: 0.75rem; color: #6b7280; }
+        .log-details { font-size: 0.85rem; color: #4b5563; display: flex; flex-wrap: wrap; gap: 15px; }
+        .filter-bar { display: flex; gap: 10px; margin: 15px 0; flex-wrap: wrap; }
+        .filter-input { flex: 1; padding: 8px; border-radius: 12px; border: 1px solid #dceaf2; }
+        .export-btn { background: #10b981; color: white; border: none; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+        .stats-box { background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 16px; padding: 15px; margin: 15px 0; text-align: center; }
     </style>
 </head>
 <body>
@@ -133,6 +142,27 @@
     <div id="admin" class="screen">
         <div class="card">
             <h3 style="color:#5f4b8b; margin-bottom:10px;">لوحة التحكم بالإدارة</h3>
+            
+            <!-- إحصائيات الدخول -->
+            <div class="stats-box" id="statsBox">
+                <div>📊 إحصائيات دخول الطلاب</div>
+                <div style="font-size:0.9rem; margin-top:8px;" id="statsDetails">جاري التحميل...</div>
+            </div>
+            
+            <!-- شريط التصفية والتصدير -->
+            <div class="filter-bar">
+                <input type="text" id="filterName" class="filter-input" placeholder="🔍 تصفية حسب اسم الطالب" onkeyup="filterLogs()">
+                <button class="export-btn" onclick="exportLogsToCSV()">📥 تصدير كسجل CSV</button>
+            </div>
+            
+            <!-- سجلات الدخول -->
+            <div id="loginLogsPanel" style="max-height:400px; overflow-y:auto; margin-bottom:20px;">
+                <h4 style="color:#1e4a6e; margin-bottom:10px;">🕐 سجلات دخول الطلاب (آخر 100)</h4>
+                <div id="logsList"></div>
+            </div>
+            
+            <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
+            
             <div style="max-height:450px; overflow-y:auto;">
                 <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الإعلانات واللافتات التدويرية</h4>
                 <button class="btn btn-admin" onclick="toggleNoticePanel()">عرض نافذة التحكم بالإعلانات</button>
@@ -191,6 +221,7 @@ let wrongAnswersHistory = [];
 let isDailyChallengeMode = false;
 let myPresenceRef = null;
 let isAdminLoggedIn = false;
+let allLogsData = [];
 
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
 
@@ -329,9 +360,7 @@ function setupOnlinePresence() {
 // عداد الزوار - يعمل بشكل حقيقي 100%
 // ==========================================
 function setupVisitorCounter() {
-    // إذا كان المدير مسجل الدخول، لا نزيد العداد
     if (isAdminLoggedIn) {
-        // فقط نعرض العداد الحالي دون تعديل
         db.ref('visitor_counter').on('value', snap => {
             const count = snap.val() || 0;
             const box = document.getElementById('visitorCountBox');
@@ -340,18 +369,12 @@ function setupVisitorCounter() {
         return;
     }
     
-    // زيادة العداد بشكل آني لكل زائر جديد
     const visitorRef = db.ref('visitor_counter');
     visitorRef.transaction(function(currentValue) {
-        // إذا كانت القيمة الحالية غير موجودة، نبدأ من 1
-        if (currentValue === null) {
-            return 1;
-        }
-        // وإلا نزيد بمقدار 1
+        if (currentValue === null) return 1;
         return currentValue + 1;
     });
     
-    // الاستماع للتحديثات وعرض العداد
     visitorRef.on('value', function(snap) {
         const count = snap.val() || 0;
         const box = document.getElementById('visitorCountBox');
@@ -376,7 +399,173 @@ function stopListeningOnlineCount() {
     if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
 }
 
-// مراقبة حالة الاتصال العامة (للنقطة الخضراء فقط)
+// ==========================================
+// نظام تتبع الدخول المتقدم
+// ==========================================
+async function getUserLocation() {
+    try {
+        // استخدام عدة APIs للحصول على معلومات دقيقة
+        const response = await fetch('https://ipapi.co/json/');
+        if (response.ok) {
+            const data = await response.json();
+            return {
+                ip: data.ip || 'unknown',
+                country: data.country_name || data.country || 'unknown',
+                city: data.city || 'unknown',
+                region: data.region || 'unknown',
+                timezone: data.timezone || 'unknown'
+            };
+        }
+        throw new Error('IP API failed');
+    } catch (e) {
+        try {
+            // API احتياطية
+            const response2 = await fetch('https://api.ipify.org?format=json');
+            const data2 = await response2.json();
+            return { ip: data2.ip, country: 'unknown', city: 'unknown', region: 'unknown', timezone: 'unknown' };
+        } catch(e2) {
+            return { ip: 'unknown', country: 'unknown', city: 'unknown', region: 'unknown', timezone: 'unknown' };
+        }
+    }
+}
+
+async function logUserLogin(userId, userName, location) {
+    const loginLog = {
+        userId: userId,
+        userName: userName,
+        ipAddress: location.ip,
+        country: location.country,
+        city: location.city,
+        region: location.region,
+        timezone: location.timezone,
+        timestamp: firebase.database.ServerValue.TIMESTAMP,
+        date: new Date().toISOString(),
+        userAgent: navigator.userAgent.substring(0, 200) // لتحديد نوع الجهاز
+    };
+    await db.ref('login_logs/' + userId + '/' + Date.now()).set(loginLog);
+}
+
+async function loadLoginLogs() {
+    const logsSnap = await db.ref('login_logs').once('value');
+    const logs = logsSnap.val();
+    if (!logs) {
+        document.getElementById('logsList').innerHTML = '<p style="text-align:center;color:#888;padding:20px;">لا توجد سجلات دخول حتى الآن</p>';
+        document.getElementById('statsDetails').innerHTML = 'لا توجد بيانات';
+        return;
+    }
+    
+    allLogsData = [];
+    Object.entries(logs).forEach(([userId, userLogs]) => {
+        Object.entries(userLogs).forEach(([logId, logData]) => {
+            allLogsData.push({...logData, userId, logId});
+        });
+    });
+    
+    // ترتيب حسب الأحدث أولاً
+    allLogsData.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+    
+    // عرض الإحصائيات
+    updateStats();
+    
+    // عرض السجلات
+    displayLogs(allLogsData.slice(0, 100));
+}
+
+function updateStats() {
+    const uniqueStudents = new Set(allLogsData.map(l => l.userId)).size;
+    const totalLogins = allLogsData.length;
+    const countries = new Set(allLogsData.map(l => l.country).filter(c => c && c !== 'unknown')).size;
+    
+    const lastWeek = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    const recentLogins = allLogsData.filter(l => (l.timestamp || 0) > lastWeek).length;
+    
+    document.getElementById('statsDetails').innerHTML = `
+        🧑‍🎓 طلاب نشطون: ${uniqueStudents}<br>
+        🔐 إجمالي محاولات الدخول: ${totalLogins}<br>
+        🌍 دول مختلفة: ${countries}<br>
+        📅 آخر 7 أيام: ${recentLogins}
+    `;
+}
+
+function displayLogs(logs) {
+    const container = document.getElementById('logsList');
+    if (!logs.length) {
+        container.innerHTML = '<p style="text-align:center;color:#888;padding:20px;">لا توجد سجلات مطابقة</p>';
+        return;
+    }
+    
+    container.innerHTML = logs.map(log => {
+        const date = log.timestamp ? new Date(log.timestamp).toLocaleString('ar-SA', { hour12: true }) : 'تاريخ غير معروف';
+        return `
+            <div class="log-entry">
+                <div class="log-header">
+                    <span class="log-name">👨‍⚕️ ${escapeHtml(log.userName || 'غير معروف')}</span>
+                    <span class="log-time">⏰ ${date}</span>
+                </div>
+                <div class="log-details">
+                    <span>🌍 ${escapeHtml(log.country || 'غير معروف')}</span>
+                    <span>📍 ${escapeHtml(log.city || 'غير معروف')}</span>
+                    <span>📡 IP: ${escapeHtml(log.ipAddress || 'غير متوفر')}</span>
+                    <span>🖥️ ${escapeHtml(log.userAgent ? (log.userAgent.includes('Mobile') ? 'جوال' : 'كمبيوتر') : 'جهاز غير معروف')}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+function filterLogs() {
+    const filterText = document.getElementById('filterName').value.toLowerCase();
+    if (!filterText) {
+        displayLogs(allLogsData.slice(0, 100));
+        return;
+    }
+    const filtered = allLogsData.filter(log => 
+        (log.userName && log.userName.toLowerCase().includes(filterText)) ||
+        (log.country && log.country.toLowerCase().includes(filterText))
+    );
+    displayLogs(filtered.slice(0, 100));
+}
+
+function exportLogsToCSV() {
+    if (!allLogsData.length) {
+        alert('لا توجد بيانات للتصدير');
+        return;
+    }
+    
+    const headers = ['اسم الطالب', 'الدولة', 'المدينة', 'IP', 'نوع الجهاز', 'التاريخ والوقت'];
+    const rows = allLogsData.map(log => [
+        log.userName || 'غير معروف',
+        log.country || 'غير معروف',
+        log.city || 'غير معروف',
+        log.ipAddress || 'غير معروف',
+        log.userAgent && log.userAgent.includes('Mobile') ? 'جوال' : 'كمبيوتر',
+        log.timestamp ? new Date(log.timestamp).toLocaleString('ar-SA') : 'غير معروف'
+    ]);
+    
+    const csvContent = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.href = url;
+    link.setAttribute('download', 'سجلات_الدخول_' + new Date().toISOString().slice(0,19) + '.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    alert('تم تصدير ' + allLogsData.length + ' سجل بنجاح');
+}
+
 db.ref('.info/connected').on('value', s => {
     const isConnected = s.val();
     document.getElementById('dot').className = 'status-dot' + (isConnected ? ' ok' : '');
@@ -399,7 +588,8 @@ async function autoLogin() {
             renderAdmin(); 
             listenUsers(); 
             startListeningOnlineCount(); 
-            setupVisitorCounter(); // للمدير (لن يزيد العداد)
+            setupVisitorCounter();
+            await loadLoginLogs();
             return true; 
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -408,17 +598,16 @@ async function autoLogin() {
             isAdminLoggedIn = false;
             await loadQs(); 
             checkSavedProgress();
-            setupOnlinePresence(); // إضافة الطالب إلى المتصلين
+            setupOnlinePresence();
             startListeningOnlineCount();
-            setupVisitorCounter(); // إضافة الطالب إلى عداد الزوار
+            setupVisitorCounter();
             return true;
         }
     } catch(e) { console.log('Auto-login failed:', e.message); }
-    // إذا لم يكن هناك تسجيل دخول، نعتبر المستخدم زائراً
     isAdminLoggedIn = false;
     startListeningOnlineCount();
-    setupOnlinePresence(); // إضافة الزائر إلى المتصلين
-    setupVisitorCounter(); // إضافة الزائر إلى عداد الزوار
+    setupOnlinePresence();
+    setupVisitorCounter();
     return false;
 }
 
@@ -426,6 +615,8 @@ async function login() {
     const u = document.getElementById('user').value.trim();
     const p = document.getElementById('pass').value.trim();
     if (!u || !p) return alert('يرجى كتابة اسم المستخدم وكلمة السر');
+    
+    const location = await getUserLocation();
     
     try {
         if (p === 'salem1959') {
@@ -437,7 +628,8 @@ async function login() {
             renderAdmin(); 
             listenUsers(); 
             startListeningOnlineCount(); 
-            setupVisitorCounter(); // للمدير (لن يزيد العداد)
+            setupVisitorCounter();
+            await loadLoginLogs();
             return;
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -448,9 +640,13 @@ async function login() {
             isAdminLoggedIn = false;
             await loadQs(); 
             checkSavedProgress();
-            setupOnlinePresence(); // إضافة الطالب
+            setupOnlinePresence();
             startListeningOnlineCount();
-            setupVisitorCounter(); // إضافة الطالب
+            setupVisitorCounter();
+            
+            // تسجيل دخول الطالب
+            await logUserLogin(key(u), d.name, location);
+            
         } else {
             alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
         }
