@@ -29,6 +29,42 @@
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
+        
+        /* زر الدعم المميز */
+        .support-btn {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a3a2a;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1rem;
+            margin: 15px 0 10px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(247, 151, 30, 0.3);
+            text-align: center;
+        }
+        .support-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(247, 151, 30, 0.4);
+        }
+        .support-icon {
+            font-size: 1.3rem;
+        }
+        .support-text {
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.2);
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: normal;
+        }
+        
         .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
         .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
         .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
@@ -64,126 +100,6 @@
         .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; margin: 0; min-width: 150px; }
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; text-align: center; margin: 0; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        
-        /* تحسينات جديدة لنافذة سجلات الدخول */
-        .tracking-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 15px;
-            color: white;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-top: 10px;
-        }
-        .stat-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 16px;
-            padding: 10px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-        }
-        .stat-number {
-            font-size: 1.6rem;
-            font-weight: bold;
-            display: block;
-        }
-        .stat-label {
-            font-size: 0.7rem;
-            opacity: 0.9;
-        }
-        .search-box {
-            background: white;
-            border-radius: 50px;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 15px 0;
-            border: 1px solid #e2e8f0;
-        }
-        .search-box input {
-            flex: 1;
-            border: none;
-            padding: 10px 0;
-            margin: 0;
-            background: transparent;
-        }
-        .search-box input:focus {
-            outline: none;
-        }
-        .search-icon {
-            color: #94a3b8;
-            font-size: 1.2rem;
-        }
-        .logs-container {
-            max-height: 380px;
-            overflow-y: auto;
-            border-radius: 20px;
-        }
-        .log-card {
-            background: white;
-            border-radius: 16px;
-            padding: 12px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border-right: 4px solid #667eea;
-            transition: all 0.2s;
-        }
-        .log-card:hover {
-            transform: translateX(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        .log-name-date {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-        .log-name {
-            font-weight: bold;
-            color: #1e4a6e;
-            font-size: 1rem;
-        }
-        .log-time {
-            font-size: 0.7rem;
-            color: #94a3b8;
-        }
-        .log-location {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            font-size: 0.8rem;
-            color: #475569;
-        }
-        .log-location span {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .refresh-btn {
-            background: #f1f5f9;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            color: #475569;
-            transition: all 0.2s;
-        }
-        .refresh-btn:hover {
-            background: #e2e8f0;
-        }
-        .no-data {
-            text-align: center;
-            padding: 40px;
-            color: #94a3b8;
-        }
     </style>
 </head>
 <body>
@@ -252,76 +168,48 @@
     
     <div id="admin" class="screen">
         <div class="card">
-            <h3 style="color:#5f4b8b; margin-bottom:10px; text-align:center;">✨ لوحة التحكم والإدارة ✨</h3>
-            
-            <!-- نافذة تتبع حركة الدخول المحسنة -->
-            <div class="tracking-header">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                    <span style="font-weight: bold;">📍 تتبع حركة الدخول</span>
-                    <button class="refresh-btn" onclick="loadLoginLogs()" style="background: rgba(255,255,255,0.2); color: white;">⟳ تحديث</button>
-                </div>
-                <div class="stats-grid" id="statsGrid">
-                    <div class="stat-card">
-                        <span class="stat-number" id="statStudents">0</span>
-                        <span class="stat-label">طلاب نشطون</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statLogins">0</span>
-                        <span class="stat-label">إجمالي الدخول</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statCountries">0</span>
-                        <span class="stat-label">دول مختلفة</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-number" id="statRecent">0</span>
-                        <span class="stat-label">آخر 7 أيام</span>
-                    </div>
-                </div>
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="searchInput" placeholder="ابحث باسم طالب أو دولة..." onkeyup="filterLogs()">
-                </div>
-            </div>
-            
-            <!-- قائمة السجلات -->
-            <div class="logs-container" id="logsList">
-                <div class="no-data">جاري التحميل...</div>
-            </div>
-            
-            <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
-            
+            <h3 style="color:#5f4b8b; margin-bottom:10px;">لوحة التحكم بالإدارة</h3>
             <div style="max-height:450px; overflow-y:auto;">
-                <h4 style="margin:10px 0 5px; color:#1e4a6e;">📢 إدارة الإعلانات</h4>
-                <button class="btn btn-admin" onclick="toggleNoticePanel()">⚙️ إدارة الإعلانات واللافتات</button>
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الإعلانات واللافتات التدويرية</h4>
+                <button class="btn btn-admin" onclick="toggleNoticePanel()">عرض نافذة التحكم بالإعلانات</button>
                 <div id="noticeCollapsePanel" class="collapse">
                     <div class="notice-manager-panel">
                         <div id="noticeListContainer"></div>
-                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة إعلان جديد</button>
-                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">💾 حفظ التغييرات</button>
+                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة حقل إعلان أو صورة جديد</button>
+                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">حفظ وتحديث قائمة الإعلانات نهائياً</button>
                     </div>
                 </div>
+                
+                <!-- زر الدعم المميز والأنيق -->
+                <a href="https://wa.me/963939436998?text=دكتور%20زكريا،%20أود%20دعم%20تطبيق%20مدرب%20التشخيص%20السني%20بمبلغ%20بسيط،%20كيف%20يمكنني%20إرساله؟" 
+                   target="_blank" 
+                   class="support-btn">
+                    <span class="support-icon">💚</span>
+                    <span>دعم استمرار التطبيق</span>
+                    <span class="support-text">واتساب</span>
+                </a>
+                
                 <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
-                <h4 style="margin:10px 0 5px; color:#1e4a6e;">👥 إدارة الطلاب</h4>
-                <button class="btn btn-admin" onclick="toggleUsers()">📋 قائمة الطلاب <span id="reqBadge" class="badge">0</span></button>
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">إدارة الطلاب المسجلين</h4>
+                <button class="btn btn-admin" onclick="toggleUsers()">عرض القائمة الكاملة <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
                 
-                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة</h4>
-                <button class="btn btn-admin" onclick="toggleJson()">📦 إضافة جماعية JSON</button>
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">إدارة بنك الأسئلة</h4>
+                <button class="btn btn-admin" onclick="toggleJson()">إضافة جماعية عبر JSON</button>
                 <div id="jsonPanel" style="display:none; margin:10px 0;">
                     <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
-                    <button class="btn btn-admin" onclick="addJson()">➕ إضافة الأسئلة</button>
+                    <button class="btn btn-admin" onclick="addJson()">إضافة مصفوفة الأسئلة</button>
                 </div>
-                <button class="btn btn-admin" onclick="addOne()">➕ إضافة سؤال مفرد</button>
+                <button class="btn btn-admin" onclick="addOne()">إضافة سؤال مفرد</button>
                 <div id="qList"></div>
             </div>
-            <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج من الإدارة</button>
+            <button class="btn" style="margin-top:10px;" onclick="logout()">خروج من الإدارة</button>
         </div>
     </div>
     
     <div id="appNoticeBox" class="admin-notice-box"></div>
-    <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">🦷 تطبيق تشخيص أمراض الفم والأسنان</a>
-    <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">📱 تواصل معنا عبر واتساب</a>
+    <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">الانتقال إلى تطبيق تشخيص أمراض الفم والأسنان</a>
+    <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-btn">تواصل معنا عبر واتساب</a>
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
 
@@ -349,13 +237,10 @@ let wrongAnswersHistory = [];
 let isDailyChallengeMode = false;
 let myPresenceRef = null;
 let isAdminLoggedIn = false;
-let allLogsData = [];
 
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
 
-// ==========================================
-// نظام السجلات اليومية
-// ==========================================
+// نظام السجلات اليومية - شعلة الإنجاز 🔥
 (function() {
     const STREAK_KEY = 'daily_streak_v2';
     const LAST_DATE_KEY = 'last_active_date_v2';
@@ -460,17 +345,21 @@ const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', P
         toast.style.opacity = '1';
         setTimeout(() => toast.style.opacity = '0', 3000);
     }
+    
+    window.addEventListener('load', () => {
+        const streak = parseInt(localStorage.getItem(STREAK_KEY)) || 0;
+        if (streak > 0) showStreakBadge(streak);
+    });
 })();
 
-// ==========================================
-// نظام المتصلين
-// ==========================================
 function setupOnlinePresence() {
     if (myPresenceRef) {
         myPresenceRef.remove();
         myPresenceRef = null;
     }
-    if (isAdminLoggedIn) return;
+    if (isAdminLoggedIn) {
+        return;
+    }
     myPresenceRef = db.ref('online_status').push();
     myPresenceRef.set(true);
     myPresenceRef.onDisconnect().remove();
@@ -485,11 +374,15 @@ function setupVisitorCounter() {
         });
         return;
     }
+    
     const visitorRef = db.ref('visitor_counter');
     visitorRef.transaction(function(currentValue) {
-        if (currentValue === null) return 1;
+        if (currentValue === null) {
+            return 1;
+        }
         return currentValue + 1;
     });
+    
     visitorRef.on('value', function(snap) {
         const count = snap.val() || 0;
         const box = document.getElementById('visitorCountBox');
@@ -512,139 +405,6 @@ function stopListeningOnlineCount() {
     const box = document.getElementById('onlineCountBox');
     if (box) { box.style.display = 'none'; box.innerText = ''; }
     if (onlineRef) { db.ref('online_status').off('value', onlineRef); onlineRef = null; }
-}
-
-// ==========================================
-// نظام تتبع الدخول المتقدم (نسخة محسنة)
-// ==========================================
-async function getUserLocation() {
-    try {
-        const response = await fetch('https://ipapi.co/json/');
-        if (response.ok) {
-            const data = await response.json();
-            return {
-                ip: data.ip || 'unknown',
-                country: data.country_name || data.country || 'غير معروف',
-                city: data.city || 'غير معروف',
-                region: data.region || 'غير معروف'
-            };
-        }
-        throw new Error('IP API failed');
-    } catch (e) {
-        try {
-            const response2 = await fetch('https://api.ipify.org?format=json');
-            const data2 = await response2.json();
-            return { ip: data2.ip, country: 'غير معروف', city: 'غير معروف', region: 'غير معروف' };
-        } catch(e2) {
-            return { ip: 'غير معروف', country: 'غير معروف', city: 'غير معروف', region: 'غير معروف' };
-        }
-    }
-}
-
-async function logUserLogin(userId, userName, location) {
-    const loginLog = {
-        userId: userId,
-        userName: userName,
-        ipAddress: location.ip,
-        country: location.country,
-        city: location.city,
-        region: location.region,
-        timestamp: firebase.database.ServerValue.TIMESTAMP,
-        date: new Date().toISOString()
-    };
-    await db.ref('login_logs/' + userId + '/' + Date.now()).set(loginLog);
-}
-
-async function loadLoginLogs() {
-    const logsSnap = await db.ref('login_logs').once('value');
-    const logs = logsSnap.val();
-    if (!logs) {
-        document.getElementById('logsList').innerHTML = '<div class="no-data">📭 لا توجد سجلات دخول حتى الآن</div>';
-        updateStatsDisplay(0, 0, 0, 0);
-        return;
-    }
-    
-    allLogsData = [];
-    Object.entries(logs).forEach(([userId, userLogs]) => {
-        Object.entries(userLogs).forEach(([logId, logData]) => {
-            allLogsData.push({...logData, userId, logId});
-        });
-    });
-    
-    allLogsData.sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
-    
-    const uniqueStudents = new Set(allLogsData.map(l => l.userId)).size;
-    const totalLogins = allLogsData.length;
-    const countries = new Set(allLogsData.map(l => l.country).filter(c => c && c !== 'غير معروف')).size;
-    const lastWeek = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    const recentLogins = allLogsData.filter(l => (l.timestamp || 0) > lastWeek).length;
-    
-    updateStatsDisplay(uniqueStudents, totalLogins, countries, recentLogins);
-    displayLogs(allLogsData.slice(0, 50));
-}
-
-function updateStatsDisplay(students, logins, countries, recent) {
-    document.getElementById('statStudents').innerText = students;
-    document.getElementById('statLogins').innerText = logins;
-    document.getElementById('statCountries').innerText = countries;
-    document.getElementById('statRecent').innerText = recent;
-}
-
-function displayLogs(logs) {
-    const container = document.getElementById('logsList');
-    if (!logs.length) {
-        container.innerHTML = '<div class="no-data">🔍 لا توجد سجلات مطابقة للبحث</div>';
-        return;
-    }
-    
-    const countryFlags = {
-        'سوريا': '🇸🇾', 'مصر': '🇪🇬', 'السعودية': '🇸🇦', 'العراق': '🇮🇶',
-        'الأردن': '🇯🇴', 'لبنان': '🇱🇧', 'فلسطين': '🇵🇸', 'الإمارات': '🇦🇪',
-        'الكويت': '🇰🇼', 'قطر': '🇶🇦', 'عمان': '🇴🇲', 'البحرين': '🇧🇭',
-        'اليمن': '🇾🇪', 'ليبيا': '🇱🇾', 'تونس': '🇹🇳', 'الجزائر': '🇩🇿',
-        'المغرب': '🇲🇦', 'السودان': '🇸🇩', 'موريتانيا': '🇲🇷', 'الصومال': '🇸🇴'
-    };
-    
-    container.innerHTML = logs.map(log => {
-        const date = log.timestamp ? new Date(log.timestamp).toLocaleString('ar-SA', { hour12: true }) : 'تاريخ غير معروف';
-        const flag = countryFlags[log.country] || '🌍';
-        return `
-            <div class="log-card">
-                <div class="log-name-date">
-                    <span class="log-name">👨‍⚕️ ${escapeHtml(log.userName || 'غير معروف')}</span>
-                    <span class="log-time">⏰ ${date}</span>
-                </div>
-                <div class="log-location">
-                    <span>${flag} ${escapeHtml(log.country || 'غير معروف')}</span>
-                    <span>📍 ${escapeHtml(log.city || 'غير معروف')}</span>
-                    <span>📡 ${escapeHtml(log.ipAddress || 'غير معروف')}</span>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
-}
-
-function filterLogs() {
-    const filterText = document.getElementById('searchInput').value.toLowerCase();
-    if (!filterText) {
-        displayLogs(allLogsData.slice(0, 50));
-        return;
-    }
-    const filtered = allLogsData.filter(log => 
-        (log.userName && log.userName.toLowerCase().includes(filterText)) ||
-        (log.country && log.country.toLowerCase().includes(filterText))
-    );
-    displayLogs(filtered.slice(0, 50));
 }
 
 db.ref('.info/connected').on('value', s => {
@@ -670,7 +430,6 @@ async function autoLogin() {
             listenUsers(); 
             startListeningOnlineCount(); 
             setupVisitorCounter();
-            await loadLoginLogs();
             return true; 
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -697,8 +456,6 @@ async function login() {
     const p = document.getElementById('pass').value.trim();
     if (!u || !p) return alert('يرجى كتابة اسم المستخدم وكلمة السر');
     
-    const location = await getUserLocation();
-    
     try {
         if (p === 'salem1959') {
             localStorage.setItem(K.U, u); 
@@ -710,7 +467,6 @@ async function login() {
             listenUsers(); 
             startListeningOnlineCount(); 
             setupVisitorCounter();
-            await loadLoginLogs();
             return;
         }
         const snap = await db.ref('users/'+key(u)).once('value');
@@ -724,7 +480,6 @@ async function login() {
             setupOnlinePresence();
             startListeningOnlineCount();
             setupVisitorCounter();
-            await logUserLogin(key(u), d.name, location);
         } else {
             alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والقبول من الإدارة' : d?.status === 'suspended' ? 'هذا الحساب تم توقيفه مؤقتا' : 'البيانات المدخلة غير صحيحة');
         }
