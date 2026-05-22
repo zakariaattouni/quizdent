@@ -153,6 +153,14 @@
         .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 150px; }
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+
+        /* إخفاء العناصر الإضافية فقط في صفحة الدخول */
+        body.login-mode .online-strip,
+        body.login-mode .admin-notice-box,
+        body.login-mode .whatsapp-support,
+        body.login-mode .main-app-btn {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -596,7 +604,16 @@ function logout() {
     Qs=[]; quiz=[]; score=0; qi=0; wrongAnswersHistory=[]; isAdminLoggedIn=false;
     show('login'); document.getElementById('user').value=''; document.getElementById('pass').value='';
 }
-function show(id) { document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // إضافة/إزالة الكلاس الخاص بإخفاء العناصر الإضافية في صفحة الدخول
+    if (id === 'login') {
+        document.body.classList.add('login-mode');
+    } else {
+        document.body.classList.remove('login-mode');
+    }
+}
 function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
 function showError(m) { const e=document.getElementById('err'); e.innerText=m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),4000); }
 
