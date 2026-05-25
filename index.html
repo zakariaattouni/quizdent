@@ -1,389 +1,625 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مدرب التشخيص السني</title>
-
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Tajawal,sans-serif;
-}
-
-body{
-background:#eef6fb;
-padding:20px;
-}
-
-.app{
-max-width:700px;
-margin:auto;
-}
-
-.card{
-background:white;
-padding:20px;
-border-radius:20px;
-box-shadow:0 5px 20px rgba(0,0,0,.08);
-margin-bottom:15px;
-}
-
-h1,h2{
-margin-bottom:15px;
-color:#1e4a6e;
-text-align:center;
-}
-
-input,textarea{
-width:100%;
-padding:12px;
-margin:8px 0;
-border-radius:14px;
-border:1px solid #d8e4ec;
-}
-
-button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:14px;
-background:#1f7b6e;
-color:white;
-font-weight:bold;
-cursor:pointer;
-margin-top:8px;
-}
-
-button:hover{
-opacity:.9;
-}
-
-.screen{
-display:none;
-}
-
-.screen.active{
-display:block;
-}
-
-.q-item{
-background:#f8fafc;
-padding:12px;
-border-radius:14px;
-margin-top:10px;
-}
-
-.small{
-font-size:.9rem;
-text-align:center;
-margin-top:10px;
-}
-
-a{
-color:#1f7b6e;
-text-decoration:none;
-}
-
-.option{
-background:#f5f8fb;
-padding:12px;
-border-radius:14px;
-margin:8px 0;
-cursor:pointer;
-}
-
-.option.correct{
-background:#00b894;
-color:white;
-}
-
-.option.wrong{
-background:#d63031;
-color:white;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مدرب التشخيص السني - الدكتور زكريا عطوني</title>
+    <link rel="icon" type="image/png" href="https://img.icons8.com/fluent/192/tooth.png">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', 'Tajawal', sans-serif; }
+        body { background: linear-gradient(135deg, #e0f2fe, #f0f9ff); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 10px; }
+        .app { width: 100%; max-width: 580px; display: flex; flex-direction: column; gap: 10px; }
+        .header { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 15px 20px; text-align: center; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .header h1 { font-size: 1.3rem; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+        .header p { font-size: 0.85rem; opacity: 0.9; }
+        .status-dot { width: 12px; height: 12px; background: #e17055; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 2px rgba(0,0,0,0.2); }
+        .status-dot.ok { background: #00b894; box-shadow: 0 0 6px #00b894; }
+        
+        /* شريط المتصلين أسفل الهيدر */
+        .online-strip {
+            background: #f8fafc;
+            border-radius: 40px;
+            padding: 8px 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            backdrop-filter: blur(2px);
+            direction: rtl;
+        }
+        .online-strip-label {
+            background: #2c9b7a20;
+            padding: 4px 12px;
+            border-radius: 30px;
+            color: #1f6e5c;
+            font-weight: bold;
+            font-size: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .online-users-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .online-user-badge {
+            background: linear-gradient(115deg, #e6f4f0, #d0ebe4);
+            color: #1e4a6e;
+            border-radius: 40px;
+            padding: 4px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            border-right: 2px solid #2c9b7a;
+        }
+        .online-empty {
+            color: #94a3b8;
+            font-size: 0.75rem;
+            font-weight: normal;
+            padding: 4px 8px;
+        }
+        
+        .screen { display: none; animation: fade 0.3s; }
+        .screen.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        h2 { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; font-size: 1rem; }
+        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; transition: transform 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
+        .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
+        .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
+        .option { background: #fafefd; border: 1.5px solid #e2f0ed; padding: 12px 20px; border-radius: 50px; margin: 8px 0; cursor: pointer; font-weight: 600; text-align: right; transition: 0.2s; }
+        .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
+        .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
+        .exp { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; margin-top: 10px; font-size: 0.9rem; color: #7a5a2a; display: none; }
+        .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+        .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
+        .q-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #2c9b7a; }
+        .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 5px 0; }
+        .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #6c5ce7; }
+        .tag { font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+        .tag.active { background: #d4edda; color: #155724; }
+        .tag.pending { background: #fff3cd; color: #856404; }
+        .tag.suspended { background: #e2e3e5; color: #383d41; }
+        .badge { background: #d63031; color: white; border-radius: 50%; padding: 2px 8px; font-size: 0.8rem; font-weight: bold; display: none; }
+        .collapse { display: none; margin-top: 10px; }
+        .collapse.show { display: block; }
+        .error { background: #ffebee; color: #c62828; padding: 10px; border-radius: 12px; margin: 10px 0; font-size: 0.9rem; display: none; }
+        .error.show { display: block; }
+        #quizArea { flex: 1; overflow-y: auto; max-height: 400px; padding-right: 5px; }
+        .main-app-btn { background: linear-gradient(105deg, #3b82f6, #1d4ed8); color: white; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 24px; font-weight: 700; width: 100%; text-align: center; box-shadow: 0 4px 12px rgba(29, 78, 216, 0.2); transition: 0.2s; font-size: 1rem; margin-top: 5px; }
+        .main-app-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(29, 78, 216, 0.4); }
+        
+        .whatsapp-support {
+            background: linear-gradient(135deg, #075E54, #128C7E, #25D366);
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 14px 20px;
+            border-radius: 60px;
+            font-weight: 700;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .whatsapp-support::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .whatsapp-support:hover::before { left: 100%; }
+        .whatsapp-support:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5); }
+        .whatsapp-icon { font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        .whatsapp-text { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.3; }
+        .whatsapp-title { font-size: 1rem; font-weight: bold; }
+        .whatsapp-subtitle { font-size: 0.7rem; opacity: 0.9; }
+        .whatsapp-badge { background: rgba(255,255,255,0.25); border-radius: 50px; padding: 3px 10px; font-size: 0.7rem; margin-right: 8px; }
+        
+        .admin-notice-box { background: #e0f2fe; border: 2px solid #0284c7; border-radius: 18px; padding: 0px; text-align: center; color: #0369a1; font-weight: 800; font-size: 0.95rem; display: none; overflow: hidden; width: 100%; }
+        .admin-notice-box img { width: 100%; max-height: 250px; object-fit: contain; display: none; background: #fff; }
+        .admin-notice-text { padding: 15px; display: block; }
+        .report-box { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 15px; border-radius: 16px; text-align: center; }
+        .wrong-review-item { background: #fff5f5; border-right: 4px solid #f56565; padding: 12px; border-radius: 14px; margin-bottom: 10px; text-align: right; font-size: 0.9rem; }
+        .notice-manager-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-top: 10px; }
+        .notice-row-item { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+        .notice-row-fields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 150px; }
+        .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
+        .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        /* إخفاء العناصر الإضافية فقط في صفحة الدخول */
+        body.login-mode .online-strip,
+        body.login-mode .admin-notice-box,
+        body.login-mode .whatsapp-support,
+        body.login-mode .main-app-btn {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-
 <div class="app">
-
-<div class="card">
-<h1>🦷 مدرب التشخيص السني</h1>
+    <div class="header">
+        <h1>
+            <span>🦷 مدرب التشخيص السني</span>
+            <span id="dot" class="status-dot"></span>
+        </h1>
+        <p>بإشراف الدكتور زكريا محمد عطوني</p>
+        
+        <!-- شريط أسماء المتصلين الآن (أسفل الهيدر) -->
+        <div class="online-strip" id="onlineStrip">
+            <span class="online-strip-label">📡 المتصلون الآن:</span>
+            <div class="online-users-list" id="onlineUsersList">
+                <span class="online-empty">— لا يوجد متصلون —</span>
+            </div>
+        </div>
+    </div>
+    <div id="err" class="error"></div>
+    
+    <div id="login" class="screen active">
+        <div class="card">
+            <h2>تسجيل الدخول</h2>
+            <input type="text" id="user" placeholder="اسم المستخدم">
+            <input type="password" id="pass" placeholder="كلمة السر">
+            <button class="btn" onclick="login()">دخول</button>
+            <p style="text-align:center; margin-top:15px;">
+                <a href="#" style="color:#2c9b7a;" onclick="show('register')">حساب جديد للاستخدام</a>
+            </p>
+        </div>
+    </div>
+    
+    <div id="register" class="screen">
+        <div class="card">
+            <h2>تسجيل طالب جديد</h2>
+            <input type="text" id="regUser" placeholder="الاسم الكامل">
+            <input type="password" id="regPass" placeholder="كلمة السر">
+            <button class="btn" onclick="register()">إرسال الطلب</button>
+            <button class="btn" style="background:#aaa;" onclick="show('login')">رجوع</button>
+        </div>
+    </div>
+    
+    <div id="student" class="screen">
+        <div class="card">
+            <button id="resumeBtn" class="btn btn-resume" onclick="resumeSession()">استئناف الجلسة السابقة المتبقية</button>
+            <div id="quizContent">
+                <div class="row">
+                    <span class="pill" id="qNum">--</span>
+                    <span class="pill" id="score">النقاط: 0</span>
+                </div>
+                <div id="quizArea">
+                    <div id="qText" style="font-size:1.2rem; font-weight:800; color:#1f3e48; margin-bottom:15px;"></div>
+                    <div id="opts"></div>
+                    <div id="exp" class="exp"></div>
+                </div>
+            </div>
+            <div id="reportArea" style="display:none; max-height:400px; overflow-y:auto; margin-bottom:15px;">
+                <h2>تقرير الأداء والمراجعة</h2>
+                <div class="report-box">
+                    <div style="font-size:1.1rem; font-weight:bold; color:#166534;" id="repScore"></div>
+                    <div style="font-size:0.9rem; color:#4b5563;" id="repPercent"></div>
+                </div>
+                <h4 style="color:#c53030; margin-bottom:8px; text-align:right;" id="repWrongTitle">أسئلة تحتاج مراجعة وتدقيق علمي:</h4>
+                <div id="wrongList"></div>
+            </div>
+            <button id="quizActionBtn" class="btn" style="background:#e2edf0; color:#4a5568;" onclick="logout()">خروج من الحساب</button>
+        </div>
+    </div>
+    
+    <div id="admin" class="screen">
+        <div class="card">
+            <h3 style="color:#5f4b8b; margin-bottom:10px; text-align:center;">✨ لوحة التحكم والإدارة ✨</h3>
+            <div style="max-height:450px; overflow-y:auto;">
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">📢 إدارة الإعلانات</h4>
+                <button class="btn btn-admin" onclick="toggleNoticePanel()">⚙️ إدارة الإعلانات واللافتات</button>
+                <div id="noticeCollapsePanel" class="collapse">
+                    <div class="notice-manager-panel">
+                        <div id="noticeListContainer"></div>
+                        <button class="btn" style="background:#0284c7; font-size:0.85rem; padding:8px; margin-top:5px;" onclick="addNewNoticeRow()">+ إضافة إعلان جديد</button>
+                        <button class="btn btn-admin" style="margin-top:8px;" onclick="saveAllNoticesFromManager()">💾 حفظ التغييرات</button>
+                    </div>
+                </div>
+                <hr style="border:0; border-top:1px dashed #dceaf2; margin:15px 0 10px;">
+                <h4 style="margin:10px 0 5px; color:#1e4a6e;">👥 إدارة الطلاب</h4>
+                <button class="btn btn-admin" onclick="toggleUsers()">📋 قائمة الطلاب <span id="reqBadge" class="badge">0</span></button>
+                <div id="usersList" class="collapse"></div>
+                
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة</h4>
+                <button class="btn btn-admin" onclick="toggleJson()">📦 إضافة جماعية JSON</button>
+                <div id="jsonPanel" style="display:none; margin:10px 0;">
+                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
+                    <button class="btn btn-admin" onclick="addJson()">➕ إضافة الأسئلة</button>
+                </div>
+                <button class="btn btn-admin" onclick="addOne()">➕ إضافة سؤال مفرد</button>
+                <div id="qList"></div>
+            </div>
+            <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج من الإدارة</button>
+        </div>
+    </div>
+    
+    <div id="appNoticeBox" class="admin-notice-box"></div>
+    
+    <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-support">
+        <span class="whatsapp-icon">💚</span>
+        <div class="whatsapp-text">
+            <span class="whatsapp-title">تواصل مع الدكتور زكريا مباشرة</span>
+            <span class="whatsapp-subtitle">استشارات - أسئلة - دعم فني <span class="whatsapp-badge">متاح 24/7</span></span>
+        </div>
+        <span style="font-size:1.2rem;">←</span>
+    </a>
+    <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">🦷 تطبيق تشخيص أمراض الفم والأسنان</a>
+    <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
-
-<!-- LOGIN -->
-<div id="login" class="screen active">
-<div class="card">
-<h2>تسجيل الدخول</h2>
-
-<input id="user" placeholder="اسم المستخدم">
-<input id="pass" type="password" placeholder="كلمة السر">
-
-<button onclick="login()">دخول</button>
-
-<div class="small">
-<a href="#" onclick="show('register')">إنشاء حساب جديد</a>
+<div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
+    <div class="card" style="width:100%; max-width:450px;">
+        <h3 id="mTitle">نموذج السؤال</h3>
+        <input id="mQ" placeholder="نص السؤال العلمي">
+        <input id="m1" placeholder="الخيار الأول"><input id="m2" placeholder="الخيار الثاني">
+        <input id="m3" placeholder="الخيار الثالث"><input id="m4" placeholder="الخيار الرابع">
+        <input id="mC" placeholder="نسخة مطابقة من الخيار الصحيح تماما" style="background:#e8f0fe;">
+        <textarea id="mE" rows="2" placeholder="الشرح والتفسير العلمي المرتبط بالسؤال"></textarea>
+        <div class="row" style="margin-top:10px;">
+            <button class="btn" id="mSave">حفظ البيانات</button>
+            <button class="btn" style="background:#ccc;" onclick="closeModal()">إلغاء الأمر</button>
+        </div>
+    </div>
 </div>
-</div>
-</div>
-
-<!-- REGISTER -->
-<div id="register" class="screen">
-<div class="card">
-<h2>تسجيل جديد</h2>
-
-<input id="regUser" placeholder="اسم المستخدم">
-<input id="regPass" type="password" placeholder="كلمة السر">
-
-<button onclick="register()">تسجيل</button>
-<button onclick="show('login')">رجوع</button>
-</div>
-</div>
-
-<!-- ADMIN -->
-<div id="admin" class="screen">
-<div class="card">
-<h2>لوحة الإدارة</h2>
-
-<textarea id="qText" placeholder="السؤال"></textarea>
-<input id="o1" placeholder="الخيار الأول">
-<input id="o2" placeholder="الخيار الثاني">
-<input id="o3" placeholder="الخيار الثالث">
-<input id="o4" placeholder="الخيار الرابع">
-<input id="correct" placeholder="الإجابة الصحيحة حرفياً">
-<textarea id="exp" placeholder="التفسير"></textarea>
-
-<button onclick="saveQuestion()">حفظ السؤال</button>
-<button onclick="logout()">خروج</button>
-
-<div id="questionsList"></div>
-</div>
-</div>
-
-<!-- STUDENT -->
-<div id="student" class="screen">
-<div class="card">
-<h2>الاختبار</h2>
-
-<div id="questionArea"></div>
-
-<button onclick="logout()">خروج</button>
-</div>
-</div>
-
-</div>
-
 <script>
-
-const firebaseConfig = {
-apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
-authDomain: "quizdental-c4d5a.firebaseapp.com",
-databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com",
-projectId: "quizdental-c4d5a",
-storageBucket: "quizdental-c4d5a.appspot.com",
-messagingSenderId: "750036143183",
-appId: "1:750036143183:web:721a31ef795f973887ee3a"
-};
-
-firebase.initializeApp(firebaseConfig);
+const cfg = { apiKey:"AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA", authDomain:"quizdental-c4d5a.firebaseapp.com", projectId:"quizdental-c4d5a", databaseURL:"https://quizdental-c4d5a-default-rtdb.firebaseio.com/", storageBucket:"quizdental-c4d5a.appspot.com", messagingSenderId:"750036143183", appId:"1:750036143183:web:721a31ef795f973887ee3a" };
+firebase.initializeApp(cfg);
 const db = firebase.database();
-
-let questions = [];
-let current = 0;
-
-function show(id){
-document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-}
-
-function key(s){
-return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,'');
-}
-
-async function ensureAdmin(){
-const snap = await db.ref('users/admin').once('value');
-
-if(!snap.val()){
-await db.ref('users/admin').set({
-name:'admin',
-password:'admin123',
-role:'admin'
+let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef = null;
+let wrongAnswersHistory = []; 
+let isDailyChallengeMode = false;
+let myPresenceRef = null;
+let isAdminLoggedIn = false;
+const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
+// ======================== مؤشر الاتصال (النقطة الحمراء/الخضراء) ========================
+db.ref('.info/connected').on('value', snap => {
+    const isConnected = snap.val();
+    const dot = document.getElementById('dot');
+    if (dot) dot.className = 'status-dot' + (isConnected ? ' ok' : '');
 });
+// ======================== نظام المتصلين وعرض الأسماء في الشريط ========================
+function setupOnlinePresenceWithName(userName) {
+    if (myPresenceRef) {
+        myPresenceRef.remove();
+        myPresenceRef = null;
+    }
+    if (isAdminLoggedIn) return;
+    // إنشاء عقدة تحت online_users تحمل اسم المستخدم الحقيقي
+    myPresenceRef = db.ref('online_users').push();
+    myPresenceRef.set({ name: userName, timestamp: firebase.database.ServerValue.TIMESTAMP });
+    myPresenceRef.onDisconnect().remove();
 }
+function listenOnlineUsers() {
+    const usersListDiv = document.getElementById('onlineUsersList');
+    if (!usersListDiv) return;
+    db.ref('online_users').on('value', (snapshot) => {
+        const users = snapshot.val();
+        if (!users) {
+            usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>';
+            return;
+        }
+        const names = Object.values(users).map(u => u.name).filter(n => n && n.trim() !== '');
+        if (names.length === 0) {
+            usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>';
+            return;
+        }
+        // عرض الأسماء مع أيقونة
+        usersListDiv.innerHTML = names.map(name => `<span class="online-user-badge">👤 ${escapeHtml(name)}</span>`).join('');
+    });
 }
-
-async function register(){
-const u = document.getElementById('regUser').value.trim();
-const p = document.getElementById('regPass').value.trim();
-
-if(!u || !p){
-alert('املأ الحقول');
-return;
+// ======================== دوال مساعدة ========================
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
 }
-
-await db.ref('users/' + key(u)).set({
-name:u,
-password:p,
-role:'user'
-});
-
-alert('تم التسجيل');
-show('login');
+async function loadQs() {
+    const snap = await db.ref('questions').once('value');
+    const d = snap.val(); Qs = d ? Object.entries(d).map(([id,q])=>({...q, id})) : [];
 }
-
-async function login(){
-const u = document.getElementById('user').value.trim();
-const p = document.getElementById('pass').value.trim();
-
-if(!u || !p){
-alert('أدخل البيانات');
-return;
+function checkSavedProgress() {
+    show('student');
+    document.getElementById('quizContent').style.display = 'block';
+    document.getElementById('reportArea').style.display = 'none';
+    document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
+    document.getElementById('quizActionBtn').onclick = logout;
+    const today = new Date().toDateString();
+    const hasAnsweredDaily = localStorage.getItem('daily_challenge_' + today);
+    const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
+    if (!hasAnsweredDaily && Qs.length > 0) {
+        document.getElementById('resumeBtn').style.display = 'none';
+        startDailyChallenge();
+    } else if (savedQuiz) {
+        const savedIndex = localStorage.getItem(K.PROGRESS_INDEX);
+        const resumeBtn = document.getElementById('resumeBtn');
+        resumeBtn.style.display = 'block';
+        resumeBtn.innerText = `استئناف الجلسة السابقة (سؤال رقم ${parseInt(savedIndex) + 1})`;
+        startQuiz(false);
+    } else {
+        startQuiz(true);
+    }
 }
-
-// admin
-if(u === 'admin' && p === 'admin123'){
-show('admin');
-loadQuestionsAdmin();
-return;
+function startDailyChallenge() {
+    isDailyChallengeMode = true;
+    score = 0;
+    qi = 0;
+    wrongAnswersHistory = [];
+    const dailyIndex = new Date().getDate() % Qs.length;
+    quiz = [Qs[dailyIndex]]; 
+    renderQ();
 }
-
-// user
-const snap = await db.ref('users/' + key(u)).once('value');
-const data = snap.val();
-
-if(!data){
-alert('المستخدم غير موجود');
-return;
+function startQuiz(forceNew = true) {
+    isDailyChallengeMode = false;
+    if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
+    if (forceNew) {
+        clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
+    } else {
+        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
+    }
 }
-
-if(data.password !== p){
-alert('كلمة السر غير صحيحة');
-return;
+function resumeSession() {
+    isDailyChallengeMode = false;
+    try {
+        const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
+        const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
+        const savedScore = parseInt(localStorage.getItem(K.PROGRESS_SCORE));
+        const savedWrong = JSON.parse(localStorage.getItem(K.PROGRESS_WRONG)) || [];
+        if (savedQuiz && savedQuiz.length > 0) {
+            quiz = savedQuiz; qi = savedIndex; score = savedScore; wrongAnswersHistory = savedWrong;
+            document.getElementById('resumeBtn').style.display = 'none'; renderQ();
+        }
+    } catch (e) { console.log(e); startQuiz(true); }
 }
-
-show('student');
-startQuiz();
+function saveCurrentProgressToStorage() {
+    if (isDailyChallengeMode) return;
+    localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
+    localStorage.setItem(K.PROGRESS_INDEX, qi);
+    localStorage.setItem(K.PROGRESS_SCORE, score);
+    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
 }
-
-async function saveQuestion(){
-const q = document.getElementById('qText').value.trim();
-const o1 = document.getElementById('o1').value.trim();
-const o2 = document.getElementById('o2').value.trim();
-const o3 = document.getElementById('o3').value.trim();
-const o4 = document.getElementById('o4').value.trim();
-const c = document.getElementById('correct').value.trim();
-const e = document.getElementById('exp').value.trim();
-
-if(!q || !o1 || !o2 || !o3 || !o4 || !c){
-alert('بيانات ناقصة');
-return;
+function clearProgressStorage() {
+    localStorage.removeItem(K.PROGRESS_QUIZ); localStorage.removeItem(K.PROGRESS_INDEX);
+    localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
 }
-
-await db.ref('questions').push({
-q:q,
-o:[o1,o2,o3,o4],
-c:c,
-e:e
-});
-
-alert('تم الحفظ');
-
-loadQuestionsAdmin();
+function renderQ() {
+    if (qi >= quiz.length) { 
+        if (isDailyChallengeMode) {
+            const today = new Date().toDateString();
+            localStorage.setItem('daily_challenge_' + today, 'true');
+            showDailyChallengeResult();
+            return;
+        }
+        clearProgressStorage(); showFinalReport(); return; 
+    }
+    const q = quiz[qi];
+    if (isDailyChallengeMode) {
+        document.getElementById('qNum').innerHTML = `🌟 <span style="color:#e67e22;">تحدي حالة اليوم الطبي</span>`;
+        document.getElementById('score').innerText = `النقاط: ${score}`;
+        document.getElementById('qText').innerHTML = `<div style="border-bottom: 2px dashed #e2f0ed; padding-bottom: 8px; margin-bottom: 8px; font-size: 0.9rem; color: #e67e22;">حالة سريرية مميزة تتغير كل 24 ساعة:</div> ${q.q}`;
+    } else {
+        document.getElementById('qNum').innerText = `سؤال رقم: ${qi+1}/${quiz.length}`;
+        document.getElementById('score').innerText = `النقاط: ${score}`;
+        document.getElementById('qText').innerText = q.q;
+    }
+    document.getElementById('exp').style.display = 'none';
+    const opts = document.getElementById('opts'); opts.innerHTML = '';
+    const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
+    mixedOptions.forEach(opt => {
+        const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
+        div.onclick = () => {
+            if (opts.querySelector('.correct,.wrong')) return;
+            if (opt === q.c) { score += 10; div.classList.add('correct'); }
+            else { 
+                div.classList.add('wrong'); 
+                [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
+                wrongAnswersHistory.push({ q: q.q, c: q.c, e: q.e });
+            }
+            document.getElementById('score').innerText = `النقاط: ${score}`;
+            const exp = document.getElementById('exp');
+            exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
+            const delay = isDailyChallengeMode ? 3500 : 1800;
+            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, delay);
+        };        
+        opts.appendChild(div);
+    });
 }
-
-async function loadQuestionsAdmin(){
-const snap = await db.ref('questions').once('value');
-const data = snap.val();
-
-const box = document.getElementById('questionsList');
-box.innerHTML = '';
-
-if(!data){
-box.innerHTML = '<div class="q-item">لا توجد أسئلة</div>';
-return;
+function showDailyChallengeResult() {
+    const isCorrect = wrongAnswersHistory.length === 0;
+    const qText = document.getElementById('qText');
+    const opts = document.getElementById('opts');
+    qText.innerHTML = isCorrect ? `🎉 <span style="color:#009688;">أحسنت يا دكتور! لقد شخصت حالة اليوم بنجاح.</span>` : `🩺 <span style="color:#d63031;">محاولة جيدة، راجع التفسير.</span>`;
+    opts.innerHTML = `<button class="btn" style="background: linear-gradient(105deg, #3b82f6, #1d4ed8); margin-top:15px;" onclick="startQuiz(true)">التدريب المفتوح 🚀</button>`;
 }
-
-Object.entries(data).forEach(([id,q],i)=>{
-const div = document.createElement('div');
-div.className = 'q-item';
-div.innerHTML = '<b>'+(i+1)+'.</b> '+q.q;
-box.appendChild(div);
-});
+function showFinalReport() {
+    document.getElementById('quizContent').style.display = 'none';
+    document.getElementById('reportArea').style.display = 'block';
+    const maxScore = quiz.length * 10; const percent = Math.round((score / maxScore) * 100) || 0;
+    document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية: ${score} من ${maxScore}`;
+    document.getElementById('repPercent').innerText = `نسبة التشخيص: ${percent}%`;
+    const wrongList = document.getElementById('wrongList'); wrongList.innerHTML = '';
+    if (wrongAnswersHistory.length === 0) {
+        document.getElementById('repWrongTitle').innerText = "رائع! تشخيصاتك سليمة 100%.";
+    } else {
+        document.getElementById('repWrongTitle').innerText = "حالات تحتاج مراجعة:";
+        wrongAnswersHistory.forEach((item, index) => {
+            const div = document.createElement('div'); div.className = 'wrong-review-item';
+            div.innerHTML = `<div><strong>حالة ${index+1}:</strong> ${item.q}</div><div style="color:#155724;">✅ ${item.c}</div><div style="color:#7a5a2a;">💡 ${item.e}</div>`;
+            wrongList.appendChild(div);
+        });
+    }
+    const actionBtn = document.getElementById('quizActionBtn');
+    actionBtn.innerText = 'بدء جولة جديدة'; actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
+    actionBtn.onclick = checkSavedProgress;
 }
-
-async function startQuiz(){
-const snap = await db.ref('questions').once('value');
-const data = snap.val();
-
-if(!data){
-document.getElementById('questionArea').innerHTML = 'لا توجد أسئلة';
-return;
+// دوال الإدارة والطلاب (محذوف منها التتبع)
+function renderAdmin() { /* نفس الكود الأصلي */ 
+    const c = document.getElementById('qList');
+    if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد أسئلة</p>'; return; }
+    c.innerHTML = '';
+    Qs.forEach((q,i) => {
+        const div = document.createElement('div'); div.className = 'q-item';
+        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong></div><div class="correct-badge">✅ ${q.c}</div><div class="row"><button class="btn" style="background:#ffb703;width:auto;" onclick="editQ('${q.id}')">تعديل</button><button class="btn" style="background:#e17055;width:auto;" onclick="delQ('${q.id}')">حذف</button></div>`;
+        c.appendChild(div);
+    });
 }
-
-questions = Object.values(data);
-current = 0;
-renderQuestion();
+function listenUsers() { /* كامل كما هو */ 
+    if (usersRef) db.ref('users').off('value', usersRef);
+    usersRef = db.ref('users').on('value', snap => {
+        const d = snap.val(), c = document.getElementById('usersList');
+        if (!c) return;
+        if (!d) { c.innerHTML = '<p style="text-align:center;">لا يوجد طلاب</p>'; pending=0; updBadge(); return; }
+        pending = 0; c.innerHTML = '';
+        Object.entries(d).forEach(([k,u]) => {
+            if (u.status === 'pending') pending++;
+            const st = {active:['نشط','active'],pending:['قيد الانتظار','pending'],suspended:['موقوف','suspended']}[u.status]||['مجهول',''];
+            const div = document.createElement('div'); div.className = 'user-item';
+            div.innerHTML = `<div><strong>${u.name}</strong> <span class="tag ${st[1]}">${st[0]}</span></div><div>كلمة السر: ${u.password}</div><div class="row">${u.status!=='active'?`<button class="btn" style="background:#00b894;width:auto;" onclick="setSt('${k}','active')">تنشيط</button>`:''}${u.status!=='suspended'?`<button class="btn" style="background:#fdcb6e;width:auto;" onclick="setSt('${k}','suspended')">إيقاف</button>`:''}<button class="btn" style="background:#d63031;width:auto;" onclick="delU('${k}','${u.name}')">حذف</button></div>`;
+            c.appendChild(div);
+        });
+        updBadge();
+    });
 }
-
-function renderQuestion(){
-if(current >= questions.length){
-document.getElementById('questionArea').innerHTML = '<h3>انتهى الاختبار</h3>';
-return;
+function updBadge() { const b = document.getElementById('reqBadge'); b.innerText = pending; b.style.display = pending>0?'inline-block':'none'; }
+function toggleUsers() { document.getElementById('usersList').classList.toggle('show'); }
+async function setSt(k, st) { if (confirm('تغيير الحالة؟')) await db.ref('users/'+k).update({status:st}); }
+async function delU(k, n) { if (confirm(`حذف ${n}؟`)) await db.ref('users/'+k).remove(); }
+async function delQ(id) { if (confirm('حذف السؤال؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
+function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
+async function addJson() { /* كود إضافة JSON */ 
+    const t = document.getElementById('jsonInput').value.trim(); if (!t) return;
+    let arr; try { arr = JSON.parse(t); } catch(e) { return alert('JSON خاطئ'); }
+    let ok=0;
+    for(const it of arr) { if(it.q && it.o?.length===4 && it.c && it.e && it.o.includes(it.c)) { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e}); ok++; } }
+    alert(`تمت إضافة ${ok} سؤال`); toggleJson(); await loadQs(); renderAdmin();
 }
-
-const q = questions[current];
-
-let html = '<h3>'+q.q+'</h3>';
-
-const shuffled = [...q.o].sort(()=>Math.random()-0.5);
-
-shuffled.forEach(opt=>{
-html += `<div class="option" onclick="checkAnswer(this, '${opt.replace(/'/g,"\\'")}', '${q.c.replace(/'/g,"\\'")}')">${opt}</div>`;
-});
-
-html += `<div style="margin-top:10px;color:#555;">${q.e || ''}</div>`;
-
-document.getElementById('questionArea').innerHTML = html;
+function addOne() { editId=null; document.getElementById('mTitle').innerText='إضافة سؤال'; ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value=''); document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=saveOne; }
+async function saveOne() { /* حفظ السؤال */ 
+    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('بيانات ناقصة');
+    await db.ref('questions').push({q,o,c,e}); alert('تم الحفظ'); closeModal(); await loadQs(); if(document.getElementById('admin').classList.contains('active')) renderAdmin();
 }
-
-function checkAnswer(el,opt,correct){
-const options = document.querySelectorAll('.option');
-
-options.forEach(o=>o.style.pointerEvents='none');
-
-if(opt === correct){
-el.classList.add('correct');
-}else{
-el.classList.add('wrong');
-
-options.forEach(o=>{
-if(o.innerText === correct){
-o.classList.add('correct');
+function editQ(id) { const q=Qs.find(x=>x.id===id); if(!q) return; editId=id; document.getElementById('mTitle').innerText='تعديل'; document.getElementById('mQ').value=q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value=v); document.getElementById('mC').value=q.c; document.getElementById('mE').value=q.e; document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=()=>updQ(id); }
+async function updQ(id) { /* تحديث */ 
+    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ');
+    await db.ref('questions/'+id).set({q,o,c,e}); alert('تم التحديث'); closeModal(); await loadQs(); renderAdmin();
 }
-});
+function closeModal() { document.getElementById('modal').style.display='none'; editId=null; }
+// الإعلانات
+let noticeTimeout=null, currentNoticeIndex=0, noticeLines=[];
+function buildNoticeManagerUI() { const container=document.getElementById('noticeListContainer'); if(!container) return; container.innerHTML=''; noticeLines.forEach((item,idx)=>{ const row=document.createElement('div'); row.className='notice-row-item'; row.innerHTML=`<div class="notice-row-fields"><input type="text" class="notice-input-content" value="${item.content.replace(/"/g,'&quot;')}"><input type="number" class="notice-input-time" value="${item.time||4}"><button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button></div>`; container.appendChild(row); }); }
+function addNewNoticeRow() { noticeLines.push({content:'',time:4}); buildNoticeManagerUI(); }
+function removeNoticeRow(idx) { noticeLines.splice(idx,1); buildNoticeManagerUI(); }
+async function saveAllNoticesFromManager() { const container=document.getElementById('noticeListContainer'); const rows=container.getElementsByClassName('notice-row-item'); let result=[]; for(let row of rows){ const content=row.querySelector('.notice-input-content').value.trim(); const time=parseInt(row.querySelector('.notice-input-time').value.trim()); if(content) result.push(`${content} * ${isNaN(time)?4:time}`); } await db.ref('app_notice').set(result.join('\n')); alert('تم حفظ الإعلانات'); }
+function checkIsImage(c) { return /\.(jpeg|jpg|gif|png|webp)$/i.test(c) || c.startsWith('data:image/'); }
+function displayNoticeContent(box,obj){ if(noticeTimeout) clearTimeout(noticeTimeout); const dur=(obj.time||4)*1000; if(checkIsImage(obj.content)){ box.innerHTML=`<div id="noticeTxt">جاري التحميل...</div><img id="noticeImg" src="${obj.content}" style="display:none;">`; const img=document.getElementById('noticeImg'), txt=document.getElementById('noticeTxt'); img.onload=()=>{ txt.style.display='none'; img.style.display='block'; noticeTimeout=setTimeout(nextNotice,dur); }; img.onerror=()=>nextNotice(); } else { box.innerHTML=`<span class="admin-notice-text">${obj.content}</span>`; noticeTimeout=setTimeout(nextNotice,dur); } }
+function nextNotice(){ if(noticeLines.length<=1) return; const box=document.getElementById('appNoticeBox'); currentNoticeIndex=(currentNoticeIndex+1)%noticeLines.length; displayNoticeContent(box,noticeLines[currentNoticeIndex]); }
+function listenToNotice(){ db.ref('app_notice').on('value',snap=>{ const raw=snap.val()||""; const box=document.getElementById('appNoticeBox'); const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l); noticeLines=lines.map(l=>{ if(l.includes('*')){ const parts=l.split('*'); return {content:parts[0].trim(), time:parseInt(parts[1].trim())||4}; } return {content:l,time:4}; }); buildNoticeManagerUI(); if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex=0; if(noticeLines.length){ box.style.display='block'; displayNoticeContent(box,noticeLines[0]); } else box.style.display='none'; }); }
+function toggleNoticePanel(){ document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
+// الدوال الرئيسية (تسجيل الدخول, الخروج)
+async function login() {
+    const u = document.getElementById('user').value.trim();
+    const p = document.getElementById('pass').value.trim();
+    if (!u || !p) return alert('أدخل البيانات');
+    if (p === 'salem1959') {
+        localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
+        isAdminLoggedIn=true;
+        await loadQs(); show('admin'); renderAdmin(); listenUsers(); 
+        return;
+    }
+    const snap = await db.ref('users/'+key(u)).once('value');
+    const d = snap.val();
+    if (d && d.password === p && d.status === 'active') {
+        localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
+        isAdminLoggedIn=false;
+        await loadQs(); checkSavedProgress();
+        // بدء نظام الحضور باسم الطالب الحقيقي
+        setupOnlinePresenceWithName(d.name);
+        listenOnlineUsers();
+    } else {
+        alert(d?.status === 'pending' ? 'الحساب قيد المراجعة' : d?.status === 'suspended' ? 'موقوف' : 'بيانات غير صحيحة');
+    }
 }
-
-setTimeout(()=>{
-current++;
-renderQuestion();
-},1500);
+async function register() {
+    const n = document.getElementById('regUser').value.trim();
+    const p = document.getElementById('regPass').value.trim();
+    if(!n||!p) return alert('املأ الحقول');
+    await db.ref('users/'+key(n)).set({name:n, password:p, status:'pending', at:Date.now()});
+    alert('تم إرسال الطلب'); show('login');
 }
-
-function logout(){
-show('login');
+function logout() {
+    if(myPresenceRef) { myPresenceRef.remove(); myPresenceRef=null; }
+    if(usersRef) db.ref('users').off('value', usersRef);
+    localStorage.removeItem(K.U); localStorage.removeItem(K.P);
+    Qs=[]; quiz=[]; score=0; qi=0; wrongAnswersHistory=[]; isAdminLoggedIn=false;
+    show('login'); document.getElementById('user').value=''; document.getElementById('pass').value='';
 }
-
-window.onload = async ()=>{
-await ensureAdmin();
+function show(id) {
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    // إضافة/إزالة الكلاس الخاص بإخفاء العناصر الإضافية في صفحة الدخول
+    if (id === 'login') {
+        document.body.classList.add('login-mode');
+    } else {
+        document.body.classList.remove('login-mode');
+    }
+}
+function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
+function showError(m) { const e=document.getElementById('err'); e.innerText=m; e.classList.add('show'); setTimeout(()=>e.classList.remove('show'),4000); }
+window.onload = () => {
+    show('login');
+    listenToNotice();
+    listenOnlineUsers(); // استماع دائم لعرض المتصلين
+    autoLogin().catch(()=>{});
 };
-
+async function autoLogin() {
+    const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
+    if (!u || !p) return;
+    if (p === 'salem1959') { 
+        isAdminLoggedIn=true; await loadQs(); show('admin'); renderAdmin(); listenUsers(); return true;
+    }
+    const snap = await db.ref('users/'+key(u)).once('value');
+    const d = snap.val();
+    if (d && d.password === p && d.status === 'active') {
+        isAdminLoggedIn=false; await loadQs(); checkSavedProgress();
+        setupOnlinePresenceWithName(d.name);
+        listenOnlineUsers();
+        return true;
+    }
+    return false;
+}
 </script>
-
 </body>
 </html>
