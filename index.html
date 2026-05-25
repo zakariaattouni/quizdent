@@ -45,10 +45,9 @@
         .screen.active { display: block; }
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-        <h2> { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
+        h2 { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; font-size: 1rem; }
-        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; transition: transform 0.2s; }
-        .btn:hover { transform: translateY(-2px); }
+        .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; transition: transform 0.2s; }        .btn:hover { transform: translateY(-2px); }
         .btn-admin { background: linear-gradient(105deg, #6c5ce7, #8b5cf6); }
         .btn-danger { background: linear-gradient(105deg, #e17055, #d63031); }
         .btn-resume { background: linear-gradient(105deg, #f39c12, #d35400); margin-bottom: 12px; display: none; }
@@ -97,8 +96,7 @@
         .notice-manager-panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 12px; margin-top: 10px; }
         .notice-row-item { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 14px; padding: 10px; margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
         .notice-row-fields { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 150px; }
-        .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
+        .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 150px; }        .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         
         /* تنظيف وإخفاء تام لكل العناصر الإضافية في شاشة الدخول والتسجيل لمنع التشتيت */
@@ -112,6 +110,29 @@
         }
         
         .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
+        
+        /* === نظام الشارات والإنجازات === */
+        .badges-container { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; justify-content: center; }
+        .badge-item { background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 2px solid #7dd3fc; border-radius: 16px; padding: 6px 12px; font-size: 0.75rem; font-weight: 700; color: #0369a1; display: flex; align-items: center; gap: 4px; opacity: 0.5; transition: 0.3s; }
+        .badge-item.unlocked { opacity: 1; border-color: #fbbf24; background: linear-gradient(135deg, #fffbeb, #fef3c7); box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); animation: badgePop 0.4s ease; }
+        @keyframes badgePop { 0% { transform: scale(0.8); } 70% { transform: scale(1.1); } 100% { transform: scale(1); } }
+        
+        /* === تأثيرات الاحتفال === */
+        @keyframes confettiFall { 0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        .confetti { position: fixed; width: 8px; height: 12px; background: #fbbf24; animation: confettiFall 2s ease-out forwards; z-index: 9999; pointer-events: none; border-radius: 2px; }
+        .confetti:nth-child(odd) { background: #2c9b7a; } .confetti:nth-child(3n) { background: #6c5ce7; }
+        
+        /* === شريط التقدم البصري === */
+        .progress-ring { width: 60px; height: 60px; border-radius: 50%; background: conic-gradient(#2c9b7a calc(var(--progress) * 1%), #e2e8f0 0); display: flex; align-items: center; justify-content: center; position: relative; font-weight: bold; color: #1e4a6e; }
+        .progress-ring::before { content: ''; position: absolute; inset: 4px; background: white; border-radius: 50%; }
+        .progress-ring span { position: relative; z-index: 2; font-size: 0.8rem; }
+        
+        /* === رأس تحدي اليوم === */
+        #dailyChallengeHeader { background:linear-gradient(135deg,#fef3c7,#fde68a); border-radius:16px; padding:10px 15px; margin:10px 0; display:none; text-align:center; border:2px solid #f59e0b; }
+        #dailyChallengeHeader div:first-child { font-weight:800; color:#92400e; margin-bottom:5px; }
+        #challengeTimer { font-size:1.3rem; font-weight:bold; color:#d97706; direction:ltr; font-family:monospace; }
+        #dailyChallengeHeader > div:last-child { font-size:0.8rem; color:#b45309; margin-top:5px; }
+        #shareChallengeBtn { background:#25D366; color:white; border:none; padding:6px 16px; border-radius:20px; font-weight:bold; margin-top:8px; cursor:pointer; display:flex; align-items:center; gap:6px; margin:8px auto 0; }
     </style>
 </head>
 <body>
@@ -124,8 +145,7 @@
         <p>بإشراف الدكتور زكريا محمد عطوني</p>
         
         <div class="online-strip" id="onlineStrip">
-            <span class="online-strip-label">📡 المتصلون الآن:</span>
-            <div class="online-users-list" id="onlineUsersList">
+            <span class="online-strip-label">📡 المتصلون الآن:</span>            <div class="online-users-list" id="onlineUsersList">
                 <span class="online-empty">— لا يوجد متصلون —</span>
             </div>
         </div>
@@ -136,6 +156,7 @@
             <span style="font-weight: 800; color: #1e4a6e; font-size: 0.9rem;">🩺 مستوى الأطباء التفاعلي</span>
             <div id="userStreakDisplay" class="streak-badge">🔥 التزام 0 يوم</div>
         </div>
+        <div class="badges-container" id="badgesContainer"></div>
         <div class="leaderboard-title">🏆 لوحة شرف أطباء التشخيص الصاعدين:</div>
         <div id="leaderboardList" class="leaderboard-list">
             <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">جاري تحميل لوحة الصدارة...</div>
@@ -173,6 +194,13 @@
                     <span class="pill" id="qNum">--</span>
                     <span class="pill" id="score">النقاط: 0</span>
                     <span class="pill" id="doctorTitle" style="background:#fff0f6; color:#d63384;">🧑‍🎓 طالب امتياز</span>
+                </div>                
+                <!-- رأس تحدي اليوم -->
+                <div id="dailyChallengeHeader">
+                    <div>⏳ تحدي اليوم الطبي</div>
+                    <div id="challengeTimer">--:--:--</div>
+                    <div>🎁 مكافأة: <strong>×2 نقاط</strong> + شارة حصرية</div>
+                    <button id="shareChallengeBtn">📤 شارك نتيجتك</button>
                 </div>
                 
                 <div id="caseImgContainer" class="case-image-container">
@@ -215,8 +243,7 @@
                 <button class="btn btn-admin" onclick="toggleUsers()">📋 قائمة الطلاب <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
                 
-                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة والحالات السريرية</h4>
-                <button class="btn" style="background: linear-gradient(105deg, #2c9b7a, #1f7b6e); margin-bottom: 12px; font-weight: bold;" onclick="addOne()">➕ إضافة حالة سريرية جديدة (نص / صور)</button>
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة والحالات السريرية</h4>                <button class="btn" style="background: linear-gradient(105deg, #2c9b7a, #1f7b6e); margin-bottom: 12px; font-weight: bold;" onclick="addOne()">➕ إضافة حالة سريرية جديدة (نص / صور)</button>
                 
                 <button class="btn btn-admin" onclick="toggleJson()">📦 إضافة جماعية JSON</button>
                 <div id="jsonPanel" style="display:none; margin:10px 0;">
@@ -265,9 +292,105 @@ let Qs = [], quiz = [], score = 0, qi = 0, editId = null, pending = 0, usersRef 
 let wrongAnswersHistory = []; 
 let isDailyChallengeMode = false;
 let myPresenceRef = null;
-let isAdminLoggedIn = false;
-let currentUserKey = "";
+let isAdminLoggedIn = false;let currentUserKey = "";
+let userData = { totalPoints: 0, streak: 0, totalQuestions: 0, consecutiveCorrect: 0 };
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
+
+// === نظام الشارات والإنجازات ===
+const BADGES = {
+    firstBlood: {id:'firstBlood', name:'🎯 أول تشخيص', desc:'أجب عن سؤالك الأول', condition: (u)=>u.totalQuestions>=1},
+    streak3: {id:'streak3', name:'🔥 مثابر', desc:'3 أيام التزام', condition: (u)=>u.streak>=3},
+    perfect10: {id:'perfect10', name:'💎 دقة ذهبية', desc:'10 إجابات صحيحة متتالية', condition: (u)=>u.consecutiveCorrect>=10},
+    specialist: {id:'specialist', name:'🦷 أخصائي', desc:'وصلت لـ 500 نقطة', condition: (u)=>u.totalPoints>=500}
+};
+
+function checkAndUnlockBadges(userKey, data) {
+    const unlocked = JSON.parse(localStorage.getItem('badges_'+userKey) || '[]');
+    let newUnlocked = [];
+    Object.values(BADGES).forEach(badge => {
+        if(!unlocked.includes(badge.id) && badge.condition(data)) {
+            unlocked.push(badge.id); newUnlocked.push(badge);
+            triggerConfetti();
+        }
+    });
+    localStorage.setItem('badges_'+userKey, JSON.stringify(unlocked));
+    if(newUnlocked.length) showBadgeNotification(newUnlocked);
+    renderBadges(unlocked);
+    return unlocked;
+}
+
+function renderBadges(unlocked) {
+    const container = document.getElementById('badgesContainer');
+    if(!container) return;
+    container.innerHTML = Object.values(BADGES).map(b => 
+        `<span class="badge-item ${unlocked.includes(b.id)?'unlocked':''}" title="${b.desc}">${b.name}</span>`
+    ).join('');
+}
+
+function triggerConfetti() {
+    for(let i=0; i<30; i++) {
+        const c = document.createElement('div'); c.className='confetti';
+        c.style.left = Math.random()*100 + 'vw'; c.style.animationDelay = (Math.random()*0.5)+'s';
+        document.body.appendChild(c); setTimeout(()=>c.remove(), 2000);
+    }
+}
+
+function showBadgeNotification(badges) {
+    const notif = document.createElement('div');
+    notif.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:white;padding:12px 24px;border-radius:20px;z-index:10000;box-shadow:0 10px 30px rgba(0,0,0,0.2);animation:fade 0.3s;font-weight:bold;text-align:center;';
+    notif.innerHTML = `🎉 تهانينا!<br><small>${badges.map(b=>b.name).join(' + ')}</small>`;
+    document.body.appendChild(notif); setTimeout(()=>{notif.style.opacity='0'; setTimeout(()=>notif.remove(),300)}, 3000);
+}
+// === تحسينات التفاعل البصري ===
+function enhanceAnswerFeedback(element, isCorrect) {
+    element.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+    if(isCorrect) {
+        element.style.transform = 'scale(1.05)';
+        element.style.boxShadow = '0 0 25px rgba(0, 184, 148, 0.6)';
+    } else {
+        element.style.transform = 'scale(0.98)';
+        element.style.boxShadow = '0 0 20px rgba(214, 48, 49, 0.5)';
+    }
+}
+
+function smoothQuestionTransition(callback) {
+    const quizArea = document.getElementById('quizArea');
+    quizArea.style.opacity = '0'; quizArea.style.transform = 'translateY(15px)';
+    quizArea.style.transition = 'all 0.25s ease';
+    setTimeout(() => { callback(); quizArea.style.opacity='1'; quizArea.style.transform='translateY(0)'; }, 200);
+}
+
+// === تحدي اليوم المعزز ===
+function startChallengeTimer() {
+    const header = document.getElementById('dailyChallengeHeader');
+    const timerEl = document.getElementById('challengeTimer');
+    if(!isDailyChallengeMode) { header.style.display='none'; return; }
+    header.style.display = 'block';
+    
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()+1);
+    const update = () => {
+        const diff = midnight - new Date();
+        if(diff <= 0) { timerEl.innerText = 'انتهى!'; return; }
+        const h = Math.floor(diff/36e5).toString().padStart(2,'0');
+        const m = Math.floor((diff%36e5)/6e4).toString().padStart(2,'0');
+        const s = Math.floor((diff%6e4)/1000).toString().padStart(2,'0');
+        timerEl.innerText = `${h}:${m}:${s}`;
+    };
+    update(); setInterval(update, 1000);
+}
+
+function setupShareButton() {
+    document.getElementById('shareChallengeBtn')?.addEventListener('click', () => {
+        const percent = Math.round((score / (quiz.length*10)) * 100) || 0;
+        const text = `🦷 نتائجي في مدرب التشخيص السني:\n✅ ${percent}% دقة\n🔥 التزام: ${document.getElementById('userStreakDisplay')?.innerText || '0'}\n\nجرب التحدي معي: https://zakariaattouni.github.io/dental-diagnosis/`;
+        const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+        if(!localStorage.getItem('shared_'+new Date().toDateString())) {
+            localStorage.setItem('shared_'+new Date().toDateString(), '1');
+        }
+    });
+}
 db.ref('.info/connected').on('value', snap => {
     const isConnected = snap.val();
     const dot = document.getElementById('dot');
@@ -316,8 +439,7 @@ function listenLeaderboard() {
         listDiv.innerHTML = usersArray.map((u, i) => `
             <div class="leaderboard-item ${i === 0 ? 'top-1' : ''}">
                 <div>
-                    <span class="user-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
-                    <span>${escapeHtml(u.name)}</span>
+                    <span class="user-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>                    <span>${escapeHtml(u.name)}</span>
                     <span class="user-title">${getDoctorTitle(u.points)}</span>
                 </div>
                 <div style="font-weight:bold; color:#2c9b7a;">${u.points} نقطة</div>
@@ -341,10 +463,13 @@ function handleUserStreak(userSnapshotValue, userKey) {
     }
     const streakDisplay = document.getElementById('userStreakDisplay');
     if (streakDisplay) streakDisplay.innerText = `🔥 التزام ${currentStreak} يوم متتالي`;
+    // تحديث بيانات المستخدم للشارات
+    userData.streak = currentStreak;
+    checkAndUnlockBadges(userKey, userData);
 }
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
+    return str.replace(/[&<>]/g, m => ({ '&': '&', '<': '<', '>': '>' }[m]));
 }
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
@@ -360,9 +485,10 @@ function checkSavedProgress() {
     db.ref('users/' + currentUserKey + '/totalPoints').on('value', s => {
         const p = s.val() || 0;
         document.getElementById('doctorTitle').innerText = getDoctorTitle(p);
+        userData.totalPoints = p;
+        checkAndUnlockBadges(currentUserKey, userData);
     });
-    const today = new Date().toDateString();
-    const hasAnsweredDaily = localStorage.getItem('daily_challenge_' + today);
+    const today = new Date().toDateString();    const hasAnsweredDaily = localStorage.getItem('daily_challenge_' + today);
     const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
     if (!hasAnsweredDaily && Qs.length > 0) {
         document.getElementById('resumeBtn').style.display = 'none';
@@ -378,17 +504,23 @@ function checkSavedProgress() {
     }
 }
 function startDailyChallenge() {
-    isDailyChallengeMode = true; score = 0; qi = 0; wrongAnswersHistory = [];
+    isDailyChallengeMode = true; score = 0; qi = 0; wrongAnswersHistory = []; userData.consecutiveCorrect = 0;
     const dailyIndex = new Date().getDate() % Qs.length;
-    quiz = [Qs[dailyIndex]]; renderQ();
+    quiz = [Qs[dailyIndex]]; 
+    renderQ();
+    startChallengeTimer();
+    setupShareButton();
 }
 function startQuiz(forceNew = true) {
     isDailyChallengeMode = false;
+    document.getElementById('dailyChallengeHeader').style.display = 'none';
     if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
-    quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
+    quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; userData.consecutiveCorrect = 0; 
+    renderQ();
 }
 function resumeSession() {
     isDailyChallengeMode = false;
+    document.getElementById('dailyChallengeHeader').style.display = 'none';
     try {
         const savedQuiz = JSON.parse(localStorage.getItem(K.PROGRESS_QUIZ));
         const savedIndex = parseInt(localStorage.getItem(K.PROGRESS_INDEX));
@@ -405,8 +537,7 @@ function saveCurrentProgressToStorage() {
     localStorage.setItem(K.PROGRESS_QUIZ, JSON.stringify(quiz));
     localStorage.setItem(K.PROGRESS_INDEX, qi);
     localStorage.setItem(K.PROGRESS_SCORE, score);
-    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));
-}
+    localStorage.setItem(K.PROGRESS_WRONG, JSON.stringify(wrongAnswersHistory));}
 function clearProgressStorage() {
     localStorage.removeItem(K.PROGRESS_QUIZ); localStorage.removeItem(K.PROGRESS_INDEX);
     localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
@@ -444,21 +575,37 @@ function renderQ() {
     const mixedOptions = [...q.o].sort(()=>Math.random()-0.5);
     mixedOptions.forEach(opt => {
         const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
+        // === تحسينات التفاعل البصري للخيارات ===
+        div.addEventListener('mouseenter', function() { this.style.transform = 'translateX(-4px)'; this.style.borderColor = '#2c9b7a'; });
+        div.addEventListener('mouseleave', function() { this.style.transform = 'translateX(0)'; this.style.borderColor = '#e2f0ed'; });
+        
         div.onclick = () => {
             if (opts.querySelector('.correct,.wrong')) return;
             if (opt === q.c) { 
-                score += 10; div.classList.add('correct');
-                db.ref('users/' + currentUserKey + '/totalPoints').transaction(current => (current || 0) + 10);
+                score += (isDailyChallengeMode ? 20 : 10); 
+                div.classList.add('correct');
+                enhanceAnswerFeedback(div, true);
+                db.ref('users/' + currentUserKey + '/totalPoints').transaction(current => (current || 0) + (isDailyChallengeMode ? 20 : 10));
+                userData.consecutiveCorrect = (userData.consecutiveCorrect || 0) + 1;                userData.totalQuestions = (userData.totalQuestions || 0) + 1;
+                userData.totalPoints = (userData.totalPoints || 0) + (isDailyChallengeMode ? 20 : 10);
+                checkAndUnlockBadges(currentUserKey, userData);
             }
             else { 
                 div.classList.add('wrong'); 
+                enhanceAnswerFeedback(div, false);
                 [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
                 wrongAnswersHistory.push({ q: q.q, c: q.c, e: q.e });
+                userData.consecutiveCorrect = 0;
+                userData.totalQuestions = (userData.totalQuestions || 0) + 1;
             }
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
             exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
-            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, isDailyChallengeMode ? 3500 : 1800);
+            setTimeout(()=>{ 
+                qi++; 
+                saveCurrentProgressToStorage(); 
+                smoothQuestionTransition(() => renderQ()); 
+            }, isDailyChallengeMode ? 3500 : 1800);
         };        
         opts.appendChild(div);
     });
@@ -488,8 +635,7 @@ function showFinalReport() {
     const actionBtn = document.getElementById('quizActionBtn');
     actionBtn.innerText = 'بدء جولة جديدة'; actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
     actionBtn.onclick = checkSavedProgress;
-}
-function renderAdmin() { 
+}function renderAdmin() { 
     const c = document.getElementById('qList');
     if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد أسئلة</p>'; return; }
     c.innerHTML = '';
@@ -538,12 +684,11 @@ async function saveOne() {
 function editQ(id) { const q=Qs.find(x=>x.id===id); if(!q) return; editId=id; document.getElementById('mTitle').innerText='تعديل السؤال الطبي'; document.getElementById('mQ').value=q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value=v); document.getElementById('mC').value=q.c; document.getElementById('mImg').value=q.img || ""; document.getElementById('mE').value=q.e; document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=()=>updQ(id); }
 async function updQ(id) { 
     const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), img=document.getElementById('mImg').value.trim(), e=document.getElementById('mE').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ بالبيانات المكتوبة');
-    await db.ref('questions/'+id).set({q,o,c,e,img}); alert('تم التحديث بنجاح'); closeModal(); await loadQs(); renderAdmin();
+    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ بالبيانات المكتوبة');    await db.ref('questions/'+id).set({q,o,c,e,img}); alert('تم التحديث بنجاح'); closeModal(); await loadQs(); renderAdmin();
 }
 function closeModal() { document.getElementById('modal').style.display='none'; editId=null; }
 let noticeTimeout=null, currentNoticeIndex=0, noticeLines=[];
-function buildNoticeManagerUI() { const container=document.getElementById('noticeListContainer'); if(!container) return; container.innerHTML=''; noticeLines.forEach((item,idx)=>{ const row=document.createElement('div'); row.className='notice-row-item'; row.innerHTML=`<div class="notice-row-fields"><input type="text" class="notice-input-content" value="${item.content.replace(/"/g,'&quot;')}"><input type="number" class="notice-input-time" value="${item.time||4}"><button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button></div>`; container.appendChild(row); }); }
+function buildNoticeManagerUI() { const container=document.getElementById('noticeListContainer'); if(!container) return; container.innerHTML=''; noticeLines.forEach((item,idx)=>{ const row=document.createElement('div'); row.className='notice-row-item'; row.innerHTML=`<div class="notice-row-fields"><input type="text" class="notice-input-content" value="${item.content.replace(/"/g,'"')}"><input type="number" class="notice-input-time" value="${item.time||4}"><button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button></div>`; container.appendChild(row); }); }
 function addNewNoticeRow() { noticeLines.push({content:'',time:4}); buildNoticeManagerUI(); }
 function removeNoticeRow(idx) { noticeLines.splice(idx,1); buildNoticeManagerUI(); }
 async function saveAllNoticesFromManager() { const container=document.getElementById('noticeListContainer'); const rows=container.getElementsByClassName('notice-row-item'); let result=[]; for(let row of rows){ const content=row.querySelector('.notice-input-content').value.trim(); const time=parseInt(row.querySelector('.notice-input-time').value.trim()); if(content) result.push(`${content} * ${isNaN(time)?4:time}`); } await db.ref('app_notice').set(result.join('\n')); alert('تم حفظ التغييرات'); }
@@ -568,11 +713,15 @@ async function login() {
     if (d && d.password === p && d.status === 'active') {
         localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
         isAdminLoggedIn=false;
+        userData = { totalPoints: d.totalPoints||0, streak: d.streak||0, totalQuestions: 0, consecutiveCorrect: 0 };
         handleUserStreak(d, currentUserKey);
         await loadQs(); checkSavedProgress();
         setupOnlinePresenceWithName(d.name);
         listenOnlineUsers();
         listenLeaderboard();
+        // عرض الشارات المحفوظة
+        const unlocked = JSON.parse(localStorage.getItem('badges_'+currentUserKey) || '[]');
+        renderBadges(unlocked);
     } else {
         alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والموافقة' : d?.status === 'suspended' ? 'الحساب موقوف حالياً' : 'بيانات الدخول غير صحيحة');
     }
@@ -584,11 +733,11 @@ async function register() {
     await db.ref('users/'+key(n)).set({name:n, password:p, status:'pending', totalPoints: 0, streak: 0, lastLoginDate: "", at:Date.now()});
     alert('تم إرسال الطلب، بانتظار تفعيل الدكتور زكريا لحسابك'); show('login');
 }
-function logout() {
-    if(myPresenceRef) { myPresenceRef.remove(); myPresenceRef=null; }
+function logout() {    if(myPresenceRef) { myPresenceRef.remove(); myPresenceRef=null; }
     if(usersRef) db.ref('users').off('value', usersRef);
     localStorage.removeItem(K.U); localStorage.removeItem(K.P);
     Qs=[]; quiz=[]; score=0; qi=0; wrongAnswersHistory=[]; isAdminLoggedIn=false; currentUserKey="";
+    userData = { totalPoints: 0, streak: 0, totalQuestions: 0, consecutiveCorrect: 0 };
     show('login'); document.getElementById('user').value=''; document.getElementById('pass').value='';
 }
 function show(id) {
@@ -622,15 +771,17 @@ async function autoLogin() {
     const d = snap.val();
     if (d && d.password === p && d.status === 'active') {
         isAdminLoggedIn=false;
+        userData = { totalPoints: d.totalPoints||0, streak: d.streak||0, totalQuestions: 0, consecutiveCorrect: 0 };
         handleUserStreak(d, currentUserKey);
         await loadQs(); checkSavedProgress();
         setupOnlinePresenceWithName(d.name);
         listenOnlineUsers();
         listenLeaderboard();
+        const unlocked = JSON.parse(localStorage.getItem('badges_'+currentUserKey) || '[]');
+        renderBadges(unlocked);
         return true;
     }
     return false;
-}
-</script>
+}</script>
 </body>
 </html>
