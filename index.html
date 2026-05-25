@@ -84,7 +84,6 @@
         .exp { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; margin-top: 10px; font-size: 0.9rem; color: #7a5a2a; display: none; }
         .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
         .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-        .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
         .q-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #2c9b7a; }
         .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 5px 0; }
         .user-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #6c5ce7; }
@@ -153,13 +152,18 @@
         .notice-input-content { flex: 1; padding: 8px 12px; border-radius: 12px; border: 1px solid #cbd5e1; font-size: 0.9rem; min-width: 150px; }
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
-        /* إخفاء العناصر الإضافية فقط في صفحة الدخول */
+        
+        /* إخفاء العناصر الإضافية ونافذة الإعلام والفوتر فقط في وضع الدخول */
         body.login-mode .online-strip,
         body.login-mode .admin-notice-box,
         body.login-mode .whatsapp-support,
-        body.login-mode .main-app-btn {
-            display: none;
+        body.login-mode .main-app-btn,
+        body.login-mode .footer {
+            display: none !important;
         }
+        
+        /* تصميم الفوتر الافتراضي لباقي الصفحات */
+        .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -261,6 +265,7 @@
         </div>
     </div>
     
+    <!-- نافذة الإعلانات تم إرجاعها هنا وتعمل في باقي الصفحات وتختفي فقط في تسجيل الدخول -->
     <div id="appNoticeBox" class="admin-notice-box"></div>
     
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-support">
@@ -272,6 +277,7 @@
         <span style="font-size:1.2rem;">←</span>
     </a>
     <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">🦷 تطبيق تشخيص أمراض الفم والأسنان</a>
+    <!-- الفوتر تم إرجاعه هنا ويعمل في باقي الصفحات ويختفي فقط في تسجيل الدخول -->
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
 <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
@@ -311,7 +317,6 @@ function setupOnlinePresenceWithName(userName) {
         myPresenceRef = null;
     }
     if (isAdminLoggedIn) return;
-    // إنشاء عقدة تحت online_users تحمل اسم المستخدم الحقيقي
     myPresenceRef = db.ref('online_users').push();
     myPresenceRef.set({ name: userName, timestamp: firebase.database.ServerValue.TIMESTAMP });
     myPresenceRef.onDisconnect().remove();
@@ -330,7 +335,6 @@ function listenOnlineUsers() {
             usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>';
             return;
         }
-        // عرض الأسماء مع أيقونة
         usersListDiv.innerHTML = names.map(name => `<span class="online-user-badge">👤 ${escapeHtml(name)}</span>`).join('');
     });
 }
@@ -483,8 +487,7 @@ function showFinalReport() {
     actionBtn.innerText = 'بدء جولة جديدة'; actionBtn.style.background = 'linear-gradient(105deg, #1f7b6e, #2c9b7a)'; actionBtn.style.color = 'white';
     actionBtn.onclick = checkSavedProgress;
 }
-// دوال الإدارة والطلاب (محذوف منها التتبع)
-function renderAdmin() { /* نفس الكود الأصلي */ 
+function renderAdmin() { 
     const c = document.getElementById('qList');
     if (!Qs.length) { c.innerHTML = '<p style="text-align:center;color:#888;">لا توجد أسئلة</p>'; return; }
     c.innerHTML = '';
@@ -494,7 +497,7 @@ function renderAdmin() { /* نفس الكود الأصلي */
         c.appendChild(div);
     });
 }
-function listenUsers() { /* كامل كما هو */ 
+function listenUsers() { 
     if (usersRef) db.ref('users').off('value', usersRef);
     usersRef = db.ref('users').on('value', snap => {
         const d = snap.val(), c = document.getElementById('usersList');
@@ -517,7 +520,7 @@ async function setSt(k, st) { if (confirm('تغيير الحالة؟')) await db
 async function delU(k, n) { if (confirm(`حذف ${n}؟`)) await db.ref('users/'+k).remove(); }
 async function delQ(id) { if (confirm('حذف السؤال؟')) { await db.ref('questions/'+id).remove(); await loadQs(); renderAdmin(); } }
 function toggleJson() { const p = document.getElementById('jsonPanel'); p.style.display = p.style.display==='none'?'block':'none'; }
-async function addJson() { /* كود إضافة JSON */ 
+async function addJson() { 
     const t = document.getElementById('jsonInput').value.trim(); if (!t) return;
     let arr; try { arr = JSON.parse(t); } catch(e) { return alert('JSON خاطئ'); }
     let ok=0;
@@ -525,19 +528,20 @@ async function addJson() { /* كود إضافة JSON */
     alert(`تمت إضافة ${ok} سؤال`); toggleJson(); await loadQs(); renderAdmin();
 }
 function addOne() { editId=null; document.getElementById('mTitle').innerText='إضافة سؤال'; ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value=''); document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=saveOne; }
-async function saveOne() { /* حفظ السؤال */ 
+async function saveOne() { 
     const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
     if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('بيانات ناقصة');
     await db.ref('questions').push({q,o,c,e}); alert('تم الحفظ'); closeModal(); await loadQs(); if(document.getElementById('admin').classList.contains('active')) renderAdmin();
 }
 function editQ(id) { const q=Qs.find(x=>x.id===id); if(!q) return; editId=id; document.getElementById('mTitle').innerText='تعديل'; document.getElementById('mQ').value=q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value=v); document.getElementById('mC').value=q.c; document.getElementById('mE').value=q.e; document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=()=>updQ(id); }
-async function updQ(id) { /* تحديث */ 
+async function updQ(id) { 
     const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
     if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ');
     await db.ref('questions/'+id).set({q,o,c,e}); alert('تم التحديث'); closeModal(); await loadQs(); renderAdmin();
 }
 function closeModal() { document.getElementById('modal').style.display='none'; editId=null; }
-// الإعلانات
+
+// الإعلانات واللافتات
 let noticeTimeout=null, currentNoticeIndex=0, noticeLines=[];
 function buildNoticeManagerUI() { const container=document.getElementById('noticeListContainer'); if(!container) return; container.innerHTML=''; noticeLines.forEach((item,idx)=>{ const row=document.createElement('div'); row.className='notice-row-item'; row.innerHTML=`<div class="notice-row-fields"><input type="text" class="notice-input-content" value="${item.content.replace(/"/g,'&quot;')}"><input type="number" class="notice-input-time" value="${item.time||4}"><button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button></div>`; container.appendChild(row); }); }
 function addNewNoticeRow() { noticeLines.push({content:'',time:4}); buildNoticeManagerUI(); }
@@ -548,6 +552,7 @@ function displayNoticeContent(box,obj){ if(noticeTimeout) clearTimeout(noticeTim
 function nextNotice(){ if(noticeLines.length<=1) return; const box=document.getElementById('appNoticeBox'); currentNoticeIndex=(currentNoticeIndex+1)%noticeLines.length; displayNoticeContent(box,noticeLines[currentNoticeIndex]); }
 function listenToNotice(){ db.ref('app_notice').on('value',snap=>{ const raw=snap.val()||""; const box=document.getElementById('appNoticeBox'); const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l); noticeLines=lines.map(l=>{ if(l.includes('*')){ const parts=l.split('*'); return {content:parts[0].trim(), time:parseInt(parts[1].trim())||4}; } return {content:l,time:4}; }); buildNoticeManagerUI(); if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex=0; if(noticeLines.length){ box.style.display='block'; displayNoticeContent(box,noticeLines[0]); } else box.style.display='none'; }); }
 function toggleNoticePanel(){ document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
+
 // الدوال الرئيسية (تسجيل الدخول, الخروج)
 async function login() {
     const u = document.getElementById('user').value.trim();
@@ -565,7 +570,6 @@ async function login() {
         localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
         isAdminLoggedIn=false;
         await loadQs(); checkSavedProgress();
-        // بدء نظام الحضور باسم الطالب الحقيقي
         setupOnlinePresenceWithName(d.name);
         listenOnlineUsers();
     } else {
@@ -589,7 +593,6 @@ function logout() {
 function show(id) {
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    // إضافة/إزالة الكلاس الخاص بإخفاء العناصر الإضافية في صفحة الدخول
     if (id === 'login') {
         document.body.classList.add('login-mode');
     } else {
@@ -601,7 +604,7 @@ function showError(m) { const e=document.getElementById('err'); e.innerText=m; e
 window.onload = () => {
     show('login');
     listenToNotice();
-    listenOnlineUsers(); // استماع دائم لعرض المتصلين
+    listenOnlineUsers(); 
     autoLogin().catch(()=>{});
 };
 async function autoLogin() {
