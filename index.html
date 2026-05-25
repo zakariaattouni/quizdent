@@ -17,61 +17,35 @@
         .status-dot { width: 12px; height: 12px; background: #e17055; border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 2px rgba(0,0,0,0.2); }
         .status-dot.ok { background: #00b894; box-shadow: 0 0 6px #00b894; }
         
-        /* شريط المتصلين أسفل الهيدر */
+        /* شريط المتصلين */
         .online-strip {
-            background: #f8fafc;
-            border-radius: 40px;
-            padding: 8px 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            font-size: 0.85rem;
-            margin-top: 8px;
-            backdrop-filter: blur(2px);
-            direction: rtl;
+            background: #f8fafc; border-radius: 40px; padding: 8px 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid #e2e8f0;
+            display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 0.85rem; margin-top: 8px; backdrop-filter: blur(2px); direction: rtl;
         }
-        .online-strip-label {
-            background: #2c9b7a20;
-            padding: 4px 12px;
-            border-radius: 30px;
-            color: #1f6e5c;
-            font-weight: bold;
-            font-size: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .online-users-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-        .online-user-badge {
-            background: linear-gradient(115deg, #e6f4f0, #d0ebe4);
-            color: #1e4a6e;
-            border-radius: 40px;
-            padding: 4px 14px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            border-right: 2px solid #2c9b7a;
-        }
-        .online-empty {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            font-weight: normal;
-            padding: 4px 8px;
-        }
+        .online-strip-label { background: #2c9b7a20; padding: 4px 12px; border-radius: 30px; color: #1f6e5c; font-weight: bold; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 6px; }
+        .online-users-list { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .online-user-badge { background: linear-gradient(115deg, #e6f4f0, #d0ebe4); color: #1e4a6e; border-radius: 40px; padding: 4px 14px; font-size: 0.8rem; font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border-right: 2px solid #2c9b7a; }
+        .online-empty { color: #94a3b8; font-size: 0.75rem; font-weight: normal; padding: 4px 8px; }
         
+        /* لوحة الشرف وعداد الالتزام */
+        .gamification-box { background: white; border-radius: 24px; padding: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; margin-bottom: 5px; }
+        .streak-badge { background: linear-gradient(135deg, #ff7675, #e17055); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-flex; align-items: center; gap: 5px; animation: pulse 1.5s infinite; }
+        .leaderboard-title { color: #1e4a6e; font-size: 0.95rem; font-weight: 800; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 6px; }
+        .leaderboard-list { display: flex; flex-direction: column; gap: 6px; }
+        .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: #f8fafc; border-radius: 12px; font-size: 0.85rem; border: 1px solid #f1f5f9; }
+        .leaderboard-item.top-1 { background: linear-gradient(90deg, #fff9db, #fff3bf); border-right: 4px solid #fab005; font-weight: bold; }
+        .leaderboard-item .user-rank { font-weight: 800; color: #1e4a6e; width: 24px; }
+        .leaderboard-item .user-title { font-size: 0.75rem; color: #64748b; margin-right: 5px; background: #e2e8f0; padding: 2px 6px; border-radius: 8px; }
+        
+        /* حاوية صور الحالات والأشعة */
+        .case-image-container { width: 100%; margin-bottom: 15px; border-radius: 16px; overflow: hidden; border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: #f8fafc; display: none; text-align: center; }
+        .case-image-container img { max-width: 100%; max-height: 280px; object-fit: contain; cursor: zoom-in; transition: transform 0.2s ease-in-out; }
+        .case-image-container img:active { transform: scale(1.4); z-index: 99; position: relative; }
         .screen { display: none; animation: fade 0.3s; }
         .screen.active { display: block; }
         @keyframes fade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .card { background: white; border-radius: 24px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-        h2 { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
+        <h2> { color: #1e4a6e; text-align: center; margin-bottom: 15px; font-size: 1.4rem; }
         input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 20px; border: 1px solid #dceaf2; outline: none; font-size: 1rem; }
         .btn { background: linear-gradient(105deg, #1f7b6e, #2c9b7a); color: white; border: none; padding: 12px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; font-size: 1rem; margin-top: 5px; transition: transform 0.2s; }
         .btn:hover { transform: translateY(-2px); }
@@ -82,7 +56,7 @@
         .option.correct { background: linear-gradient(135deg, #00b894, #009688); color: white; border: none; }
         .option.wrong { background: linear-gradient(135deg, #ff7675, #d63031); color: white; border: none; }
         .exp { background: #fff7e5; border-right: 4px solid #f4b942; padding: 10px; border-radius: 15px; margin-top: 10px; font-size: 0.9rem; color: #7a5a2a; display: none; }
-        .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .pill { background: #e6f4f0; color: #1f6e5c; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px; }
         .row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
         .q-item { background: #f8fafc; border-radius: 16px; padding: 12px; margin: 10px 0; border-right: 3px solid #2c9b7a; }
         .correct-badge { background: #d4edda; color: #155724; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; display: inline-block; margin: 5px 0; }
@@ -101,37 +75,11 @@
         .main-app-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(29, 78, 216, 0.4); }
         
         .whatsapp-support {
-            background: linear-gradient(135deg, #075E54, #128C7E, #25D366);
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 14px 20px;
-            border-radius: 60px;
-            font-weight: 700;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            position: relative;
-            overflow: hidden;
-            margin-top: 8px;
-            margin-bottom: 8px;
-            border: 1px solid rgba(255,255,255,0.2);
+            background: linear-gradient(135deg, #075E54, #128C7E, #25D366); color: white; text-decoration: none; display: flex; align-items: center;
+            justify-content: center; gap: 12px; padding: 14px 20px; border-radius: 60px; font-weight: 700; width: 100%; text-align: center;
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3); transition: all 0.3s ease; font-size: 1rem; position: relative; overflow: hidden; margin-top: 8px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.2);
         }
-        .whatsapp-support::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
+        .whatsapp-support::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transition: left 0.5s; }
         .whatsapp-support:hover::before { left: 100%; }
         .whatsapp-support:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 30px rgba(37, 211, 102, 0.5); }
         .whatsapp-icon { font-size: 1.6rem; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2)); animation: pulse 1.5s infinite; }
@@ -153,16 +101,16 @@
         .notice-input-time { width: 75px; padding: 8px; border-radius: 12px; border: 1px solid #cbd5e1; text-align: center; }
         .notice-btn-del { background: #ef4444; color: white; border: none; border-radius: 12px; padding: 8px 12px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         
-        /* إخفاء العناصر الإضافية ونافذة الإعلام والفوتر فقط في وضع الدخول */
+        /* تنظيف وإخفاء تام لكل العناصر الإضافية في شاشة الدخول والتسجيل لمنع التشتيت */
         body.login-mode .online-strip,
         body.login-mode .admin-notice-box,
         body.login-mode .whatsapp-support,
         body.login-mode .main-app-btn,
+        body.login-mode .gamification-box,
         body.login-mode .footer {
             display: none !important;
         }
         
-        /* تصميم الفوتر الافتراضي لباقي الصفحات */
         .footer { background: linear-gradient(135deg, #1e4a6e, #2c9b7a); border-radius: 24px; padding: 12px; text-align: center; color: white; font-size: 0.8rem; }
     </style>
 </head>
@@ -175,12 +123,22 @@
         </h1>
         <p>بإشراف الدكتور زكريا محمد عطوني</p>
         
-        <!-- شريط أسماء المتصلين الآن (أسفل الهيدر) -->
         <div class="online-strip" id="onlineStrip">
             <span class="online-strip-label">📡 المتصلون الآن:</span>
             <div class="online-users-list" id="onlineUsersList">
                 <span class="online-empty">— لا يوجد متصلون —</span>
             </div>
+        </div>
+    </div>
+    
+    <div id="gamificationBox" class="gamification-box" style="display:none;">
+        <div class="row" style="margin-bottom: 12px;">
+            <span style="font-weight: 800; color: #1e4a6e; font-size: 0.9rem;">🩺 مستوى الأطباء التفاعلي</span>
+            <div id="userStreakDisplay" class="streak-badge">🔥 التزام 0 يوم</div>
+        </div>
+        <div class="leaderboard-title">🏆 لوحة شرف أطباء التشخيص الصاعدين:</div>
+        <div id="leaderboardList" class="leaderboard-list">
+            <div style="text-align:center; color:#94a3b8; font-size:0.8rem;">جاري تحميل لوحة الصدارة...</div>
         </div>
     </div>
     <div id="err" class="error"></div>
@@ -214,6 +172,11 @@
                 <div class="row">
                     <span class="pill" id="qNum">--</span>
                     <span class="pill" id="score">النقاط: 0</span>
+                    <span class="pill" id="doctorTitle" style="background:#fff0f6; color:#d63384;">🧑‍🎓 طالب امتياز</span>
+                </div>
+                
+                <div id="caseImgContainer" class="case-image-container">
+                    <img id="caseImg" src="" alt="حالة سريرية / أشعة" title="اضغط لمشاهدة تفاصيل الحالة">
                 </div>
                 <div id="quizArea">
                     <div id="qText" style="font-size:1.2rem; font-weight:800; color:#1f3e48; margin-bottom:15px;"></div>
@@ -252,20 +215,20 @@
                 <button class="btn btn-admin" onclick="toggleUsers()">📋 قائمة الطلاب <span id="reqBadge" class="badge">0</span></button>
                 <div id="usersList" class="collapse"></div>
                 
-                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة</h4>
+                <h4 style="margin:20px 0 10px; color:#1e4a6e;">📚 إدارة الأسئلة والحالات السريرية</h4>
+                <button class="btn" style="background: linear-gradient(105deg, #2c9b7a, #1f7b6e); margin-bottom: 12px; font-weight: bold;" onclick="addOne()">➕ إضافة حالة سريرية جديدة (نص / صور)</button>
+                
                 <button class="btn btn-admin" onclick="toggleJson()">📦 إضافة جماعية JSON</button>
                 <div id="jsonPanel" style="display:none; margin:10px 0;">
-                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير"}]'></textarea>
+                    <textarea id="jsonInput" rows="4" style="font-family:monospace; direction:ltr;" placeholder='[{"q":"السؤال","o":["أ","ب","ج","د"],"c":"أ","e":"التفسير","img":""}]'></textarea>
                     <button class="btn btn-admin" onclick="addJson()">➕ إضافة الأسئلة</button>
                 </div>
-                <button class="btn btn-admin" onclick="addOne()">➕ إضافة سؤال مفرد</button>
                 <div id="qList"></div>
             </div>
             <button class="btn" style="margin-top:10px;" onclick="logout()">🚪 خروج من الإدارة</button>
         </div>
     </div>
     
-    <!-- نافذة الإعلانات تم إرجاعها هنا وتعمل في باقي الصفحات وتختفي فقط في تسجيل الدخول -->
     <div id="appNoticeBox" class="admin-notice-box"></div>
     
     <a href="https://wa.me/963939436998" target="_blank" class="whatsapp-support">
@@ -277,7 +240,6 @@
         <span style="font-size:1.2rem;">←</span>
     </a>
     <a href="https://zakariaattouni.github.io/dental-diagnosis/" target="_blank" class="main-app-btn">🦷 تطبيق تشخيص أمراض الفم والأسنان</a>
-    <!-- الفوتر تم إرجاعه هنا ويعمل في باقي الصفحات ويختفي فقط في تسجيل الدخول -->
     <div class="footer">إعداد الدكتور زكريا محمد عطوني | حقوق النشر 2026</div>
 </div>
 <div id="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); align-items:center; justify-content:center; z-index:100; padding:15px;">
@@ -287,6 +249,7 @@
         <input id="m1" placeholder="الخيار الأول"><input id="m2" placeholder="الخيار الثاني">
         <input id="m3" placeholder="الخيار الثالث"><input id="m4" placeholder="الخيار الرابع">
         <input id="mC" placeholder="نسخة مطابقة من الخيار الصحيح تماما" style="background:#e8f0fe;">
+        <input id="mImg" placeholder="رابط صورة الحالة أو الأشعة (اختياري)" style="background:#f0fdf4;">
         <textarea id="mE" rows="2" placeholder="الشرح والتفسير العلمي المرتبط بالسؤال"></textarea>
         <div class="row" style="margin-top:10px;">
             <button class="btn" id="mSave">حفظ البيانات</button>
@@ -303,19 +266,15 @@ let wrongAnswersHistory = [];
 let isDailyChallengeMode = false;
 let myPresenceRef = null;
 let isAdminLoggedIn = false;
+let currentUserKey = "";
 const K = { U:'dq_u', P:'dq_p', PROGRESS_QUIZ:'dq_pq', PROGRESS_INDEX:'dq_pi', PROGRESS_SCORE:'dq_ps', PROGRESS_WRONG:'dq_pw' };
-// ======================== مؤشر الاتصال (النقطة الحمراء/الخضراء) ========================
 db.ref('.info/connected').on('value', snap => {
     const isConnected = snap.val();
     const dot = document.getElementById('dot');
     if (dot) dot.className = 'status-dot' + (isConnected ? ' ok' : '');
 });
-// ======================== نظام المتصلين وعرض الأسماء في الشريط ========================
 function setupOnlinePresenceWithName(userName) {
-    if (myPresenceRef) {
-        myPresenceRef.remove();
-        myPresenceRef = null;
-    }
+    if (myPresenceRef) { myPresenceRef.remove(); myPresenceRef = null; }
     if (isAdminLoggedIn) return;
     myPresenceRef = db.ref('online_users').push();
     myPresenceRef.set({ name: userName, timestamp: firebase.database.ServerValue.TIMESTAMP });
@@ -326,27 +285,66 @@ function listenOnlineUsers() {
     if (!usersListDiv) return;
     db.ref('online_users').on('value', (snapshot) => {
         const users = snapshot.val();
-        if (!users) {
-            usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>';
-            return;
-        }
+        if (!users) { usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>'; return; }
         const names = Object.values(users).map(u => u.name).filter(n => n && n.trim() !== '');
-        if (names.length === 0) {
-            usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>';
-            return;
-        }
+        if (names.length === 0) { usersListDiv.innerHTML = '<span class="online-empty">— لا يوجد متصلون —</span>'; return; }
         usersListDiv.innerHTML = names.map(name => `<span class="online-user-badge">👤 ${escapeHtml(name)}</span>`).join('');
     });
 }
-// ======================== دوال مساعدة ========================
+function getDoctorTitle(totalPoints) {
+    if (totalPoints >= 1000) return "👑 استشاري قدير";
+    if (totalPoints >= 500) return "🦷 أخصائي تشخيص";
+    if (totalPoints >= 150) return "🩺 ممارس عام";
+    return "🧑‍🎓 طالب امتياز";
+}
+function listenLeaderboard() {
+    db.ref('users').orderByChild('totalPoints').limitToLast(5).on('value', snap => {
+        const listDiv = document.getElementById('leaderboardList');
+        if (!listDiv) return;
+        let usersArray = [];
+        snap.forEach(child => {
+            const val = child.val();
+            if (val.status === 'active') {
+                usersArray.push({ name: val.name, points: val.totalPoints || 0 });
+            }
+        });
+        usersArray.reverse();
+        if (usersArray.length === 0) {
+            listDiv.innerHTML = '<div style="text-align:center; color:#94a3b8; font-size:0.8rem;">لا توجد نتائج مسجلة بعد</div>';
+            return;
+        }
+        listDiv.innerHTML = usersArray.map((u, i) => `
+            <div class="leaderboard-item ${i === 0 ? 'top-1' : ''}">
+                <div>
+                    <span class="user-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
+                    <span>${escapeHtml(u.name)}</span>
+                    <span class="user-title">${getDoctorTitle(u.points)}</span>
+                </div>
+                <div style="font-weight:bold; color:#2c9b7a;">${u.points} نقطة</div>
+            </div>
+        `).join('');
+    });
+}
+function handleUserStreak(userSnapshotValue, userKey) {
+    const todayStr = new Date().toDateString();
+    const lastLoginDate = userSnapshotValue.lastLoginDate || "";
+    let currentStreak = userSnapshotValue.streak || 0;
+    
+    if (lastLoginDate !== todayStr) {
+        const yesterdayStr = new Date(Date.now() - 86400000).toDateString();
+        if (lastLoginDate === yesterdayStr) {
+            currentStreak += 1;
+        } else {
+            currentStreak = 1; 
+        }
+        db.ref('users/' + userKey).update({ lastLoginDate: todayStr, streak: currentStreak });
+    }
+    const streakDisplay = document.getElementById('userStreakDisplay');
+    if (streakDisplay) streakDisplay.innerText = `🔥 التزام ${currentStreak} يوم متتالي`;
+}
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>]/g, function(m) {
-        if (m === '&') return '&amp;';
-        if (m === '<') return '&lt;';
-        if (m === '>') return '&gt;';
-        return m;
-    });
+    return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]));
 }
 async function loadQs() {
     const snap = await db.ref('questions').once('value');
@@ -358,6 +356,11 @@ function checkSavedProgress() {
     document.getElementById('reportArea').style.display = 'none';
     document.getElementById('quizActionBtn').innerText = 'خروج من الحساب';
     document.getElementById('quizActionBtn').onclick = logout;
+    
+    db.ref('users/' + currentUserKey + '/totalPoints').on('value', s => {
+        const p = s.val() || 0;
+        document.getElementById('doctorTitle').innerText = getDoctorTitle(p);
+    });
     const today = new Date().toDateString();
     const hasAnsweredDaily = localStorage.getItem('daily_challenge_' + today);
     const savedQuiz = localStorage.getItem(K.PROGRESS_QUIZ);
@@ -375,23 +378,14 @@ function checkSavedProgress() {
     }
 }
 function startDailyChallenge() {
-    isDailyChallengeMode = true;
-    score = 0;
-    qi = 0;
-    wrongAnswersHistory = [];
+    isDailyChallengeMode = true; score = 0; qi = 0; wrongAnswersHistory = [];
     const dailyIndex = new Date().getDate() % Qs.length;
-    quiz = [Qs[dailyIndex]]; 
-    renderQ();
+    quiz = [Qs[dailyIndex]]; renderQ();
 }
 function startQuiz(forceNew = true) {
     isDailyChallengeMode = false;
     if (!Qs.length) { alert('بنك الأسئلة فارغ حاليا'); logout(); return; }
-    if (forceNew) {
-        clearProgressStorage(); document.getElementById('resumeBtn').style.display = 'none';
-        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
-    } else {
-        quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
-    }
+    quiz = [...Qs].sort(()=>Math.random()-0.5); score = 0; qi = 0; wrongAnswersHistory = []; renderQ();
 }
 function resumeSession() {
     isDailyChallengeMode = false;
@@ -404,7 +398,7 @@ function resumeSession() {
             quiz = savedQuiz; qi = savedIndex; score = savedScore; wrongAnswersHistory = savedWrong;
             document.getElementById('resumeBtn').style.display = 'none'; renderQ();
         }
-    } catch (e) { console.log(e); startQuiz(true); }
+    } catch (e) { startQuiz(true); }
 }
 function saveCurrentProgressToStorage() {
     if (isDailyChallengeMode) return;
@@ -418,16 +412,24 @@ function clearProgressStorage() {
     localStorage.removeItem(K.PROGRESS_SCORE); localStorage.removeItem(K.PROGRESS_WRONG);
 }
 function renderQ() {
+    const imgContainer = document.getElementById('caseImgContainer');
+    const imgEl = document.getElementById('caseImg');
     if (qi >= quiz.length) { 
+        if (imgContainer) imgContainer.style.display = 'none';
         if (isDailyChallengeMode) {
-            const today = new Date().toDateString();
-            localStorage.setItem('daily_challenge_' + today, 'true');
-            showDailyChallengeResult();
-            return;
+            localStorage.setItem('daily_challenge_' + new Date().toDateString(), 'true');
+            showDailyChallengeResult(); return;
         }
         clearProgressStorage(); showFinalReport(); return; 
     }
     const q = quiz[qi];
+    if (q.img && q.img.trim() !== "") {
+        imgEl.src = q.img;
+        imgContainer.style.display = 'block';
+    } else {
+        imgContainer.style.display = 'none';
+        imgEl.src = "";
+    }
     if (isDailyChallengeMode) {
         document.getElementById('qNum').innerHTML = `🌟 <span style="color:#e67e22;">تحدي حالة اليوم الطبي</span>`;
         document.getElementById('score').innerText = `النقاط: ${score}`;
@@ -444,7 +446,10 @@ function renderQ() {
         const div = document.createElement('div'); div.className = 'option'; div.innerText = opt;
         div.onclick = () => {
             if (opts.querySelector('.correct,.wrong')) return;
-            if (opt === q.c) { score += 10; div.classList.add('correct'); }
+            if (opt === q.c) { 
+                score += 10; div.classList.add('correct');
+                db.ref('users/' + currentUserKey + '/totalPoints').transaction(current => (current || 0) + 10);
+            }
             else { 
                 div.classList.add('wrong'); 
                 [...opts.children].forEach(c=>{ if(c.innerText===q.c) c.classList.add('correct'); });
@@ -453,30 +458,27 @@ function renderQ() {
             document.getElementById('score').innerText = `النقاط: ${score}`;
             const exp = document.getElementById('exp');
             exp.innerHTML = `<b>التفسير العلمي للعيادة:</b><br>${q.e}`; exp.style.display = 'block';
-            const delay = isDailyChallengeMode ? 3500 : 1800;
-            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, delay);
+            setTimeout(()=>{ qi++; saveCurrentProgressToStorage(); renderQ(); }, isDailyChallengeMode ? 3500 : 1800);
         };        
         opts.appendChild(div);
     });
 }
 function showDailyChallengeResult() {
     const isCorrect = wrongAnswersHistory.length === 0;
-    const qText = document.getElementById('qText');
-    const opts = document.getElementById('opts');
-    qText.innerHTML = isCorrect ? `🎉 <span style="color:#009688;">أحسنت يا دكتور! لقد شخصت حالة اليوم بنجاح.</span>` : `🩺 <span style="color:#d63031;">محاولة جيدة، راجع التفسير.</span>`;
-    opts.innerHTML = `<button class="btn" style="background: linear-gradient(105deg, #3b82f6, #1d4ed8); margin-top:15px;" onclick="startQuiz(true)">التدريب المفتوح 🚀</button>`;
+    document.getElementById('qText').innerHTML = isCorrect ? `🎉 <span style="color:#009688;">أحسنت يا دكتور! لقد تشخصت حالة اليوم بنجاح.</span>` : `🩺 <span style="color:#d63031;">محاولة جيدة، راجع التفسير العلمي أعلاه.</span>`;
+    document.getElementById('opts').innerHTML = `<button class="btn" style="background: linear-gradient(105deg, #3b82f6, #1d4ed8); margin-top:15px;" onclick="startQuiz(true)">التدريب المفتوح 🚀</button>`;
 }
 function showFinalReport() {
     document.getElementById('quizContent').style.display = 'none';
     document.getElementById('reportArea').style.display = 'block';
     const maxScore = quiz.length * 10; const percent = Math.round((score / maxScore) * 100) || 0;
     document.getElementById('repScore').innerText = `نتيجة طبيبنا النهائية: ${score} من ${maxScore}`;
-    document.getElementById('repPercent').innerText = `نسبة التشخيص: ${percent}%`;
+    document.getElementById('repPercent').innerText = `نسبة التشخيص الصحيح: ${percent}%`;
     const wrongList = document.getElementById('wrongList'); wrongList.innerHTML = '';
     if (wrongAnswersHistory.length === 0) {
         document.getElementById('repWrongTitle').innerText = "رائع! تشخيصاتك سليمة 100%.";
     } else {
-        document.getElementById('repWrongTitle').innerText = "حالات تحتاج مراجعة:";
+        document.getElementById('repWrongTitle').innerText = "حالات تحتاج مراجعة للعيادة العلمية:";
         wrongAnswersHistory.forEach((item, index) => {
             const div = document.createElement('div'); div.className = 'wrong-review-item';
             div.innerHTML = `<div><strong>حالة ${index+1}:</strong> ${item.q}</div><div style="color:#155724;">✅ ${item.c}</div><div style="color:#7a5a2a;">💡 ${item.e}</div>`;
@@ -493,7 +495,7 @@ function renderAdmin() {
     c.innerHTML = '';
     Qs.forEach((q,i) => {
         const div = document.createElement('div'); div.className = 'q-item';
-        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong></div><div class="correct-badge">✅ ${q.c}</div><div class="row"><button class="btn" style="background:#ffb703;width:auto;" onclick="editQ('${q.id}')">تعديل</button><button class="btn" style="background:#e17055;width:auto;" onclick="delQ('${q.id}')">حذف</button></div>`;
+        div.innerHTML = `<div><strong>${i+1}. ${q.q}</strong> ${q.img ? '🖼️ (حالة مصورة)' : ''}</div><div class="correct-badge">✅ ${q.c}</div><div class="row"><button class="btn" style="background:#ffb703;width:auto;" onclick="editQ('${q.id}')">تعديل</button><button class="btn" style="background:#e17055;width:auto;" onclick="delQ('${q.id}')">حذف</button></div>`;
         c.appendChild(div);
     });
 }
@@ -508,7 +510,7 @@ function listenUsers() {
             if (u.status === 'pending') pending++;
             const st = {active:['نشط','active'],pending:['قيد الانتظار','pending'],suspended:['موقوف','suspended']}[u.status]||['مجهول',''];
             const div = document.createElement('div'); div.className = 'user-item';
-            div.innerHTML = `<div><strong>${u.name}</strong> <span class="tag ${st[1]}">${st[0]}</span></div><div>كلمة السر: ${u.password}</div><div class="row">${u.status!=='active'?`<button class="btn" style="background:#00b894;width:auto;" onclick="setSt('${k}','active')">تنشيط</button>`:''}${u.status!=='suspended'?`<button class="btn" style="background:#fdcb6e;width:auto;" onclick="setSt('${k}','suspended')">إيقاف</button>`:''}<button class="btn" style="background:#d63031;width:auto;" onclick="delU('${k}','${u.name}')">حذف</button></div>`;
+            div.innerHTML = `<div><strong>${u.name}</strong> <span class="tag ${st[1]}">${st[0]}</span> | <span style="font-size:0.8rem;color:#2c9b7a;font-weight:bold;">${u.totalPoints||0} نقطة</span></div><div>كلمة السر: ${u.password}</div><div class="row">${u.status!=='active'?`<button class="btn" style="background:#00b894;width:auto;" onclick="setSt('${k}','active')">تنشيط</button>`:''}${u.status!=='suspended'?`<button class="btn" style="background:#fdcb6e;width:auto;" onclick="setSt('${k}','suspended')">إيقاف</button>`:''}<button class="btn" style="background:#d63031;width:auto;" onclick="delU('${k}','${u.name}')">حذف</button></div>`;
             c.appendChild(div);
         });
         updBadge();
@@ -524,79 +526,81 @@ async function addJson() {
     const t = document.getElementById('jsonInput').value.trim(); if (!t) return;
     let arr; try { arr = JSON.parse(t); } catch(e) { return alert('JSON خاطئ'); }
     let ok=0;
-    for(const it of arr) { if(it.q && it.o?.length===4 && it.c && it.e && it.o.includes(it.c)) { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e}); ok++; } }
-    alert(`تمت إضافة ${ok} سؤال`); toggleJson(); await loadQs(); renderAdmin();
+    for(const it of arr) { if(it.q && it.o?.length===4 && it.c && it.e && it.o.includes(it.c)) { await db.ref('questions').push({q:it.q, o:it.o, c:it.c, e:it.e, img: it.img || ""}); ok++; } }
+    alert(`تمت إضافة ${ok} سؤال لبنك الحالات بنجاح`); toggleJson(); await loadQs(); renderAdmin();
 }
-function addOne() { editId=null; document.getElementById('mTitle').innerText='إضافة سؤال'; ['mQ','m1','m2','m3','m4','mC','mE'].forEach(id=>document.getElementById(id).value=''); document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=saveOne; }
+function addOne() { editId=null; document.getElementById('mTitle').innerText='إضافة سؤال مفرد مصوّر'; ['mQ','m1','m2','m3','m4','mC','mImg','mE'].forEach(id=>document.getElementById(id).value=''); document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=saveOne; }
 async function saveOne() { 
-    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('بيانات ناقصة');
-    await db.ref('questions').push({q,o,c,e}); alert('تم الحفظ'); closeModal(); await loadQs(); if(document.getElementById('admin').classList.contains('active')) renderAdmin();
+    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), img=document.getElementById('mImg').value.trim(), e=document.getElementById('mE').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('بيانات ناقصة أو الخيار الصحيح لا يطابق الخيارات');
+    await db.ref('questions').push({q,o,c,e,img}); alert('تم حفظ السؤال بنجاح'); closeModal(); await loadQs(); if(document.getElementById('admin').classList.contains('active')) renderAdmin();
 }
-function editQ(id) { const q=Qs.find(x=>x.id===id); if(!q) return; editId=id; document.getElementById('mTitle').innerText='تعديل'; document.getElementById('mQ').value=q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value=v); document.getElementById('mC').value=q.c; document.getElementById('mE').value=q.e; document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=()=>updQ(id); }
+function editQ(id) { const q=Qs.find(x=>x.id===id); if(!q) return; editId=id; document.getElementById('mTitle').innerText='تعديل السؤال الطبي'; document.getElementById('mQ').value=q.q; q.o.forEach((v,i)=>document.getElementById('m'+(i+1)).value=v); document.getElementById('mC').value=q.c; document.getElementById('mImg').value=q.img || ""; document.getElementById('mE').value=q.e; document.getElementById('modal').style.display='flex'; document.getElementById('mSave').onclick=()=>updQ(id); }
 async function updQ(id) { 
-    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), e=document.getElementById('mE').value.trim();
-    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ');
-    await db.ref('questions/'+id).set({q,o,c,e}); alert('تم التحديث'); closeModal(); await loadQs(); renderAdmin();
+    const q=document.getElementById('mQ').value.trim(), o=[1,2,3,4].map(i=>document.getElementById('m'+i).value.trim()), c=document.getElementById('mC').value.trim(), img=document.getElementById('mImg').value.trim(), e=document.getElementById('mE').value.trim();
+    if(!q || o.some(v=>!v) || !c || !e || !o.includes(c)) return alert('خطأ بالبيانات المكتوبة');
+    await db.ref('questions/'+id).set({q,o,c,e,img}); alert('تم التحديث بنجاح'); closeModal(); await loadQs(); renderAdmin();
 }
 function closeModal() { document.getElementById('modal').style.display='none'; editId=null; }
-
-// الإعلانات واللافتات
 let noticeTimeout=null, currentNoticeIndex=0, noticeLines=[];
 function buildNoticeManagerUI() { const container=document.getElementById('noticeListContainer'); if(!container) return; container.innerHTML=''; noticeLines.forEach((item,idx)=>{ const row=document.createElement('div'); row.className='notice-row-item'; row.innerHTML=`<div class="notice-row-fields"><input type="text" class="notice-input-content" value="${item.content.replace(/"/g,'&quot;')}"><input type="number" class="notice-input-time" value="${item.time||4}"><button class="notice-btn-del" onclick="removeNoticeRow(${idx})">حذف</button></div>`; container.appendChild(row); }); }
 function addNewNoticeRow() { noticeLines.push({content:'',time:4}); buildNoticeManagerUI(); }
 function removeNoticeRow(idx) { noticeLines.splice(idx,1); buildNoticeManagerUI(); }
-async function saveAllNoticesFromManager() { const container=document.getElementById('noticeListContainer'); const rows=container.getElementsByClassName('notice-row-item'); let result=[]; for(let row of rows){ const content=row.querySelector('.notice-input-content').value.trim(); const time=parseInt(row.querySelector('.notice-input-time').value.trim()); if(content) result.push(`${content} * ${isNaN(time)?4:time}`); } await db.ref('app_notice').set(result.join('\n')); alert('تم حفظ الإعلانات'); }
+async function saveAllNoticesFromManager() { const container=document.getElementById('noticeListContainer'); const rows=container.getElementsByClassName('notice-row-item'); let result=[]; for(let row of rows){ const content=row.querySelector('.notice-input-content').value.trim(); const time=parseInt(row.querySelector('.notice-input-time').value.trim()); if(content) result.push(`${content} * ${isNaN(time)?4:time}`); } await db.ref('app_notice').set(result.join('\n')); alert('تم حفظ التغييرات'); }
 function checkIsImage(c) { return /\.(jpeg|jpg|gif|png|webp)$/i.test(c) || c.startsWith('data:image/'); }
 function displayNoticeContent(box,obj){ if(noticeTimeout) clearTimeout(noticeTimeout); const dur=(obj.time||4)*1000; if(checkIsImage(obj.content)){ box.innerHTML=`<div id="noticeTxt">جاري التحميل...</div><img id="noticeImg" src="${obj.content}" style="display:none;">`; const img=document.getElementById('noticeImg'), txt=document.getElementById('noticeTxt'); img.onload=()=>{ txt.style.display='none'; img.style.display='block'; noticeTimeout=setTimeout(nextNotice,dur); }; img.onerror=()=>nextNotice(); } else { box.innerHTML=`<span class="admin-notice-text">${obj.content}</span>`; noticeTimeout=setTimeout(nextNotice,dur); } }
 function nextNotice(){ if(noticeLines.length<=1) return; const box=document.getElementById('appNoticeBox'); currentNoticeIndex=(currentNoticeIndex+1)%noticeLines.length; displayNoticeContent(box,noticeLines[currentNoticeIndex]); }
 function listenToNotice(){ db.ref('app_notice').on('value',snap=>{ const raw=snap.val()||""; const box=document.getElementById('appNoticeBox'); const lines=raw.split('\n').map(l=>l.trim()).filter(l=>l); noticeLines=lines.map(l=>{ if(l.includes('*')){ const parts=l.split('*'); return {content:parts[0].trim(), time:parseInt(parts[1].trim())||4}; } return {content:l,time:4}; }); buildNoticeManagerUI(); if(noticeTimeout) clearTimeout(noticeTimeout); currentNoticeIndex=0; if(noticeLines.length){ box.style.display='block'; displayNoticeContent(box,noticeLines[0]); } else box.style.display='none'; }); }
 function toggleNoticePanel(){ document.getElementById('noticeCollapsePanel').classList.toggle('show'); }
-
-// الدوال الرئيسية (تسجيل الدخول, الخروج)
 async function login() {
     const u = document.getElementById('user').value.trim();
     const p = document.getElementById('pass').value.trim();
     if (!u || !p) return alert('أدخل البيانات');
     if (p === 'salem1959') {
         localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
-        isAdminLoggedIn=true;
+        isAdminLoggedIn=true; currentUserKey = key(u);
         await loadQs(); show('admin'); renderAdmin(); listenUsers(); 
         return;
     }
-    const snap = await db.ref('users/'+key(u)).once('value');
+    currentUserKey = key(u);
+    const snap = await db.ref('users/'+currentUserKey).once('value');
     const d = snap.val();
     if (d && d.password === p && d.status === 'active') {
         localStorage.setItem(K.U,u); localStorage.setItem(K.P,p);
         isAdminLoggedIn=false;
+        handleUserStreak(d, currentUserKey);
         await loadQs(); checkSavedProgress();
         setupOnlinePresenceWithName(d.name);
         listenOnlineUsers();
+        listenLeaderboard();
     } else {
-        alert(d?.status === 'pending' ? 'الحساب قيد المراجعة' : d?.status === 'suspended' ? 'موقوف' : 'بيانات غير صحيحة');
+        alert(d?.status === 'pending' ? 'الحساب قيد المراجعة والموافقة' : d?.status === 'suspended' ? 'الحساب موقوف حالياً' : 'بيانات الدخول غير صحيحة');
     }
 }
 async function register() {
     const n = document.getElementById('regUser').value.trim();
     const p = document.getElementById('regPass').value.trim();
     if(!n||!p) return alert('املأ الحقول');
-    await db.ref('users/'+key(n)).set({name:n, password:p, status:'pending', at:Date.now()});
-    alert('تم إرسال الطلب'); show('login');
+    await db.ref('users/'+key(n)).set({name:n, password:p, status:'pending', totalPoints: 0, streak: 0, lastLoginDate: "", at:Date.now()});
+    alert('تم إرسال الطلب، بانتظار تفعيل الدكتور زكريا لحسابك'); show('login');
 }
 function logout() {
     if(myPresenceRef) { myPresenceRef.remove(); myPresenceRef=null; }
     if(usersRef) db.ref('users').off('value', usersRef);
     localStorage.removeItem(K.U); localStorage.removeItem(K.P);
-    Qs=[]; quiz=[]; score=0; qi=0; wrongAnswersHistory=[]; isAdminLoggedIn=false;
+    Qs=[]; quiz=[]; score=0; qi=0; wrongAnswersHistory=[]; isAdminLoggedIn=false; currentUserKey="";
     show('login'); document.getElementById('user').value=''; document.getElementById('pass').value='';
 }
 function show(id) {
     document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    if (id === 'login') {
+    if (id === 'login' || id === 'register') {
         document.body.classList.add('login-mode');
+        document.getElementById('gamificationBox').style.display = 'none';
     } else {
         document.body.classList.remove('login-mode');
+        if(!isAdminLoggedIn) { document.getElementById('gamificationBox').style.display = 'block'; }
+        else { document.getElementById('gamificationBox').style.display = 'none'; }
     }
 }
 function key(s) { return btoa(unescape(encodeURIComponent(s))).replace(/[/+=]/g,''); }
@@ -611,14 +615,18 @@ async function autoLogin() {
     const u = localStorage.getItem(K.U), p = localStorage.getItem(K.P);
     if (!u || !p) return;
     if (p === 'salem1959') { 
-        isAdminLoggedIn=true; await loadQs(); show('admin'); renderAdmin(); listenUsers(); return true;
+        isAdminLoggedIn=true; currentUserKey = key(u); await loadQs(); show('admin'); renderAdmin(); listenUsers(); return true;
     }
-    const snap = await db.ref('users/'+key(u)).once('value');
+    currentUserKey = key(u);
+    const snap = await db.ref('users/'+currentUserKey).once('value');
     const d = snap.val();
     if (d && d.password === p && d.status === 'active') {
-        isAdminLoggedIn=false; await loadQs(); checkSavedProgress();
+        isAdminLoggedIn=false;
+        handleUserStreak(d, currentUserKey);
+        await loadQs(); checkSavedProgress();
         setupOnlinePresenceWithName(d.name);
         listenOnlineUsers();
+        listenLeaderboard();
         return true;
     }
     return false;
