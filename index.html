@@ -47,8 +47,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 
     <!-- شاشة البداية -->
     <div id="landingScreen" class="screen active">
-        <div class="card" style="text-align:center">
-            <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
+        <div class="card" style="text-align:center">            <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
             <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
             <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
@@ -97,7 +96,6 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         </div>
         <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="logout()">🚪 خروج</button>
     </div>
-
     <!-- شاشة النتيجة -->
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
@@ -147,8 +145,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
-<script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script><script>
 // ========== إعداد Firebase ==========
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
@@ -168,6 +165,7 @@ let currentScore = 0;
 let currentWrong = [];
 let editingQuestionId = null;
 
+// ========== تهيئة Firebase ==========
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -177,6 +175,26 @@ try {
     console.error("Firebase error:", e);
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
 }
+
+// ========== دوال إدارة الجلسة ==========
+function saveSession(user) {
+    sessionStorage.setItem('currentUser', JSON.stringify(user));
+}
+
+function loadSession() {
+    const saved = sessionStorage.getItem('currentUser');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch(e) {
+            return null;
+        }
+    }
+    return null;
+}
+
+function clearSession() {
+    sessionStorage.removeItem('currentUser');}
 
 // ========== دوال الشاشات ==========
 function showLanding() {
@@ -215,6 +233,7 @@ async function doLogin() {
     // دخول الإدارة
     if (username === 'admin' && btoa(password) === 'c2FsZW0xOTU5') {
         currentUser = { isAdmin: true, name: 'admin' };
+        saveSession(currentUser);
         showScreen('adminScreen');
         loadQuestions();
         loadUsers();
@@ -224,11 +243,11 @@ async function doLogin() {
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
     
     try {
-        const snapshot = await db.ref('users/' + userKey).once('value');
-        const user = snapshot.val();
+        const snapshot = await db.ref('users/' + userKey).once('value');        const user = snapshot.val();
         
         if (user && user.password === password && user.status === 'active') {
             currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
+            saveSession(currentUser);
             showScreen('studentScreen');
             startNewQuiz();
         } else if (user && user.status === 'pending') {
@@ -272,12 +291,18 @@ async function doRegister() {
 }
 
 function logout() {
-    currentUser = null;
+    // مسح الجلسة والمتغيرات
+    clearSession();    currentUser = null;
     currentQuestions = [];
     currentIndex = 0;
     currentScore = 0;
     currentWrong = [];
     showLanding();
+    // تنظيف حقول الإدخال
+    document.getElementById('loginUsername').value = '';
+    document.getElementById('loginPassword').value = '';
+    document.getElementById('registerName').value = '';
+    document.getElementById('registerPassword').value = '';
 }
 
 // ========== نظام الاختبار ==========
@@ -316,8 +341,7 @@ function renderQuestion() {
     const optsDiv = document.getElementById('optionsContainer');
     const expDiv = document.getElementById('explanation');
     const nextBtn = document.getElementById('nextBtn');
-    const imgContainer = document.getElementById('questionImage');
-    const caseImg = document.getElementById('caseImage');
+    const imgContainer = document.getElementById('questionImage');    const caseImg = document.getElementById('caseImage');
     
     qNum.innerHTML = `السؤال ${currentIndex + 1}/${currentQuestions.length}`;
     scoreDisplay.innerHTML = `⭐ ${currentScore} نقطة`;
@@ -366,8 +390,7 @@ function checkAnswer(selected, correct, explanation, element) {
             const userKey = currentUser.key;
             db.ref('users/' + userKey + '/totalPoints').transaction(p => (p || 0) + 10);
         }
-    } else {
-        element.classList.add('wrong');
+    } else {        element.classList.add('wrong');
         // أظهر الخيار الصحيح
         optsDiv.querySelectorAll('.option').forEach(opt => {
             if (opt.innerHTML === correct) {
@@ -416,8 +439,7 @@ function showResult() {
                 </div>
             `;
         });
-    }
-    
+    }    
     showScreen('resultScreen');
 }
 
@@ -443,7 +465,7 @@ async function loadQuestions() {
                 <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
                 <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
                 <div class="row" style="margin-top:10px">
-                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick="editQuestion('${id}', ${JSON.stringify(q).replace(/"/g, '&quot;')})">✏️ تعديل</button>
+                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick="editQuestion('${id}', ${JSON.stringify(q).replace(/"/g, '"')})">✏️ تعديل</button>
                     <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">🗑️ حذف</button>
                 </div>
             `;
@@ -467,7 +489,6 @@ function addQuestionForm() {
     document.getElementById('explanationText').value = '';
     document.getElementById('questionModal').style.display = 'flex';
 }
-
 function editQuestion(id, q) {
     editingQuestionId = id;
     document.getElementById('modalTitle').innerHTML = '✏️ تعديل السؤال';
@@ -516,8 +537,7 @@ async function saveQuestion() {
             alert('تم تعديل السؤال بنجاح');
         } else {
             await db.ref('questions').push(questionData);
-            alert('تم إضافة السؤال بنجاح');
-        }
+            alert('تم إضافة السؤال بنجاح');        }
         closeModal();
         loadQuestions();
     } catch(e) {
@@ -566,8 +586,7 @@ async function loadUsers() {
             }
             
             const div = document.createElement('div');
-            div.className = 'user-item';
-            div.innerHTML = `
+            div.className = 'user-item';            div.innerHTML = `
                 <div><strong>${user.name}</strong> <span class="tag ${statusClass}">${statusText}</span></div>
                 <div style="font-size:13px;color:#666">🏆 النقاط: ${user.totalPoints || 0}</div>
                 <div style="font-size:12px;color:#888">🔑 ${user.password}</div>
@@ -611,8 +630,25 @@ function closeModal() {
     editingQuestionId = null;
 }
 
+// ========== بدء التشغيل - استعادة الجلسة ==========
+function restoreSession() {
+    const savedUser = loadSession();
+    if (savedUser) {
+        currentUser = savedUser;
+        if (currentUser.isAdmin) {            showScreen('adminScreen');
+            loadQuestions();
+            loadUsers();
+        } else {
+            showScreen('studentScreen');
+            startNewQuiz();
+        }
+    } else {
+        showLanding();
+    }
+}
+
 // بدء التشغيل
-showLanding();
+restoreSession();
 </script>
 </body>
 </html>
