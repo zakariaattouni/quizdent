@@ -2,22 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e4a6e">
+<meta name="mobile-web-app-capable" content="yes">
 <title>مدرب التشخيص السني - د. زكريا عطوني</title>
 
-<!-- PWA Manifest -->
-<link rel="manifest" href='data:application/json,{"name":"مدرب التشخيص السني","short_name":"التشخيص السني","start_url":".","display":"standalone","background_color":"#ffffff","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3063/3063162.png","sizes":"192x192","type":"image/png"}]}'>
+<!-- PWA: Apple -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063162.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="التشخيص السني">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px}
+body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 .container{max-width:600px;margin:0 auto}
 .header{background:linear-gradient(135deg,#1e4a6e,#2c9b7a);border-radius:20px;padding:20px;text-align:center;color:#fff;margin-bottom:15px;position:relative}
 .card{background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-bottom:15px}
-.btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px}
+.btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px;transition:transform .15s}
+.btn:active{transform:scale(.97)}
+.btn-install{background:linear-gradient(135deg,#f59e0b,#ef4444);display:none;margin-top:10px}
 .btn-admin{background:linear-gradient(135deg,#6c5ce7,#8b5cf6)}
 .btn-danger{background:linear-gradient(135deg,#e17055,#d63031)}
 .btn-header-logout{background:#d63031;color:#fff;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px;position:absolute;top:10px;left:10px;display:none}
@@ -43,8 +46,8 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:12px;font-size:14px}
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
-</style>
-</head>
+.install-banner{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:12px;border-radius:12px;text-align:center;margin-bottom:15px;cursor:pointer;font-weight:bold}
+</style></head>
 <body>
 <div class="container">
     <div class="header">
@@ -53,6 +56,11 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
     </div>
+
+    <div id="installBanner" class="install-banner" onclick="installApp()" style="display:none">
+        📲 تثبيت التطبيق على الشاشة الرئيسية
+    </div>
+
     <!-- شاشة البداية -->
     <div id="landingScreen" class="screen active">
         <div class="card" style="text-align:center">
@@ -60,6 +68,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
             <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
+            <button class="btn btn-install" id="installBtn" onclick="installApp()">📲 تثبيت التطبيق</button>
         </div>
     </div>
     <!-- شاشة تسجيل الدخول -->
@@ -69,7 +78,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <input type="text" id="loginUsername" placeholder="اسم المستخدم">
             <input type="password" id="loginPassword" placeholder="كلمة السر">
             <button class="btn" onclick="doLogin()">دخول</button>
-            <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
+            <button class="btn" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
     <!-- شاشة التسجيل -->
@@ -79,16 +88,15 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <input type="text" id="registerName" placeholder="الاسم الكامل">
             <input type="password" id="registerPassword" placeholder="كلمة السر">
             <button class="btn" onclick="doRegister()">إرسال الطلب</button>
-            <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
+            <button class="btn" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
-    <!-- شاشة الاختبار (الطالب) -->
+    <!-- شاشة الاختبار -->
     <div id="studentScreen" class="screen">
         <div class="card">
             <div class="row">
                 <span class="pill" id="questionNum">السؤال 1</span>
-                <span class="score-area" id="scoreDisplay">⭐ 0 نقطة</span>
-            </div>
+                <span class="score-area" id="scoreDisplay">⭐ 0 نقطة</span>            </div>
             <div id="dailyBadge" style="background:#fef3c7;padding:10px;border-radius:12px;margin-bottom:15px;text-align:center;display:none">
                 🌟 تحدي اليوم - نقاط مضاعفة 🌟
             </div>
@@ -115,11 +123,9 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     <div id="adminScreen" class="screen">
         <div class="card">
             <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>
-            
             <h4 style="margin:15px 0 5px">👥 الطلاب</h4>
             <button class="btn btn-admin" onclick="loadUsers()">📋 عرض الطلاب</button>
             <div id="usersList"></div>
-            
             <h4 style="margin:15px 0 5px">📚 الأسئلة</h4>
             <button class="btn btn-admin" onclick="addQuestionForm()">➕ إضافة سؤال</button>
             <button class="btn btn-admin" style="margin-top:5px" onclick="loadQuestions()">📋 عرض الأسئلة</button>
@@ -139,19 +145,177 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <input type="text" id="questionImageUrl" placeholder="رابط صورة (اختياري)">
             <textarea id="explanationText" rows="3" placeholder="الشرح العلمي"></textarea>
             <button class="btn" onclick="saveQuestion()">💾 حفظ</button>
-            <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
-        </div>
+            <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>        </div>
     </div>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
-// --- كود الـ PWA ---
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",()=>{})');
+// ============================================
+// 🔥 PWA SETUP - متوافق مع متطلبات كروم 2025+
+// ============================================
+
+// 1) إنشاء أيقونة SVG للتطبيق (سنّ طبي)
+const ICON_SVG = `
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c9b7a"/>
+      <stop offset="100%" stop-color="#1e4a6e"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#g)"/>
+  <path fill="#fff" d="M340 90c-40 0-60 20-84 20s-44-20-84-20c-50 0-90 42-90 94 0 52 20 120 44 168 18 36 34 70 58 70 22 0 28-26 48-70 12-26 22-44 32-44s20 18 32 44c20 44 26 70 48 70 24 0 40-34 58-70 24-48 44-116 44-168 0-52-40-94-90-94z"/>
+  <text x="256" y="470" font-family="Arial" font-size="36" font-weight="bold" text-anchor="middle" fill="#fff">د. ز. عطوني</text>
+</svg>`;
+
+// 2) تحويل SVG إلى PNG بأحجام مختلفة
+async function svgToPng(svg, size) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        const blob = new Blob([svg], {type: 'image/svg+xml'});
+        const url = URL.createObjectURL(blob);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = size; canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, size, size);
+            canvas.toBlob((b) => {
+                resolve({url: URL.createObjectURL(b), size});
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        };
+        img.src = url;
+    });
 }
 
+// 3) إنشاء Manifest ديناميكي (Blob URL) - متوافق مع كروم الحديث
+async function setupManifest() {
+    const icon192 = await svgToPng(ICON_SVG, 192);
+    const icon512 = await svgToPng(ICON_SVG, 512);
+    const iconMask = await svgToPng(ICON_SVG, 512); // maskable
+    const manifest = {
+        id: "/dental-coach-app-v1",
+        name: "مدرب التشخيص السني - د. زكريا عطوني",
+        short_name: "التشخيص السني",
+        description: "تطبيق تدريبي للتشخيص السني من إعداد الدكتور زكريا محمد عطوني",
+        start_url: ".",
+        scope: ".",
+        display: "standalone",
+        orientation: "portrait",
+        background_color: "#1e4a6e",
+        theme_color: "#1e4a6e",
+        lang: "ar",
+        dir: "rtl",
+        categories: ["education", "medical"],
+        icons: [
+            { src: icon192.url, sizes: "192x192", type: "image/png", purpose: "any" },
+            { src: icon512.url, sizes: "512x512", type: "image/png", purpose: "any" },
+            { src: iconMask.url, sizes: "512x512", type: "image/png", purpose: "maskable" }
+        ],
+        screenshots: [],
+        prefer_related_applications: false
+    };
+
+    const blob = new Blob([JSON.stringify(manifest)], {type: 'application/json'});
+    const manifestUrl = URL.createObjectURL(blob);
+    
+    // تحديث الرابط
+    let link = document.querySelector('link[rel="manifest"]');
+    if (!link) {
+        link = document.createElement('link');
+        link.rel = 'manifest';
+        document.head.appendChild(link);
+    }
+    link.href = manifestUrl;
+
+    // أيقونة Apple
+    let appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
+    if (!appleIcon) {
+        appleIcon = document.createElement('link');
+        appleIcon.rel = 'apple-touch-icon';
+        appleIcon.sizes = '180x180';
+        document.head.appendChild(appleIcon);
+    }
+    appleIcon.href = icon192.url;
+}
+
+// 4) Service Worker حقيقي (يعمل offline)
+async function setupServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;    
+    const swCode = `
+const CACHE_NAME = 'dental-coach-v1';
+const ASSETS = ['/'];
+
+self.addEventListener('install', (e) => {
+    e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)).catch(()=>{}));
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (e) => {
+    e.waitUntil(clients.claim());
+});
+
+self.addEventListener('fetch', (e) => {
+    if (e.request.method !== 'GET') return;
+    e.respondWith(
+        fetch(e.request).then(r => {
+            const copy = r.clone();
+            caches.open(CACHE_NAME).then(c => c.put(e.request, copy)).catch(()=>{});
+            return r;
+        }).catch(() => caches.match(e.request))
+    );
+});
+`;
+    const blob = new Blob([swCode], {type: 'application/javascript'});
+    const swUrl = URL.createObjectURL(blob);
+    
+    try {
+        await navigator.serviceWorker.register(swUrl, {scope: '.'});
+        console.log('✅ Service Worker registered');
+    } catch(e) {
+        console.warn('⚠️ SW registration note:', e.message);
+    }
+}
+
+// 5) زر التثبيت (beforeinstallprompt)
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    const btn = document.getElementById('installBtn');
+    const banner = document.getElementById('installBanner');
+    if (btn) btn.style.display = 'block';
+    if (banner) banner.style.display = 'block';
+});
+
+function installApp() {
+    if (!deferredPrompt) {
+        alert('للتثبيت: اضغط على ⋮ في أعلى المتصفح ثم "إضافة إلى الشاشة الرئيسية"');        return;
+    }
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((r) => {
+        if (r.outcome === 'accepted') console.log('✅ تم التثبيت');
+        deferredPrompt = null;
+        document.getElementById('installBtn').style.display = 'none';
+        document.getElementById('installBanner').style.display = 'none';
+    });
+}
+
+window.addEventListener('appinstalled', () => {
+    console.log('🎉 تم تثبيت التطبيق بنجاح');
+    document.getElementById('installBtn').style.display = 'none';
+    document.getElementById('installBanner').style.display = 'none';
+});
+
+// تشغيل إعداد PWA
+setupManifest();
+setupServiceWorker();
+
+// ============================================
 // ========== إعداد Firebase ==========
+// ============================================
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
@@ -168,6 +332,7 @@ let currentIndex = 0;
 let currentScore = 0;
 let currentWrong = [];
 let editingQuestionId = null;
+
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -177,8 +342,7 @@ try {
     console.error("Firebase error:", e);
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
 }
-
-// --- عند فتح الصفحة: استعادة الجلسة ---
+// ========== استعادة الجلسة ==========
 window.onload = () => {
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
@@ -210,32 +374,24 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
 }
-// ========== تسجيل الدخول والتسجيل ==========
+
+// ========== تسجيل الدخول ==========
 async function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
-    
-    if (!username || !password) {
-        alert('الرجاء إدخال اسم المستخدم وكلمة السر');
-        return;
-    }
+    if (!username || !password) { alert('الرجاء إدخال اسم المستخدم وكلمة السر'); return; }
     
     if (username === 'admin' && btoa(password) === 'c2FsZW0xOTU5') {
         currentUser = { isAdmin: true, name: 'admin' };
         localStorage.setItem('userSession', JSON.stringify(currentUser));
         document.getElementById('headerLogoutBtn').style.display = 'block';
         showScreen('adminScreen');
-        loadQuestions();
-        loadUsers();
+        loadQuestions(); loadUsers();
         return;
     }
-    
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
-    
-    try {
-        const snapshot = await db.ref('users/' + userKey).once('value');
+    try {        const snapshot = await db.ref('users/' + userKey).once('value');
         const user = snapshot.val();
-        
         if (user && user.password === password && user.status === 'active') {
             currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
             localStorage.setItem('userSession', JSON.stringify(currentUser));
@@ -249,221 +405,142 @@ async function doLogin() {
         } else {
             alert('اسم المستخدم أو كلمة السر غير صحيحة');
         }
-    } catch(e) {
-        alert('خطأ: ' + e.message);
-    }
+    } catch(e) { alert('خطأ: ' + e.message); }
 }
+
 async function doRegister() {
     const name = document.getElementById('registerName').value.trim();
     const password = document.getElementById('registerPassword').value.trim();
-    
-    if (!name || !password) {
-        alert('الرجاء ملء جميع الحقول');
-        return;
-    }
-    
+    if (!name || !password) { alert('الرجاء ملء جميع الحقول'); return; }
     const userKey = btoa(unescape(encodeURIComponent(name))).replace(/[^A-Za-z0-9]/g, '');
-    
     try {
         await db.ref('users/' + userKey).set({
-            name: name,
-            password: password,
-            status: 'pending',
-            totalPoints: 0,
-            streak: 0,
-            lastLoginDate: "",
-            registeredAt: Date.now()
+            name, password, status: 'pending', totalPoints: 0,
+            streak: 0, lastLoginDate: "", registeredAt: Date.now()
         });
         alert('تم إرسال طلب التسجيل بنجاح، سيتم تفعيل حسابك قريباً');
         showLanding();
-    } catch(e) {
-        alert('خطأ: ' + e.message);
-    }
+    } catch(e) { alert('خطأ: ' + e.message); }
 }
+
 function logout() {
     localStorage.removeItem('userSession');
     document.getElementById('headerLogoutBtn').style.display = 'none';
-    currentUser = null;
-    currentQuestions = [];
-    currentIndex = 0;
-    currentScore = 0;
-    currentWrong = [];
+    currentUser = null; currentQuestions = [];
+    currentIndex = 0; currentScore = 0; currentWrong = [];
     location.reload();
 }
+
 // ========== نظام الاختبار ==========
 async function startNewQuiz() {
     try {
         const snapshot = await db.ref('questions').once('value');
         const questions = snapshot.val();
-        
-        if (!questions) {
-            alert('لا توجد أسئلة في قاعدة البيانات، يرجى إضافة أسئلة أولاً');
-            return;
-        }
-        
+        if (!questions) { alert('لا توجد أسئلة في قاعدة البيانات'); return; }
         currentQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
         currentQuestions = currentQuestions.sort(() => Math.random() - 0.5);
-        currentIndex = 0;
-        currentScore = 0;
-        currentWrong = [];
-        
-        renderQuestion();
-    } catch(e) {
-        alert('خطأ في تحميل الأسئلة: ' + e.message);
-    }
+        currentIndex = 0; currentScore = 0; currentWrong = [];        renderQuestion();
+    } catch(e) { alert('خطأ في تحميل الأسئلة: ' + e.message); }
 }
+
 function renderQuestion() {
-    if (currentIndex >= currentQuestions.length) {
-        showResult();
-        return;
-    }
-    
+    if (currentIndex >= currentQuestions.length) { showResult(); return; }
     const q = currentQuestions[currentIndex];
-    const qNum = document.getElementById('questionNum');
-    const scoreDisplay = document.getElementById('scoreDisplay');
-    const qText = document.getElementById('questionText');
-    const optsDiv = document.getElementById('optionsContainer');
-    const expDiv = document.getElementById('explanation');
-    const nextBtn = document.getElementById('nextBtn');
+    document.getElementById('questionNum').innerHTML = `السؤال ${currentIndex + 1}/${currentQuestions.length}`;
+    document.getElementById('scoreDisplay').innerHTML = `⭐ ${currentScore} نقطة`;
+    document.getElementById('questionText').innerHTML = q.q;
+    document.getElementById('explanation').style.display = 'none';
+    document.getElementById('nextBtn').style.display = 'none';
+    
     const imgContainer = document.getElementById('questionImage');
     const caseImg = document.getElementById('caseImage');
+    if (q.img && q.img.trim()) { caseImg.src = q.img; imgContainer.style.display = 'block'; }
+    else { imgContainer.style.display = 'none'; }
     
-    qNum.innerHTML = `السؤال ${currentIndex + 1}/${currentQuestions.length}`;
-    scoreDisplay.innerHTML = `⭐ ${currentScore} نقطة`;
-    qText.innerHTML = q.q;
-    expDiv.style.display = 'none';
-    nextBtn.style.display = 'none';
-    
-    if (q.img && q.img.trim()) {
-        caseImg.src = q.img;
-        imgContainer.style.display = 'block';
-    } else {
-        imgContainer.style.display = 'none';
-    }
-    
-    const options = [...q.o];
-    options.sort(() => Math.random() - 0.5);
-    
+    const options = [...q.o].sort(() => Math.random() - 0.5);
+    const optsDiv = document.getElementById('optionsContainer');
     optsDiv.innerHTML = '';
     options.forEach(opt => {
-        const optionDiv = document.createElement('div');
-        optionDiv.className = 'option';
-        optionDiv.innerHTML = opt;
-        optionDiv.onclick = () => checkAnswer(opt, q.c, q.e, optionDiv);
-        optsDiv.appendChild(optionDiv);
+        const d = document.createElement('div');
+        d.className = 'option'; d.innerHTML = opt;
+        d.onclick = () => checkAnswer(opt, q.c, q.e, d);
+        optsDiv.appendChild(d);
     });
 }
+
 function checkAnswer(selected, correct, explanation, element) {
     const optsDiv = document.getElementById('optionsContainer');
-    const expDiv = document.getElementById('explanation');
-    
-    optsDiv.querySelectorAll('.option').forEach(opt => {
-        opt.style.pointerEvents = 'none';
-    });
+    optsDiv.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
     
     if (selected === correct) {
         element.classList.add('correct');
         currentScore += 10;
         document.getElementById('scoreDisplay').innerHTML = `⭐ ${currentScore} نقطة`;
-        
         if (currentUser && !currentUser.isAdmin) {
-            const userKey = currentUser.key;
-            db.ref('users/' + userKey + '/totalPoints').transaction(p => (p || 0) + 10);
+            db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
         }
     } else {
         element.classList.add('wrong');
         optsDiv.querySelectorAll('.option').forEach(opt => {
-            if (opt.innerHTML === correct) {
-                opt.classList.add('correct');
-            }
+            if (opt.innerHTML === correct) opt.classList.add('correct');
         });
-        currentWrong.push({
-            question: currentQuestions[currentIndex].q,
-            correct: correct,
-            explanation: explanation
-        });
+        currentWrong.push({ question: currentQuestions[currentIndex].q, correct, explanation });
     }
-    
-    expDiv.innerHTML = `<strong>📖 الشرح:</strong><br>${explanation}`;
-    expDiv.style.display = 'block';
-    
-    const nextBtn = document.getElementById('nextBtn');
-    nextBtn.style.display = 'block';
-}
-function nextQuestion() {
-    currentIndex++;
-    renderQuestion();
-}
+    document.getElementById('explanation').innerHTML = `<strong>📖 الشرح:</strong><br>${explanation}`;
+    document.getElementById('explanation').style.display = 'block';
+    document.getElementById('nextBtn').style.display = 'block';}
+
+function nextQuestion() { currentIndex++; renderQuestion(); }
+
 function showResult() {
     const total = currentQuestions.length * 10;
     const percentage = Math.round((currentScore / total) * 100);
-    
     document.getElementById('finalScore').innerHTML = `${currentScore} / ${total}`;
     document.getElementById('percentageText').innerHTML = `الدقة: ${percentage}%`;
-    
     const wrongDiv = document.getElementById('wrongAnswersList');
     if (currentWrong.length === 0) {
         wrongDiv.innerHTML = '<p style="color:#00b894;text-align:center">🎉 ممتاز! لا توجد إجابات خاطئة 🎉</p>';
     } else {
         wrongDiv.innerHTML = '<h4 style="margin:15px 0 10px">📝 أسئلة تحتاج مراجعة:</h4>';
         currentWrong.forEach((item, i) => {
-            wrongDiv.innerHTML += `
-                <div class="wrong-item">
-                    <strong>${i+1}.</strong> ${item.question}<br>
-                    ✅ الإجابة الصحيحة: ${item.correct}<br>
-                    📖 ${item.explanation}
-                </div>
-            `;
+            wrongDiv.innerHTML += `<div class="wrong-item"><strong>${i+1}.</strong> ${item.question}<br>✅ الإجابة الصحيحة: ${item.correct}<br>📖 ${item.explanation}</div>`;
         });
     }
-    
     showScreen('resultScreen');
 }
+
 // ========== دوال الإدارة ==========
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
-    
     try {
         const snapshot = await db.ref('questions').once('value');
         const questions = snapshot.val();
-        
-        if (!questions) {
-            container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>';
-            return;
-        }
-        
+        if (!questions) { container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>'; return; }
         container.innerHTML = '';
         Object.entries(questions).forEach(([id, q]) => {
             const div = document.createElement('div');
             div.className = 'q-item';
+            const safeQ = JSON.stringify(q).replace(/"/g, '"').replace(/</g, '<');
             div.innerHTML = `
                 <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
                 <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
                 <div class="row" style="margin-top:10px">
-                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick="editQuestion('${id}', ${JSON.stringify(q).replace(/"/g, '&quot;')})">✏️ تعديل</button>
+                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick='editQuestion("${id}", ${JSON.stringify(q).replace(/'/g, "\\'")})'>✏️ تعديل</button>
                     <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">🗑️ حذف</button>
                 </div>
             `;
             container.appendChild(div);
         });
-    } catch(e) {
-        container.innerHTML = '<p style="color:red">خطأ في التحميل</p>';
-    }
+    } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
 }
+
 function addQuestionForm() {
     editingQuestionId = null;
-    document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';
-    document.getElementById('qText').value = '';
-    document.getElementById('opt1').value = '';
-    document.getElementById('opt2').value = '';
-    document.getElementById('opt3').value = '';
-    document.getElementById('opt4').value = '';
-    document.getElementById('correctOpt').value = '';
-    document.getElementById('questionImageUrl').value = '';
-    document.getElementById('explanationText').value = '';
+    document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';    ['qText','opt1','opt2','opt3','opt4','correctOpt','questionImageUrl','explanationText'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('questionModal').style.display = 'flex';
 }
+
 function editQuestion(id, q) {
     editingQuestionId = id;
     document.getElementById('modalTitle').innerHTML = '✏️ تعديل السؤال';
@@ -477,6 +554,7 @@ function editQuestion(id, q) {
     document.getElementById('explanationText').value = q.e || '';
     document.getElementById('questionModal').style.display = 'flex';
 }
+
 async function saveQuestion() {
     const qText = document.getElementById('qText').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
@@ -488,23 +566,12 @@ async function saveQuestion() {
     const explanation = document.getElementById('explanationText').value.trim();
     
     if (!qText || !opt1 || !opt2 || !opt3 || !opt4 || !correct || !explanation) {
-        alert('الرجاء ملء جميع الحقول');
-        return;
+        alert('الرجاء ملء جميع الحقول'); return;
     }
-    
     if (![opt1, opt2, opt3, opt4].includes(correct)) {
-        alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة');
-        return;
+        alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة'); return;
     }
-    
-    const questionData = {
-        q: qText,
-        o: [opt1, opt2, opt3, opt4],
-        c: correct,
-        e: explanation,
-        img: imgUrl
-    };
-    
+    const questionData = { q: qText, o: [opt1, opt2, opt3, opt4], c: correct, e: explanation, img: imgUrl };
     try {
         if (editingQuestionId) {
             await db.ref('questions/' + editingQuestionId).set(questionData);
@@ -513,51 +580,29 @@ async function saveQuestion() {
             await db.ref('questions').push(questionData);
             alert('تم إضافة السؤال بنجاح');
         }
-        closeModal();
-        loadQuestions();
-    } catch(e) {
-        alert('خطأ: ' + e.message);
-    }
+        closeModal(); loadQuestions();
+    } catch(e) { alert('خطأ: ' + e.message); }
 }
+
 async function deleteQuestion(id) {
     if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
-        try {
-            await db.ref('questions/' + id).remove();
-            alert('تم حذف السؤال');
-            loadQuestions();
-        } catch(e) {
-            alert('خطأ: ' + e.message);
-        }
+        try { await db.ref('questions/' + id).remove(); alert('تم حذف السؤال'); loadQuestions(); }        catch(e) { alert('خطأ: ' + e.message); }
     }
 }
+
 async function loadUsers() {
     const container = document.getElementById('usersList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
-    
     try {
         const snapshot = await db.ref('users').once('value');
         const users = snapshot.val();
-        
-        if (!users) {
-            container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>';
-            return;
-        }
-        
+        if (!users) { container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>'; return; }
         container.innerHTML = '';
         Object.entries(users).forEach(([key, user]) => {
-            let statusClass = '';
-            let statusText = '';
-            if (user.status === 'active') {
-                statusClass = 'tag-active';
-                statusText = 'نشط';
-            } else if (user.status === 'pending') {
-                statusClass = 'tag-pending';
-                statusText = 'قيد المراجعة';
-            } else {
-                statusClass = 'tag-suspended';
-                statusText = 'موقوف';
-            }
-            
+            let statusClass = '', statusText = '';
+            if (user.status === 'active') { statusClass = 'tag-active'; statusText = 'نشط'; }
+            else if (user.status === 'pending') { statusClass = 'tag-pending'; statusText = 'قيد المراجعة'; }
+            else { statusClass = 'tag-suspended'; statusText = 'موقوف'; }
             const div = document.createElement('div');
             div.className = 'user-item';
             div.innerHTML = `
@@ -572,32 +617,25 @@ async function loadUsers() {
             `;
             container.appendChild(div);
         });
-    } catch(e) {
-        container.innerHTML = '<p style="color:red">خطأ في التحميل</p>';
-    }
+    } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
 }
+
 async function updateUserStatus(key, status) {
     try {
-        await db.ref('users/' + key).update({ status: status });
+        await db.ref('users/' + key).update({ status });
         alert(`تم تغيير الحالة إلى ${status === 'active' ? 'نشط' : 'موقوف'}`);
         loadUsers();
-    } catch(e) {
-        alert('خطأ: ' + e.message);
-    }
+    } catch(e) { alert('خطأ: ' + e.message); }
 }
+
 async function deleteUser(key, name) {
     if (confirm(`هل أنت متأكد من حذف الطالب "${name}" نهائياً؟`)) {
-        try {
-            await db.ref('users/' + key).remove();
-            alert('تم حذف الطالب');
-            loadUsers();
-        } catch(e) {
-            alert('خطأ: ' + e.message);
-        }
+        try { await db.ref('users/' + key).remove(); alert('تم حذف الطالب'); loadUsers(); }
+        catch(e) { alert('خطأ: ' + e.message); }
     }
 }
-function closeModal() {
-    document.getElementById('questionModal').style.display = 'none';
+
+function closeModal() {    document.getElementById('questionModal').style.display = 'none';
     editingQuestionId = null;
 }
 </script>
