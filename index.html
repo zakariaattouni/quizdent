@@ -10,7 +10,8 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 .container{max-width:600px;margin:0 auto}
 .header{background:linear-gradient(135deg,#1e4a6e,#2c9b7a);border-radius:20px;padding:20px;text-align:center;color:#fff;margin-bottom:15px}
 .card{background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-bottom:15px}
-.btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px}
+.btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px;transition:all 0.3s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,0.2)}
 .btn-admin{background:linear-gradient(135deg,#6c5ce7,#8b5cf6)}
 .btn-danger{background:linear-gradient(135deg,#e17055,#d63031)}
 .option{background:#f0fdf4;border:2px solid #cce5dc;padding:12px 18px;border-radius:50px;margin:10px 0;cursor:pointer;transition:all 0.2s;font-weight:500}
@@ -35,19 +36,26 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:12px;font-size:14px}
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,255,255,0.9);z-index:9999;display:flex;justify-content:center;align-items:center;flex-direction:column}
+.loading-spinner{width:50px;height:50px;border:4px solid #e0f2fe;border-top-color:#2c9b7a;border-radius:50%;animation:spin 1s linear infinite}
 </style>
 </head>
 <body>
-<div class="container">
-    <div class="header">
-        <h1>🦷 مدرب التشخيص السني</h1>
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <p style="margin-top:15px;color:#1e4a6e;font-weight:bold">جاري التحميل...</p>
+</div>
+
+<div class="container" style="display:none" id="mainContainer">
+    <div class="header">        <h1>🦷 مدرب التشخيص السني</h1>
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
     </div>
 
     <!-- شاشة البداية -->
     <div id="landingScreen" class="screen active">
-        <div class="card" style="text-align:center">            <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
+        <div class="card" style="text-align:center">
+            <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
             <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
             <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
@@ -88,14 +96,14 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             </div>
             <div id="questionImage" style="text-align:center;margin-bottom:15px;display:none">
                 <img id="caseImage" src="" style="max-width:100%;max-height:200px;border-radius:12px">
-            </div>
-            <div id="questionText" class="q-text"></div>
+            </div>            <div id="questionText" class="q-text"></div>
             <div id="optionsContainer"></div>
             <div id="explanation" class="exp-box"></div>
             <button id="nextBtn" class="btn" style="display:none" onclick="nextQuestion()">التالي ➡️</button>
         </div>
         <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="logout()">🚪 خروج</button>
     </div>
+
     <!-- شاشة النتيجة -->
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
@@ -137,15 +145,15 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <input type="text" id="opt4" placeholder="الخيار 4">
             <input type="text" id="correctOpt" placeholder="الخيار الصحيح (اكتب النص نفسه)">
             <input type="text" id="questionImageUrl" placeholder="رابط صورة (اختياري)">
-            <textarea id="explanationText" rows="3" placeholder="الشرح العلمي"></textarea>
-            <button class="btn" onclick="saveQuestion()">💾 حفظ</button>
+            <textarea id="explanationText" rows="3" placeholder="الشرح العلمي"></textarea>            <button class="btn" onclick="saveQuestion()">💾 حفظ</button>
             <button class="btn btn-outline" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script><script>
+<script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+<script>
 // ========== إعداد Firebase ==========
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
@@ -164,11 +172,30 @@ let currentIndex = 0;
 let currentScore = 0;
 let currentWrong = [];
 let editingQuestionId = null;
+let questionsCache = null;
+let usersCache = null;
+let firebaseReady = false;
 
 // ========== تهيئة Firebase ==========
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
+    
+    // الاستماع للتغييرات في الوقت الحقيقي
+    db.ref('questions').on('value', (snapshot) => {
+        questionsCache = snapshot.val();
+        console.log('✅ تم تحديث الأسئلة من قاعدة البيانات');
+    }, (error) => {
+        console.error('خطأ في الاستماع للأسئلة:', error);
+    });
+    
+    db.ref('users').on('value', (snapshot) => {
+        usersCache = snapshot.val();
+        console.log('✅ تم تحديث المستخدمين من قاعدة البيانات');
+    }, (error) => {
+        console.error('خطأ في الاستماع للمستخدمين:', error);
+    });    
+    firebaseReady = true;
     console.log("✅ Firebase connected");
     document.getElementById('connectionStatus').innerHTML = '🟢 متصل بقاعدة البيانات';
 } catch(e) {
@@ -179,14 +206,18 @@ try {
 // ========== دوال إدارة الجلسة ==========
 function saveSession(user) {
     sessionStorage.setItem('currentUser', JSON.stringify(user));
+    console.log('✅ تم حفظ الجلسة:', user);
 }
 
 function loadSession() {
     const saved = sessionStorage.getItem('currentUser');
     if (saved) {
         try {
-            return JSON.parse(saved);
+            const user = JSON.parse(saved);
+            console.log('✅ تم استرجاع الجلسة:', user);
+            return user;
         } catch(e) {
+            console.error('خطأ في استرجاع الجلسة:', e);
             return null;
         }
     }
@@ -194,7 +225,9 @@ function loadSession() {
 }
 
 function clearSession() {
-    sessionStorage.removeItem('currentUser');}
+    sessionStorage.removeItem('currentUser');
+    console.log('✅ تم مسح الجلسة');
+}
 
 // ========== دوال الشاشات ==========
 function showLanding() {
@@ -210,14 +243,18 @@ function showRegister() {
 }
 
 function showAdminLogin() {
-    showScreen('loginScreen');
-    document.getElementById('loginUsername').value = 'admin';
+    showScreen('loginScreen');    document.getElementById('loginUsername').value = 'admin';
     document.getElementById('loginPassword').focus();
 }
 
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+    document.getElementById('mainContainer').style.display = 'block';
 }
 
 // ========== تسجيل الدخول والتسجيل ==========
@@ -243,13 +280,19 @@ async function doLogin() {
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
     
     try {
-        const snapshot = await db.ref('users/' + userKey).once('value');        const user = snapshot.val();
+        // استخدام الـ cache إذا كان متوفراً
+        let user;
+        if (usersCache && usersCache[userKey]) {
+            user = usersCache[userKey];
+        } else {
+            const snapshot = await db.ref('users/' + userKey).once('value');
+            user = snapshot.val();
+        }
         
         if (user && user.password === password && user.status === 'active') {
             currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
             saveSession(currentUser);
-            showScreen('studentScreen');
-            startNewQuiz();
+            showScreen('studentScreen');            startNewQuiz();
         } else if (user && user.status === 'pending') {
             alert('حسابك قيد المراجعة من قبل المشرف');
         } else if (user && user.status === 'suspended') {
@@ -291,16 +334,14 @@ async function doRegister() {
 }
 
 function logout() {
-    // مسح الجلسة والمتغيرات
-    clearSession();    currentUser = null;
+    clearSession();
+    currentUser = null;
     currentQuestions = [];
     currentIndex = 0;
     currentScore = 0;
     currentWrong = [];
     showLanding();
-    // تنظيف حقول الإدخال
-    document.getElementById('loginUsername').value = '';
-    document.getElementById('loginPassword').value = '';
+    document.getElementById('loginUsername').value = '';    document.getElementById('loginPassword').value = '';
     document.getElementById('registerName').value = '';
     document.getElementById('registerPassword').value = '';
 }
@@ -308,8 +349,12 @@ function logout() {
 // ========== نظام الاختبار ==========
 async function startNewQuiz() {
     try {
-        const snapshot = await db.ref('questions').once('value');
-        const questions = snapshot.val();
+        let questions = questionsCache;
+        
+        if (!questions) {
+            const snapshot = await db.ref('questions').once('value');
+            questions = snapshot.val();
+        }
         
         if (!questions) {
             alert('لا توجد أسئلة في قاعدة البيانات، يرجى إضافة أسئلة أولاً');
@@ -341,15 +386,14 @@ function renderQuestion() {
     const optsDiv = document.getElementById('optionsContainer');
     const expDiv = document.getElementById('explanation');
     const nextBtn = document.getElementById('nextBtn');
-    const imgContainer = document.getElementById('questionImage');    const caseImg = document.getElementById('caseImage');
+    const imgContainer = document.getElementById('questionImage');
+    const caseImg = document.getElementById('caseImage');
     
     qNum.innerHTML = `السؤال ${currentIndex + 1}/${currentQuestions.length}`;
-    scoreDisplay.innerHTML = `⭐ ${currentScore} نقطة`;
-    qText.innerHTML = q.q;
+    scoreDisplay.innerHTML = `⭐ ${currentScore} نقطة`;    qText.innerHTML = q.q;
     expDiv.style.display = 'none';
     nextBtn.style.display = 'none';
     
-    // عرض الصورة إذا وجدت
     if (q.img && q.img.trim()) {
         caseImg.src = q.img;
         imgContainer.style.display = 'block';
@@ -357,7 +401,6 @@ function renderQuestion() {
         imgContainer.style.display = 'none';
     }
     
-    // عرض الخيارات بشكل عشوائي
     const options = [...q.o];
     options.sort(() => Math.random() - 0.5);
     
@@ -375,7 +418,6 @@ function checkAnswer(selected, correct, explanation, element) {
     const optsDiv = document.getElementById('optionsContainer');
     const expDiv = document.getElementById('explanation');
     
-    // تعطيل جميع الخيارات
     optsDiv.querySelectorAll('.option').forEach(opt => {
         opt.style.pointerEvents = 'none';
     });
@@ -385,30 +427,26 @@ function checkAnswer(selected, correct, explanation, element) {
         currentScore += 10;
         document.getElementById('scoreDisplay').innerHTML = `⭐ ${currentScore} نقطة`;
         
-        // تحديث النقاط في قاعدة البيانات
         if (currentUser && !currentUser.isAdmin) {
             const userKey = currentUser.key;
             db.ref('users/' + userKey + '/totalPoints').transaction(p => (p || 0) + 10);
         }
-    } else {        element.classList.add('wrong');
-        // أظهر الخيار الصحيح
+    } else {
+        element.classList.add('wrong');
         optsDiv.querySelectorAll('.option').forEach(opt => {
             if (opt.innerHTML === correct) {
                 opt.classList.add('correct');
             }
         });
         currentWrong.push({
-            question: currentQuestions[currentIndex].q,
-            correct: correct,
+            question: currentQuestions[currentIndex].q,            correct: correct,
             explanation: explanation
         });
     }
     
-    // عرض الشرح
     expDiv.innerHTML = `<strong>📖 الشرح:</strong><br>${explanation}`;
     expDiv.style.display = 'block';
     
-    // إظهار زر التالي
     const nextBtn = document.getElementById('nextBtn');
     nextBtn.style.display = 'block';
 }
@@ -439,41 +477,38 @@ function showResult() {
                 </div>
             `;
         });
-    }    
+    }
+    
     showScreen('resultScreen');
 }
 
 // ========== دوال الإدارة ==========
-async function loadQuestions() {
+function loadQuestions() {
     const container = document.getElementById('questionsList');
-    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     
-    try {
-        const snapshot = await db.ref('questions').once('value');
-        const questions = snapshot.val();
-        
-        if (!questions) {
-            container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>';
-            return;
-        }
-        
-        container.innerHTML = '';
-        Object.entries(questions).forEach(([id, q]) => {
-            const div = document.createElement('div');
-            div.className = 'q-item';
-            div.innerHTML = `
-                <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
-                <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
-                <div class="row" style="margin-top:10px">
-                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick="editQuestion('${id}', ${JSON.stringify(q).replace(/"/g, '"')})">✏️ تعديل</button>
-                    <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">🗑️ حذف</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    } catch(e) {
-        container.innerHTML = '<p style="color:red">خطأ في التحميل</p>';
+    if (!questionsCache) {
+        container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
+        return;    }
+    
+    if (Object.keys(questionsCache).length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>';
+        return;
     }
+    
+    container.innerHTML = '';
+    Object.entries(questionsCache).forEach(([id, q]) => {
+        const div = document.createElement('div');
+        div.className = 'q-item';
+        div.innerHTML = `
+            <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
+            <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
+            <div class="row" style="margin-top:10px">
+                <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick="editQuestion('${id}', ${JSON.stringify(q).replace(/"/g, '"')})">✏️ تعديل</button>
+                <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">🗑️ حذف</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
 }
 
 function addQuestionForm() {
@@ -489,6 +524,7 @@ function addQuestionForm() {
     document.getElementById('explanationText').value = '';
     document.getElementById('questionModal').style.display = 'flex';
 }
+
 function editQuestion(id, q) {
     editingQuestionId = id;
     document.getElementById('modalTitle').innerHTML = '✏️ تعديل السؤال';
@@ -502,7 +538,6 @@ function editQuestion(id, q) {
     document.getElementById('explanationText').value = q.e || '';
     document.getElementById('questionModal').style.display = 'flex';
 }
-
 async function saveQuestion() {
     const qText = document.getElementById('qText').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
@@ -537,7 +572,8 @@ async function saveQuestion() {
             alert('تم تعديل السؤال بنجاح');
         } else {
             await db.ref('questions').push(questionData);
-            alert('تم إضافة السؤال بنجاح');        }
+            alert('تم إضافة السؤال بنجاح');
+        }
         closeModal();
         loadQuestions();
     } catch(e) {
@@ -550,59 +586,55 @@ async function deleteQuestion(id) {
         try {
             await db.ref('questions/' + id).remove();
             alert('تم حذف السؤال');
-            loadQuestions();
-        } catch(e) {
+            loadQuestions();        } catch(e) {
             alert('خطأ: ' + e.message);
         }
     }
 }
 
-async function loadUsers() {
+function loadUsers() {
     const container = document.getElementById('usersList');
-    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     
-    try {
-        const snapshot = await db.ref('users').once('value');
-        const users = snapshot.val();
-        
-        if (!users) {
-            container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>';
-            return;
+    if (!usersCache) {
+        container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
+        return;
+    }
+    
+    if (Object.keys(usersCache).length === 0) {
+        container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>';
+        return;
+    }
+    
+    container.innerHTML = '';
+    Object.entries(usersCache).forEach(([key, user]) => {
+        let statusClass = '';
+        let statusText = '';
+        if (user.status === 'active') {
+            statusClass = 'tag-active';
+            statusText = 'نشط';
+        } else if (user.status === 'pending') {
+            statusClass = 'tag-pending';
+            statusText = 'قيد المراجعة';
+        } else {
+            statusClass = 'tag-suspended';
+            statusText = 'موقوف';
         }
         
-        container.innerHTML = '';
-        Object.entries(users).forEach(([key, user]) => {
-            let statusClass = '';
-            let statusText = '';
-            if (user.status === 'active') {
-                statusClass = 'tag-active';
-                statusText = 'نشط';
-            } else if (user.status === 'pending') {
-                statusClass = 'tag-pending';
-                statusText = 'قيد المراجعة';
-            } else {
-                statusClass = 'tag-suspended';
-                statusText = 'موقوف';
-            }
-            
-            const div = document.createElement('div');
-            div.className = 'user-item';            div.innerHTML = `
-                <div><strong>${user.name}</strong> <span class="tag ${statusClass}">${statusText}</span></div>
-                <div style="font-size:13px;color:#666">🏆 النقاط: ${user.totalPoints || 0}</div>
-                <div style="font-size:12px;color:#888">🔑 ${user.password}</div>
-                <div class="row" style="margin-top:10px">
-                    ${user.status !== 'active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'active')">✅ تفعيل</button>` : ''}
-                    ${user.status !== 'suspended' ? `<button class="btn" style="background:#fdcb6e;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'suspended')">⛔ إيقاف</button>` : ''}
-                    <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteUser('${key}', '${user.name}')">🗑️ حذف</button>
-                </div>
-            `;
-            container.appendChild(div);
-        });
-    } catch(e) {
-        container.innerHTML = '<p style="color:red">خطأ في التحميل</p>';
-    }
+        const div = document.createElement('div');
+        div.className = 'user-item';
+        div.innerHTML = `
+            <div><strong>${user.name}</strong> <span class="tag ${statusClass}">${statusText}</span></div>
+            <div style="font-size:13px;color:#666">🏆 النقاط: ${user.totalPoints || 0}</div>
+            <div style="font-size:12px;color:#888">🔑 ${user.password}</div>
+            <div class="row" style="margin-top:10px">
+                ${user.status !== 'active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'active')">✅ تفعيل</button>` : ''}
+                ${user.status !== 'suspended' ? `<button class="btn" style="background:#fdcb6e;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'suspended')">⛔ إيقاف</button>` : ''}
+                <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteUser('${key}', '${user.name}')">🗑️ حذف</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
 }
-
 async function updateUserStatus(key, status) {
     try {
         await db.ref('users/' + key).update({ status: status });
@@ -632,10 +664,15 @@ function closeModal() {
 
 // ========== بدء التشغيل - استعادة الجلسة ==========
 function restoreSession() {
+    console.log('🔄 بدء استعادة الجلسة...');
     const savedUser = loadSession();
+    
     if (savedUser) {
         currentUser = savedUser;
-        if (currentUser.isAdmin) {            showScreen('adminScreen');
+        console.log('✅ تم استرجاع المستخدم:', currentUser);
+        
+        if (currentUser.isAdmin) {
+            showScreen('adminScreen');
             loadQuestions();
             loadUsers();
         } else {
@@ -643,12 +680,23 @@ function restoreSession() {
             startNewQuiz();
         }
     } else {
+        console.log('ℹ️ لا توجد جلسة محفوظة');
         showLanding();
     }
-}
+    
+    hideLoading();}
 
-// بدء التشغيل
-restoreSession();
+// انتظار تحميل Firebase ثم استعادة الجلسة
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        if (firebaseReady) {
+            restoreSession();
+        } else {
+            console.log('⏳ انتظار تهيئة Firebase...');
+            setTimeout(restoreSession, 1000);
+        }
+    }, 500);
+});
 </script>
 </body>
 </html>
