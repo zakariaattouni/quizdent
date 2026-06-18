@@ -4,7 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>مدرب التشخيص السني - د. زكريا عطوني</title>
-<link rel="manifest" href='data:application/json,{"name":"مدرب التشخيص السني","short_name":"مدرب الأسنان","start_url":".","display":"standalone","background_color":"#ffffff","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3063/3063162.png","sizes":"192x192","type":"image/png"}]}'>
+
+<!-- PWA Manifest -->
+<link rel="manifest" href='data:application/json,{"name":"مدرب التشخيص السني","short_name":"التشخيص السني","start_url":".","display":"standalone","background_color":"#ffffff","icons":[{"src":"https://cdn-icons-png.flaticon.com/512/3063/3063162.png","sizes":"192x192","type":"image/png"}]}'>
+
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px}
@@ -45,6 +48,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
     </div>
+    <!-- شاشة البداية -->
     <div id="landingScreen" class="screen active">
         <div class="card" style="text-align:center">
             <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
@@ -53,6 +57,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
         </div>
     </div>
+    <!-- شاشة تسجيل الدخول -->
     <div id="loginScreen" class="screen">
         <div class="card">
             <h2 style="text-align:center;color:#1e4a6e">تسجيل الدخول</h2>
@@ -62,6 +67,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
+    <!-- شاشة التسجيل -->
     <div id="registerScreen" class="screen">
         <div class="card">
             <h2 style="text-align:center;color:#1e4a6e">تسجيل جديد</h2>
@@ -71,6 +77,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-outline" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
+    <!-- شاشة الاختبار (الطالب) -->
     <div id="studentScreen" class="screen">
         <div class="card">
             <div class="row">
@@ -90,6 +97,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         </div>
         <button class="btn btn-danger" onclick="logout()">🚪 خروج</button>
     </div>
+    <!-- شاشة النتيجة -->
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
             <h2>📊 نتيجة الاختبار</h2>
@@ -100,6 +108,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-danger" style="margin-top:10px" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
+    <!-- شاشة الإدارة -->
     <div id="adminScreen" class="screen">
         <div class="card">
             <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>
@@ -116,6 +125,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-danger" style="margin-top:15px" onclick="logout()">🚪 خروج</button>
         </div>
     </div>
+    <!-- نافذة إضافة/تعديل سؤال -->
     <div id="questionModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
         <div class="card" style="max-width:500px;margin:50px auto">
             <h3 id="modalTitle">إضافة سؤال</h3>
@@ -128,14 +138,14 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <input type="text" id="questionImageUrl" placeholder="رابط صورة (اختياري)">
             <textarea id="explanationText" rows="3" placeholder="الشرح العلمي"></textarea>
             <button class="btn" onclick="saveQuestion()">💾 حفظ</button>
-            <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
+            <button class="btn btn-outline" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
 </div>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
-// --- كود الـ PWA ---
+// --- كود PWA لتمكين التثبيت ---
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('data:text/javascript,self.addEventListener("fetch",()=>{})');
 }
@@ -157,6 +167,7 @@ let currentIndex = 0;
 let currentScore = 0;
 let currentWrong = [];
 let editingQuestionId = null;
+
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -167,7 +178,7 @@ try {
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
 }
 
-// --- عند فتح الصفحة: استعادة الجلسة ---
+// --- استمرار الجلسة عند إعادة التحميل ---
 window.onload = () => {
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
@@ -186,9 +197,15 @@ window.onload = () => {
 };
 
 // ========== دوال الشاشات ==========
-function showLanding() { showScreen('landingScreen'); }
-function showLogin() { showScreen('loginScreen'); }
-function showRegister() { showScreen('registerScreen'); }
+function showLanding() {
+    showScreen('landingScreen');
+}
+function showLogin() {
+    showScreen('loginScreen');
+}
+function showRegister() {
+    showScreen('registerScreen');
+}
 function showAdminLogin() {
     showScreen('loginScreen');
     document.getElementById('loginUsername').value = 'admin';
@@ -208,6 +225,7 @@ async function doLogin() {
         return;
     }
     
+    // دخول الإدارة
     if (username === 'admin' && btoa(password) === 'c2FsZW0xOTU5') {
         currentUser = { isAdmin: true, name: 'admin' };
         localStorage.setItem('userSession', JSON.stringify(currentUser)); // حفظ الجلسة
@@ -319,6 +337,7 @@ function renderQuestion() {
     expDiv.style.display = 'none';
     nextBtn.style.display = 'none';
     
+    // عرض الصورة إذا وجدت
     if (q.img && q.img.trim()) {
         caseImg.src = q.img;
         imgContainer.style.display = 'block';
@@ -326,6 +345,7 @@ function renderQuestion() {
         imgContainer.style.display = 'none';
     }
     
+    // عرض الخيارات بشكل عشوائي
     const options = [...q.o];
     options.sort(() => Math.random() - 0.5);
     
@@ -342,6 +362,7 @@ function checkAnswer(selected, correct, explanation, element) {
     const optsDiv = document.getElementById('optionsContainer');
     const expDiv = document.getElementById('explanation');
     
+    // تعطيل جميع الخيارات
     optsDiv.querySelectorAll('.option').forEach(opt => {
         opt.style.pointerEvents = 'none';
     });
@@ -351,12 +372,14 @@ function checkAnswer(selected, correct, explanation, element) {
         currentScore += 10;
         document.getElementById('scoreDisplay').innerHTML = `⭐ ${currentScore} نقطة`;
         
+        // تحديث النقاط في قاعدة البيانات
         if (currentUser && !currentUser.isAdmin) {
             const userKey = currentUser.key;
             db.ref('users/' + userKey + '/totalPoints').transaction(p => (p || 0) + 10);
         }
     } else {
         element.classList.add('wrong');
+        // أظهر الخيار الصحيح
         optsDiv.querySelectorAll('.option').forEach(opt => {
             if (opt.innerHTML === correct) {
                 opt.classList.add('correct');
@@ -369,9 +392,11 @@ function checkAnswer(selected, correct, explanation, element) {
         });
     }
     
+    // عرض الشرح
     expDiv.innerHTML = `<strong>📖 الشرح:</strong><br>${explanation}`;
     expDiv.style.display = 'block';
     
+    // إظهار زر التالي
     const nextBtn = document.getElementById('nextBtn');
     nextBtn.style.display = 'block';
 }
