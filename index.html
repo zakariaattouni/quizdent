@@ -6,15 +6,13 @@
 <meta name="theme-color" content="#1e4a6e">
 <meta name="mobile-web-app-capable" content="yes">
 <title>مدرب التشخيص السني - د. زكريا عطوني</title>
-
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="التشخيص السني">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.container{max-width:600px;margin:0 auto;padding-bottom:70px; /* مساحة للتيكر */ }
+.container{max-width:600px;margin:0 auto;padding-bottom:70px;}
 .header{background:linear-gradient(135deg,#1e4a6e,#2c9b7a);border-radius:20px;padding:20px;text-align:center;color:#fff;margin-bottom:15px;position:relative}
 .card{background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-bottom:15px}
 .btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px;transition:transform .15s}
@@ -46,13 +44,10 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .install-banner{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:12px;border-radius:12px;text-align:center;margin-bottom:15px;cursor:pointer;font-weight:bold}
-
-/* ====== أنماط الإشعارات ====== */.pending-badge{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;display:none;animation:pulse 1.5s infinite;z-index:10}
+.pending-badge{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;display:none;animation:pulse 1.5s infinite;z-index:10}
 .pending-badge:hover{background:#dc2626}
 @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(239,68,68,0.7)}50%{transform:scale(1.05);box-shadow:0 0 0 10px rgba(239,68,68,0)}}
-
-.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px;pointer-events:none}
-.toast{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:16px 20px;border-radius:16px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:12px;animation:slideIn 0.4s ease-out;pointer-events:auto;cursor:pointer}
+.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px;pointer-events:none}.toast{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:16px 20px;border-radius:16px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:12px;animation:slideIn 0.4s ease-out;pointer-events:auto;cursor:pointer}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669)}
 @keyframes slideIn{from{transform:translateY(-100px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.hiding{animation:slideOut 0.3s ease-in forwards}
@@ -62,7 +57,6 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .toast-title{font-weight:bold;font-size:15px;margin-bottom:3px}
 .toast-message{font-size:13px;opacity:0.95}
 .toast-close{background:rgba(255,255,255,0.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer}
-
 .requests-modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:2000;padding:20px;overflow:auto}
 .requests-modal-content{max-width:500px;margin:50px auto;background:#fff;border-radius:20px;padding:25px}
 .request-item{background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:12px;padding:15px;margin:10px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
@@ -72,49 +66,42 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .request-item .actions{display:flex;gap:5px}
 .request-item .actions button{padding:6px 12px;font-size:12px;width:auto;margin:0}
 
-/* ====== تيكر (حركة من اليسار إلى اليمين) ====== */
+/* ====== التيكر - الاتجاه من اليسار لليمين ====== */
 .ticker-wrapper {
     position: fixed;
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color: #b3d9ff; /* أزرق طبي فاتح */
-    padding: 12px 0;
+    background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
+    padding: 8px 0;
     overflow: hidden;
     z-index: 100;
-    box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
-    border-top: 2px solid #80bfff;
-    display: none; /* يظهر فقط عند تفعيل التيكر */
+    box-shadow: 0 -3px 12px rgba(0,0,0,0.25);
+    display: none;
 }
 .ticker-track {
-    display: flex;
+    display: inline-flex;
     white-space: nowrap;
-    animation: tickerScroll 25s linear infinite;
-    direction: ltr; /* الحركة من اليسار لليمين */
+    direction: ltr;
+    will-change: transform;
+    padding: 2px 0;
 }
 .ticker-item {
     display: inline-block;
-    padding: 0 40px;
-    font-size: 22px;
-    font-weight: 900;
-    color: #1a3a5c; /* لون غامق مناسب للخلفية الفاتحة */
+    padding: 0 18px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    text-shadow: 0 0 5px rgba(255,255,255,0.3);
-    letter-spacing: 0.5px;
+    line-height: 1.4;
+    white-space: nowrap;
 }
-.ticker-item.separator {
-    color: #2c5f8a;
-    font-size: 28px;
-    padding: 0 10px;
-}
-
-/* تعديل اتجاه الحركة: من اليسار إلى اليمين */
-@keyframes tickerScroll {
-    0% { transform: translateX(-50%); }  /* يبدأ منزاحاً لليسار */
-    100% { transform: translateX(0); }   /* ينتهي في مكانه الأصلي (يمين) */
+.ticker-item.separator {    color: rgba(255,255,255,0.55);
+    font-size: 10px;
+    padding: 0 6px;
+    vertical-align: middle;
 }
 
-/* ====== إدارة التيكر في لوحة التحكم ====== */
 .ticker-admin-item {
     background: #f0f7ff;
     border-radius: 12px;
@@ -130,6 +117,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .ticker-admin-item .text {
     font-weight: bold;
     color: #1e4a6e;
+    word-break: break-word;
 }
 .ticker-admin-item .actions button {
     width: auto;
@@ -157,28 +145,24 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     <div class="header">
         <button id="headerLogoutBtn" class="btn-header-logout" onclick="logout()">خروج 🚪</button>
         <div id="pendingBadge" class="pending-badge" onclick="showRequestsModal()">
-            🔔 <span id="pendingCount">0</span> طلب جديد
-        </div>
+            🔔 <span id="pendingCount">0</span> طلب جديد        </div>
         <h1>🦷 مدرب التشخيص السني</h1>
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
     </div>
-
     <div id="installBanner" class="install-banner" onclick="installApp()" style="display:none">
         📲 تثبيت التطبيق على الشاشة الرئيسية
     </div>
-
     <div id="toastContainer" class="toast-container"></div>
-
     <div id="landingScreen" class="screen active">
         <div class="card" style="text-align:center">
             <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
             <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
             <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
-            <button class="btn btn-install" id="installBtn" onclick="installApp()">📲 تثبيت التطبيق</button>        </div>
+            <button class="btn btn-install" id="installBtn" onclick="installApp()">📲 تثبيت التطبيق</button>
+        </div>
     </div>
-
     <div id="loginScreen" class="screen">
         <div class="card">
             <h2 style="text-align:center;color:#1e4a6e">تسجيل الدخول</h2>
@@ -188,7 +172,6 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
-
     <div id="registerScreen" class="screen">
         <div class="card">
             <h2 style="text-align:center;color:#1e4a6e">تسجيل جديد</h2>
@@ -198,7 +181,6 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333" onclick="showLanding()">رجوع</button>
         </div>
     </div>
-
     <div id="studentScreen" class="screen">
         <div class="card">
             <div class="row">
@@ -212,9 +194,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div id="optionsContainer"></div>
             <div id="explanation" class="exp-box"></div>
             <button id="nextBtn" class="btn" style="display:none" onclick="nextQuestion()">التالي ➡️</button>
-        </div>
-    </div>
-
+        </div>    </div>
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
             <h2>📊 نتيجة الاختبار</h2>
@@ -224,17 +204,15 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" onclick="startNewQuiz()">🔄 اختبار جديد</button>
         </div>
     </div>
-
-    <div id="adminScreen" class="screen">        <div class="card">
+    <div id="adminScreen" class="screen">
+        <div class="card">
             <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>
-            
             <div id="newRequestsSection" style="display:none;margin-bottom:15px">
                 <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);padding:15px;border-radius:12px;border:2px solid #f59e0b">
                     <h4 style="color:#92400e;margin-bottom:10px"> طلبات اشتراك جديدة (<span id="newRequestsCount">0</span>)</h4>
                     <button class="btn" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="showRequestsModal()">📋 عرض الطلبات</button>
                 </div>
             </div>
-            
             <h4 style="margin:15px 0 5px">👥 الطلاب</h4>
             <button class="btn btn-admin" onclick="loadUsers()">📋 عرض الطلاب</button>
             <div id="usersList"></div>
@@ -247,7 +225,6 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div id="tickerStatus" style="margin-top:8px;font-size:14px;"></div>
         </div>
     </div>
-
     <div id="questionModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
         <div class="card" style="max-width:500px;margin:50px auto">
             <h3 id="modalTitle">إضافة سؤال</h3>
@@ -263,16 +240,12 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
-    
     <div id="requestsModal" class="requests-modal">
         <div class="requests-modal-content">
             <h3 style="color:#f59e0b;text-align:center;margin-bottom:15px">🔔 الطلبات المعلقة</h3>
-            <div id="requestsList"></div>
-            <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
+            <div id="requestsList"></div>            <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
         </div>
     </div>
-
-    <!-- مودال إدارة التيكر -->
     <div id="tickerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
         <div class="card" style="max-width:500px;margin:50px auto">
             <h3 style="color:#1e4a6e;text-align:center">📢 إدارة الشريط المتحرك</h3>
@@ -284,21 +257,16 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeTickerManager()">إغلاق</button>
         </div>
     </div>
-
 </div>
-
-<!-- التيكر الفعلي (يظهر في أسفل الصفحة) -->
 <div id="tickerWrapper" class="ticker-wrapper">
     <div id="tickerTrack" class="ticker-track"></div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
 // ========== PWA SETUP ==========
 const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2c9b7a"/><stop offset="100%" stop-color="#1e4a6e"/></linearGradient></defs><rect width="512" height="512" rx="96" fill="url(#g)"/><path fill="#fff" d="M340 90c-40 0-60 20-84 20s-44-20-84-20c-50 0-90 42-90 94 0 52 20 120 44 168 18 36 34 70 58 70 22 0 28-26 48-70 12-26 22-44 32-44s20 18 32 44c20 44 26 70 48 70 24 0 40-34 58-70 24-48 44-116 44-168 0-52-40-94-90-94z"/><text x="256" y="470" font-family="Arial" font-size="36" font-weight="bold" text-anchor="middle" fill="#fff">د. ز. عطوني</text></svg>`;
 let appIconUrl = null;
-
 async function svgToPng(svg, size) {
     return new Promise((resolve) => {
         const img = new Image();
@@ -319,14 +287,12 @@ async function svgToPng(svg, size) {
         img.src = url;
     });
 }
-
 async function setupManifest() {
     const icon192 = await svgToPng(ICON_SVG, 192);
     const icon512 = await svgToPng(ICON_SVG, 512);
     const manifest = {
         id: "/dental-coach-app-v1",
-        name: "مدرب التشخيص السني - د. زكريا عطوني",
-        short_name: "التشخيص السني",
+        name: "مدرب التشخيص السني - د. زكريا عطوني",        short_name: "التشخيص السني",
         description: "تطبيق تدريبي للتشخيص السني",
         start_url: ".",
         scope: ".",
@@ -345,14 +311,13 @@ async function setupManifest() {
     const manifestUrl = URL.createObjectURL(blob);
     let link = document.querySelector('link[rel="manifest"]');
     if (!link) {
-        link = document.createElement('link');        link.rel = 'manifest';
+        link = document.createElement('link');
+        link.rel = 'manifest';
         document.head.appendChild(link);
     }
     link.href = manifestUrl;
 }
-
 setupManifest();
-
 let deferredPrompt = null;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
@@ -362,7 +327,6 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if (btn) btn.style.display = 'block';
     if (banner) banner.style.display = 'block';
 });
-
 function installApp() {
     if (!deferredPrompt) {
         alert('للتثبيت: اضغط على ⋮ في أعلى المتصفح ثم "إضافة إلى الشاشة الرئيسية"');
@@ -376,10 +340,8 @@ function installApp() {
         document.getElementById('installBanner').style.display = 'none';
     });
 }
-
 // ========== Firebase Setup ==========
-const firebaseConfig = {
-    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
+const firebaseConfig = {    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
     projectId: "quizdental-c4d5a",
     databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
@@ -387,7 +349,6 @@ const firebaseConfig = {
     messagingSenderId: "750036143183",
     appId: "1:750036143183:web:721a31ef795f973887ee3a"
 };
-
 let db = null;
 let currentUser = null;
 let currentQuestions = [];
@@ -403,23 +364,19 @@ try {
     console.error("Firebase error:", e);
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
 }
-
 // ========== نظام الإشعارات ==========
 let lastPendingCount = 0;
 let checkInterval = null;
 let notifPermission = 'default';
 let pushSupported = 'Notification' in window;
-
 async function requestNotificationPermission() {
     if (!pushSupported) {
         showToast('🔔 تنبيه', 'الإشعارات الداخلية تعمل بشكل كامل', 'success');
         return;
     }
-    
     try {
         const permission = await Notification.requestPermission();
         notifPermission = permission;
-        
         if (permission === 'granted') {
             showToast('✅ تم التفعيل', 'ستصلك إشعارات خارجية أيضاً');
             new Notification(' مدرب التشخيص السني', {
@@ -433,12 +390,10 @@ async function requestNotificationPermission() {
         }
     } catch(e) {
         console.error('خطأ:', e);
-    }
-}
-
+    }}
 function sendPushNotification(title, body, userName = null) {
-    if (!pushSupported) return;    if (notifPermission !== 'granted') return;
-    
+    if (!pushSupported) return;
+    if (notifPermission !== 'granted') return;
     try {
         const notif = new Notification(title, {
             body: body,
@@ -450,7 +405,6 @@ function sendPushNotification(title, body, userName = null) {
             requireInteraction: true,
             vibrate: [200, 100, 200]
         });
-        
         notif.onclick = () => {
             window.focus();
             notif.close();
@@ -459,7 +413,6 @@ function sendPushNotification(title, body, userName = null) {
                 setTimeout(() => showRequestsModal(), 300);
             }
         };
-        
         setTimeout(() => {
             try { notif.close(); } catch(e) {}
         }, 15000);
@@ -467,7 +420,6 @@ function sendPushNotification(title, body, userName = null) {
         console.error('خطأ Push:', e);
     }
 }
-
 function playBeep() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -483,13 +435,12 @@ function playBeep() {
             gain.connect(ctx.destination);
             osc.frequency.value = n.f;
             osc.type = 'sine';
-            gain.gain.setValueAtTime(0.3, ctx.currentTime + n.s);            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + n.s + n.d);
+            gain.gain.setValueAtTime(0.3, ctx.currentTime + n.s);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + n.s + n.d);
             osc.start(ctx.currentTime + n.s);
             osc.stop(ctx.currentTime + n.s + n.d);
-        });
-    } catch(e) {}
+        });    } catch(e) {}
 }
-
 function showToast(title, message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -508,9 +459,7 @@ function showToast(title, message, type = 'info') {
         }
     };
     container.appendChild(toast);
-    
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    
     setTimeout(() => {
         if (toast.parentElement) {
             toast.classList.add('hiding');
@@ -518,38 +467,30 @@ function showToast(title, message, type = 'info') {
         }
     }, 8000);
 }
-
 function checkPendingUsers() {
     if (!db || !currentUser || !currentUser.isAdmin) return;
-    
     try {
         db.ref('users').once('value').then(snapshot => {
             const users = snapshot.val() || {};
             let pendingCount = 0;
-            const pendingUsers = [];            
+            const pendingUsers = [];
             Object.entries(users).forEach(([key, user]) => {
                 if (user.status === 'pending') {
                     pendingCount++;
                     pendingUsers.push({ key, ...user });
                 }
             });
-            
             const badge = document.getElementById('pendingBadge');
             const countSpan = document.getElementById('pendingCount');
             const section = document.getElementById('newRequestsSection');
             const sectionCount = document.getElementById('newRequestsCount');
-            
             if (pendingCount > 0) {
                 if (badge) { badge.style.display = 'block'; countSpan.textContent = pendingCount; }
                 if (section) { section.style.display = 'block'; sectionCount.textContent = pendingCount; }
-                
                 if (pendingCount > lastPendingCount && lastPendingCount >= 0) {
-                    const newCount = pendingCount - lastPendingCount;
-                    const newUsers = pendingUsers.slice(-newCount);
-                    
+                    const newCount = pendingCount - lastPendingCount;                    const newUsers = pendingUsers.slice(-newCount);
                     showToast('🆕 طلبات جديدة!', `${newCount} طلب اشتراك جديد`);
                     playBeep();
-                    
                     newUsers.forEach(u => {
                         sendPushNotification(
                             ' طلب اشتراك جديد!',
@@ -557,7 +498,6 @@ function checkPendingUsers() {
                             u.name
                         );
                     });
-                    
                     if (document.getElementById('adminScreen').classList.contains('active')) {
                         loadUsers();
                     }
@@ -566,7 +506,6 @@ function checkPendingUsers() {
                 if (badge) badge.style.display = 'none';
                 if (section) section.style.display = 'none';
             }
-            
             lastPendingCount = pendingCount;
         }).catch(err => {
             console.error('Error:', err);
@@ -575,43 +514,32 @@ function checkPendingUsers() {
         console.error('Error:', e);
     }
 }
-
 function startNotificationSystem() {
     if (!currentUser || !currentUser.isAdmin) return;
-    
     if (pushSupported && notifPermission === 'default') {
         setTimeout(() => requestNotificationPermission(), 1500);
     }
-    
     checkPendingUsers();
-    
     if (checkInterval) clearInterval(checkInterval);
     checkInterval = setInterval(checkPendingUsers, 10000);
 }
-
 function showRequestsModal() {
     if (!db) return;
-    
     const modal = document.getElementById('requestsModal');
     const list = document.getElementById('requestsList');
     list.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     modal.style.display = 'block';
-    
     db.ref('users').once('value').then(snapshot => {
         const users = snapshot.val() || {};
         const pendingUsers = [];
-        
         Object.entries(users).forEach(([key, user]) => {
             if (user.status === 'pending') {
                 pendingUsers.push({ key, ...user });
             }
         });
-        
-        if (pendingUsers.length === 0) {
-            list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
+        if (pendingUsers.length === 0) {            list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
             return;
         }
-        
         list.innerHTML = '';
         pendingUsers.forEach(user => {
             const registeredTime = user.registeredAt ? new Date(user.registeredAt).toLocaleString('ar-EG') : 'غير معروف';
@@ -621,7 +549,8 @@ function showRequestsModal() {
                 <div class="info">
                     <div class="name"> ${user.name}</div>
                     <div class="time">📅 ${registeredTime}</div>
-                </div>                <div class="actions">
+                </div>
+                <div class="actions">
                     <button class="btn" style="background:#00b894" onclick="quickApprove('${user.key}', '${user.name.replace(/'/g, "\\'")}')">✅ تفعيل</button>
                     <button class="btn" style="background:#e17055" onclick="quickReject('${user.key}', '${user.name.replace(/'/g, "\\'")}')">🗑️ حذف</button>
                 </div>
@@ -632,11 +561,9 @@ function showRequestsModal() {
         list.innerHTML = '<p style="color:red;text-align:center">خطأ في التحميل</p>';
     });
 }
-
 function closeRequestsModal() {
     document.getElementById('requestsModal').style.display = 'none';
 }
-
 async function quickApprove(key, name) {
     if (!db) return;
     try {
@@ -649,7 +576,6 @@ async function quickApprove(key, name) {
         showToast('❌ خطأ', e.message);
     }
 }
-
 async function quickReject(key, name) {
     if (!confirm(`هل تريد حذف طلب "${name}"؟`)) return;
     if (!db) return;
@@ -660,22 +586,17 @@ async function quickReject(key, name) {
         loadUsers();
         checkPendingUsers();
     } catch(e) {
-        showToast('❌ خطأ', e.message);
-    }
+        showToast('❌ خطأ', e.message);    }
 }
-
 // ========== دوال التيكر ==========
 let tickerItems = [];
-let tickerInterval = null;
 
-// تحميل التيكر من Firebase وتحديث العرض
 async function loadTicker() {
     if (!db) return;
     try {
         const snapshot = await db.ref('ticker').once('value');
         const data = snapshot.val();
         tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
-        // ترتيب حسب الترتيب (إن وجد) أو حسب المفتاح
         tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
         updateTickerDisplay();
         updateTickerStatus();
@@ -687,46 +608,88 @@ async function loadTicker() {
     }
 }
 
-// تحديث شريط التيكر في الواجهة
-function updateTickerDisplay() {
-    const wrapper = document.getElementById('tickerWrapper');
-    const track = document.getElementById('tickerTrack');
-    const activeItems = tickerItems.filter(item => item.active !== false);
-    
-    if (activeItems.length === 0) {
-        wrapper.style.display = 'none';
-        return;
-    }
-    
-    // نعرض التيكر فقط إذا كان المستخدم طالباً وليس إدارة
-    if (currentUser && currentUser.isAdmin) {
-        wrapper.style.display = 'none';
-        return;
-    }
-    
-    wrapper.style.display = 'block';
-    track.innerHTML = '';
-    
-    // نكرر النصوص عدة مرات لضمان استمرارية الحركة
-    const repeatCount = 3;
-    for (let r = 0; r < repeatCount; r++) {
-        activeItems.forEach((item, idx) => {
+function measureTickerWidth(items) {
+    try {
+        const temp = document.createElement('div');
+        temp.style.cssText = 'position:absolute;left:-99999px;top:-99999px;white-space:nowrap;display:inline-flex;visibility:hidden;pointer-events:none;';
+        items.forEach(item => {
             const span = document.createElement('span');
             span.className = 'ticker-item';
             span.textContent = item.text;
-            track.appendChild(span);
-            // إضافة فاصل بين النصوص
-            if (idx < activeItems.length - 1 || r < repeatCount - 1) {
+            temp.appendChild(span);
+            const sep = document.createElement('span');
+            sep.className = 'ticker-item separator';
+            sep.textContent = '◆';
+            temp.appendChild(sep);
+        });
+        document.body.appendChild(temp);
+        const width = temp.scrollWidth;
+        document.body.removeChild(temp);
+        return width > 0 ? width : 1000;
+    } catch(e) {
+        return 1000;
+    }
+}
+
+function updateTickerDisplay() {
+    try {
+        const wrapper = document.getElementById('tickerWrapper');
+        const track = document.getElementById('tickerTrack');
+        const activeItems = tickerItems.filter(item => item.active !== false);
+        if (activeItems.length === 0 || (currentUser && currentUser.isAdmin)) {
+            wrapper.style.display = 'none';
+            return;
+        }
+
+        wrapper.style.display = 'block';
+        track.innerHTML = '';
+        track.style.animation = 'none';
+
+        const oneSetWidth = measureTickerWidth(activeItems);
+        if (oneSetWidth <= 0) return;
+
+        const buildSet = () => {
+            activeItems.forEach(item => {
+                const span = document.createElement('span');
+                span.className = 'ticker-item';
+                span.textContent = item.text;
+                track.appendChild(span);
                 const sep = document.createElement('span');
                 sep.className = 'ticker-item separator';
                 sep.textContent = '◆';
                 track.appendChild(sep);
+            });
+        };
+
+        buildSet();
+        buildSet();
+        buildSet();
+
+        const styleId = 'ticker-keyframes-dynamic';
+        let styleEl = document.getElementById(styleId);
+        if (!styleEl) {
+            styleEl = document.createElement('style');
+            styleEl.id = styleId;
+            document.head.appendChild(styleEl);
+        }
+        
+        styleEl.textContent = `
+            @keyframes tickerScrollPixels {
+                0%   { transform: translateX(-${oneSetWidth}px); }
+                100% { transform: translateX(0px); }
             }
-        });
+        `;
+
+        const speed = 50;
+        let duration = oneSetWidth / speed;
+        duration = Math.max(15, Math.min(120, duration));
+
+        void track.offsetWidth;        track.style.animation = `tickerScrollPixels ${duration}s linear infinite`;
+    } catch(e) {
+        console.error('Ticker display error:', e);
     }
 }
 
-// تحديث حالة التيكر في لوحة الإدارة
 function updateTickerStatus() {
     const statusDiv = document.getElementById('tickerStatus');
     const activeCount = tickerItems.filter(item => item.active !== false).length;
@@ -738,7 +701,6 @@ function updateTickerStatus() {
     }
 }
 
-// عرض قائمة إدارة التيكر في المودال
 function renderTickerAdminList() {
     const container = document.getElementById('tickerItemsList');
     if (!container) return;
@@ -766,14 +728,12 @@ function renderTickerAdminList() {
     });
 }
 
-// إضافة نص جديد للتيكر
 async function addTickerItem() {
     const input = document.getElementById('tickerInput');
     const text = input.value.trim();
     if (!text) {
         alert('الرجاء إدخال نص');
-        return;
-    }
+        return;    }
     if (!db) return;
     try {
         const newRef = db.ref('ticker').push();
@@ -791,7 +751,6 @@ async function addTickerItem() {
     }
 }
 
-// تبديل حالة النص (نشط/غير نشط)
 async function toggleTickerItem(id) {
     if (!db) return;
     try {
@@ -807,7 +766,6 @@ async function toggleTickerItem(id) {
     }
 }
 
-// حذف نص من التيكر
 async function deleteTickerItem(id) {
     if (!confirm('هل تريد حذف هذا النص من التيكر؟')) return;
     if (!db) return;
@@ -821,13 +779,10 @@ async function deleteTickerItem(id) {
     }
 }
 
-// فتح مودال إدارة التيكر
 function openTickerManager() {
     document.getElementById('tickerModal').style.display = 'block';
     renderTickerAdminList();
-}
-
-function closeTickerManager() {
+}function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
 
@@ -837,21 +792,21 @@ window.onload = () => {
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         document.getElementById('headerLogoutBtn').style.display = 'block';
-        if (currentUser.isAdmin) {            showScreen('adminScreen');
+        if (currentUser.isAdmin) {
+            showScreen('adminScreen');
             loadQuestions();
             loadUsers();
             startNotificationSystem();
-            loadTicker(); // تحميل التيكر
+            loadTicker();
         } else {
             showScreen('studentScreen');
             startNewQuiz();
-            loadTicker(); // تحميل التيكر ليظهر أسفل
+            loadTicker();
         }
     } else {
         showLanding();
     }
 };
-
 function showLanding() { showScreen('landingScreen'); }
 function showLogin() { showScreen('loginScreen'); }
 function showRegister() { showScreen('registerScreen'); }
@@ -863,25 +818,20 @@ function showAdminLogin() {
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    // إظهار/إخفاء التيكر حسب الصفحة
     const wrapper = document.getElementById('tickerWrapper');
     if (screenId === 'studentScreen' && currentUser && !currentUser.isAdmin) {
-        // سيتم التحكم به عبر updateTickerDisplay
         loadTicker();
     } else {
         wrapper.style.display = 'none';
     }
 }
-
 async function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
     if (!username || !password) { alert('الرجاء إدخال اسم المستخدم وكلمة السر'); return; }
-    
     if (username === 'admin' && btoa(password) === 'c2FsZW0xOTU5') {
         currentUser = { isAdmin: true, name: 'admin' };
-        localStorage.setItem('userSession', JSON.stringify(currentUser));
-        document.getElementById('headerLogoutBtn').style.display = 'block';
+        localStorage.setItem('userSession', JSON.stringify(currentUser));        document.getElementById('headerLogoutBtn').style.display = 'block';
         showScreen('adminScreen');
         loadQuestions();
         loadUsers();
@@ -897,7 +847,8 @@ async function doLogin() {
             currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
             localStorage.setItem('userSession', JSON.stringify(currentUser));
             document.getElementById('headerLogoutBtn').style.display = 'block';
-            showScreen('studentScreen');            startNewQuiz();
+            showScreen('studentScreen');
+            startNewQuiz();
             loadTicker();
         } else if (user && user.status === 'pending') {
             alert('حسابك قيد المراجعة من قبل المشرف');
@@ -908,7 +859,6 @@ async function doLogin() {
         }
     } catch(e) { alert('خطأ: ' + e.message); }
 }
-
 async function doRegister() {
     const name = document.getElementById('registerName').value.trim();
     const password = document.getElementById('registerPassword').value.trim();
@@ -923,7 +873,6 @@ async function doRegister() {
         showLanding();
     } catch(e) { alert('خطأ: ' + e.message); }
 }
-
 function logout() {
     if (checkInterval) { clearInterval(checkInterval); checkInterval = null; }
     localStorage.removeItem('userSession');
@@ -931,11 +880,9 @@ function logout() {
     currentUser = null;
     currentQuestions = [];
     currentIndex = 0;
-    currentScore = 0;
-    currentWrong = [];
+    currentScore = 0;    currentWrong = [];
     location.reload();
 }
-
 async function startNewQuiz() {
     try {
         const snapshot = await db.ref('questions').once('value');
@@ -947,8 +894,8 @@ async function startNewQuiz() {
         currentScore = 0;
         currentWrong = [];
         renderQuestion();
-    } catch(e) { alert('خطأ في تحميل الأسئلة: ' + e.message); }}
-
+    } catch(e) { alert('خطأ في تحميل الأسئلة: ' + e.message); }
+}
 function renderQuestion() {
     if (currentIndex >= currentQuestions.length) { showResult(); return; }
     const q = currentQuestions[currentIndex];
@@ -957,12 +904,10 @@ function renderQuestion() {
     document.getElementById('questionText').innerHTML = q.q;
     document.getElementById('explanation').style.display = 'none';
     document.getElementById('nextBtn').style.display = 'none';
-    
     const imgContainer = document.getElementById('questionImage');
     const caseImg = document.getElementById('caseImage');
     if (q.img && q.img.trim()) { caseImg.src = q.img; imgContainer.style.display = 'block'; }
     else { imgContainer.style.display = 'none'; }
-    
     const options = [...q.o].sort(() => Math.random() - 0.5);
     const optsDiv = document.getElementById('optionsContainer');
     optsDiv.innerHTML = '';
@@ -974,11 +919,9 @@ function renderQuestion() {
         optsDiv.appendChild(d);
     });
 }
-
 function checkAnswer(selected, correct, explanation, element) {
     const optsDiv = document.getElementById('optionsContainer');
     optsDiv.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
-    
     if (selected === correct) {
         element.classList.add('correct');
         currentScore += 10;
@@ -986,8 +929,7 @@ function checkAnswer(selected, correct, explanation, element) {
         if (currentUser && !currentUser.isAdmin) {
             db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
         }
-    } else {
-        element.classList.add('wrong');
+    } else {        element.classList.add('wrong');
         optsDiv.querySelectorAll('.option').forEach(opt => {
             if (opt.innerHTML === correct) opt.classList.add('correct');
         });
@@ -998,7 +940,6 @@ function checkAnswer(selected, correct, explanation, element) {
     document.getElementById('nextBtn').style.display = 'block';
 }
 function nextQuestion() { currentIndex++; renderQuestion(); }
-
 function showResult() {
     const total = currentQuestions.length * 10;
     const percentage = Math.round((currentScore / total) * 100);
@@ -1015,7 +956,6 @@ function showResult() {
     }
     showScreen('resultScreen');
 }
-
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
@@ -1038,9 +978,7 @@ async function loadQuestions() {
             container.appendChild(div);
         });
     } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
-}
-
-function addQuestionForm() {
+}function addQuestionForm() {
     editingQuestionId = null;
     document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';
     ['qText','opt1','opt2','opt3','opt4','correctOpt','questionImageUrl','explanationText'].forEach(id => document.getElementById(id).value = '');
@@ -1059,7 +997,6 @@ function editQuestion(id, q) {
     document.getElementById('explanationText').value = q.e || '';
     document.getElementById('questionModal').style.display = 'flex';
 }
-
 async function saveQuestion() {
     const qText = document.getElementById('qText').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
@@ -1069,7 +1006,6 @@ async function saveQuestion() {
     const correct = document.getElementById('correctOpt').value.trim();
     const imgUrl = document.getElementById('questionImageUrl').value.trim();
     const explanation = document.getElementById('explanationText').value.trim();
-    
     if (!qText || !opt1 || !opt2 || !opt3 || !opt4 || !correct || !explanation) { alert('الرجاء ملء جميع الحقول'); return; }
     if (![opt1, opt2, opt3, opt4].includes(correct)) { alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة'); return; }
     const questionData = { q: qText, o: [opt1, opt2, opt3, opt4], c: correct, e: explanation, img: imgUrl };
@@ -1085,16 +1021,14 @@ async function saveQuestion() {
         loadQuestions();
     } catch(e) { alert('خطأ: ' + e.message); }
 }
-
 async function deleteQuestion(id) {
     if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
         try { await db.ref('questions/' + id).remove(); alert('تم حذف السؤال'); loadQuestions(); }
         catch(e) { alert('خطأ: ' + e.message); }
     }
 }
-
-async function loadUsers() {
-    const container = document.getElementById('usersList');    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
+async function loadUsers() {    const container = document.getElementById('usersList');
+    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     try {
         const snapshot = await db.ref('users').once('value');
         const users = snapshot.val();
@@ -1121,7 +1055,6 @@ async function loadUsers() {
         });
     } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
 }
-
 async function updateUserStatus(key, status) {
     try {
         await db.ref('users/' + key).update({ status });
@@ -1130,17 +1063,16 @@ async function updateUserStatus(key, status) {
         checkPendingUsers();
     } catch(e) { alert('خطأ: ' + e.message); }
 }
-
 async function deleteUser(key, name) {
     if (confirm(`هل أنت متأكد من حذف الطالب "${name}" نهائياً؟`)) {
         try { await db.ref('users/' + key).remove(); alert('تم حذف الطالب'); loadUsers(); checkPendingUsers(); }
         catch(e) { alert('خطأ: ' + e.message); }
     }
 }
-
 function closeModal() {
     document.getElementById('questionModal').style.display = 'none';
     editingQuestionId = null;
 }
 </script>
-</body></html>
+</body>
+</html>
