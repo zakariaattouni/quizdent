@@ -14,7 +14,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.container{max-width:600px;margin:0 auto}
+.container{max-width:600px;margin:0 auto;padding-bottom:70px; /* مساحة للتيكر */ }
 .header{background:linear-gradient(135deg,#1e4a6e,#2c9b7a);border-radius:20px;padding:20px;text-align:center;color:#fff;margin-bottom:15px;position:relative}
 .card{background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-bottom:15px}
 .btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px;transition:transform .15s}
@@ -71,7 +71,87 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .request-item .time{font-size:12px;color:#a16207;margin-top:3px}
 .request-item .actions{display:flex;gap:5px}
 .request-item .actions button{padding:6px 12px;font-size:12px;width:auto;margin:0}
-</style></head>
+
+/* ====== تيكر (حركة من اليسار إلى اليمين) ====== */
+.ticker-wrapper {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #b3d9ff; /* أزرق طبي فاتح */
+    padding: 12px 0;
+    overflow: hidden;
+    z-index: 100;
+    box-shadow: 0 -4px 15px rgba(0,0,0,0.15);
+    border-top: 2px solid #80bfff;
+    display: none; /* يظهر فقط عند تفعيل التيكر */
+}
+.ticker-track {
+    display: flex;
+    white-space: nowrap;
+    animation: tickerScroll 25s linear infinite;
+    direction: ltr; /* الحركة من اليسار لليمين */
+}
+.ticker-item {
+    display: inline-block;
+    padding: 0 40px;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1a3a5c; /* لون غامق مناسب للخلفية الفاتحة */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-shadow: 0 0 5px rgba(255,255,255,0.3);
+    letter-spacing: 0.5px;
+}
+.ticker-item.separator {
+    color: #2c5f8a;
+    font-size: 28px;
+    padding: 0 10px;
+}
+
+/* تعديل اتجاه الحركة: من اليسار إلى اليمين */
+@keyframes tickerScroll {
+    0% { transform: translateX(-50%); }  /* يبدأ منزاحاً لليسار */
+    100% { transform: translateX(0); }   /* ينتهي في مكانه الأصلي (يمين) */
+}
+
+/* ====== إدارة التيكر في لوحة التحكم ====== */
+.ticker-admin-item {
+    background: #f0f7ff;
+    border-radius: 12px;
+    padding: 12px 15px;
+    margin: 8px 0;
+    border-right: 3px solid #2c9b7a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.ticker-admin-item .text {
+    font-weight: bold;
+    color: #1e4a6e;
+}
+.ticker-admin-item .actions button {
+    width: auto;
+    padding: 4px 12px;
+    font-size: 12px;
+    margin: 0 3px;
+}
+.ticker-admin-item .status-badge {
+    font-size: 12px;
+    padding: 2px 12px;
+    border-radius: 20px;
+}
+.ticker-admin-item .status-badge.active {
+    background: #d4edda;
+    color: #155724;
+}
+.ticker-admin-item .status-badge.inactive {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+</head>
 <body>
 <div class="container">
     <div class="header">
@@ -162,6 +242,9 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn btn-admin" onclick="addQuestionForm()">➕ إضافة سؤال</button>
             <button class="btn btn-admin" style="margin-top:5px" onclick="loadQuestions()"> عرض الأسئلة</button>
             <div id="questionsList"></div>
+            <h4 style="margin:15px 0 5px">📢 إدارة الشريط المتحرك (التيكر)</h4>
+            <button class="btn btn-admin" onclick="openTickerManager()">⚙️ إدارة التيكر</button>
+            <div id="tickerStatus" style="margin-top:8px;font-size:14px;"></div>
         </div>
     </div>
 
@@ -188,6 +271,25 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
         </div>
     </div>
+
+    <!-- مودال إدارة التيكر -->
+    <div id="tickerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
+        <div class="card" style="max-width:500px;margin:50px auto">
+            <h3 style="color:#1e4a6e;text-align:center">📢 إدارة الشريط المتحرك</h3>
+            <div style="margin:15px 0">
+                <input type="text" id="tickerInput" placeholder="أدخل نصاً جديداً للتيكر" style="margin-bottom:5px">
+                <button class="btn btn-admin" onclick="addTickerItem()">➕ إضافة نص</button>
+            </div>
+            <div id="tickerItemsList"></div>
+            <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeTickerManager()">إغلاق</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- التيكر الفعلي (يظهر في أسفل الصفحة) -->
+<div id="tickerWrapper" class="ticker-wrapper">
+    <div id="tickerTrack" class="ticker-track"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
@@ -308,9 +410,6 @@ let checkInterval = null;
 let notifPermission = 'default';
 let pushSupported = 'Notification' in window;
 
-/**
- * طلب إذن الإشعارات
- */
 async function requestNotificationPermission() {
     if (!pushSupported) {
         showToast('🔔 تنبيه', 'الإشعارات الداخلية تعمل بشكل كامل', 'success');
@@ -337,9 +436,6 @@ async function requestNotificationPermission() {
     }
 }
 
-/**
- * إرسال Push Notification
- */
 function sendPushNotification(title, body, userName = null) {
     if (!pushSupported) return;    if (notifPermission !== 'granted') return;
     
@@ -372,9 +468,6 @@ function sendPushNotification(title, body, userName = null) {
     }
 }
 
-/**
- * تشغيل صوت تنبيه
- */
 function playBeep() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -397,9 +490,6 @@ function playBeep() {
     } catch(e) {}
 }
 
-/**
- * عرض Toast
- */
 function showToast(title, message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -429,9 +519,6 @@ function showToast(title, message, type = 'info') {
     }, 8000);
 }
 
-/**
- * التحقق من الطلبات المعلقة
- */
 function checkPendingUsers() {
     if (!db || !currentUser || !currentUser.isAdmin) return;
     
@@ -488,13 +575,10 @@ function checkPendingUsers() {
         console.error('Error:', e);
     }
 }
-/**
- * بدء نظام الإشعارات
- */
+
 function startNotificationSystem() {
     if (!currentUser || !currentUser.isAdmin) return;
     
-    // إذا كان المتصفح يدعم Push، نطلب الإذن
     if (pushSupported && notifPermission === 'default') {
         setTimeout(() => requestNotificationPermission(), 1500);
     }
@@ -580,6 +664,173 @@ async function quickReject(key, name) {
     }
 }
 
+// ========== دوال التيكر ==========
+let tickerItems = [];
+let tickerInterval = null;
+
+// تحميل التيكر من Firebase وتحديث العرض
+async function loadTicker() {
+    if (!db) return;
+    try {
+        const snapshot = await db.ref('ticker').once('value');
+        const data = snapshot.val();
+        tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
+        // ترتيب حسب الترتيب (إن وجد) أو حسب المفتاح
+        tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
+        updateTickerDisplay();
+        updateTickerStatus();
+        if (currentUser && currentUser.isAdmin) {
+            renderTickerAdminList();
+        }
+    } catch(e) {
+        console.error('خطأ في تحميل التيكر:', e);
+    }
+}
+
+// تحديث شريط التيكر في الواجهة
+function updateTickerDisplay() {
+    const wrapper = document.getElementById('tickerWrapper');
+    const track = document.getElementById('tickerTrack');
+    const activeItems = tickerItems.filter(item => item.active !== false);
+    
+    if (activeItems.length === 0) {
+        wrapper.style.display = 'none';
+        return;
+    }
+    
+    // نعرض التيكر فقط إذا كان المستخدم طالباً وليس إدارة
+    if (currentUser && currentUser.isAdmin) {
+        wrapper.style.display = 'none';
+        return;
+    }
+    
+    wrapper.style.display = 'block';
+    track.innerHTML = '';
+    
+    // نكرر النصوص عدة مرات لضمان استمرارية الحركة
+    const repeatCount = 3;
+    for (let r = 0; r < repeatCount; r++) {
+        activeItems.forEach((item, idx) => {
+            const span = document.createElement('span');
+            span.className = 'ticker-item';
+            span.textContent = item.text;
+            track.appendChild(span);
+            // إضافة فاصل بين النصوص
+            if (idx < activeItems.length - 1 || r < repeatCount - 1) {
+                const sep = document.createElement('span');
+                sep.className = 'ticker-item separator';
+                sep.textContent = '◆';
+                track.appendChild(sep);
+            }
+        });
+    }
+}
+
+// تحديث حالة التيكر في لوحة الإدارة
+function updateTickerStatus() {
+    const statusDiv = document.getElementById('tickerStatus');
+    const activeCount = tickerItems.filter(item => item.active !== false).length;
+    const total = tickerItems.length;
+    if (total === 0) {
+        statusDiv.innerHTML = '⚠️ لا توجد نصوص في التيكر';
+    } else {
+        statusDiv.innerHTML = `📢 عدد النصوص: ${total} (نشطة: ${activeCount})`;
+    }
+}
+
+// عرض قائمة إدارة التيكر في المودال
+function renderTickerAdminList() {
+    const container = document.getElementById('tickerItemsList');
+    if (!container) return;
+    if (tickerItems.length === 0) {
+        container.innerHTML = '<p style="color:#888;text-align:center">لا توجد نصوص مضافة بعد</p>';
+        return;
+    }
+    container.innerHTML = '';
+    tickerItems.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'ticker-admin-item';
+        const statusClass = item.active !== false ? 'active' : 'inactive';
+        const statusText = item.active !== false ? 'نشط' : 'غير نشط';
+        div.innerHTML = `
+            <div class="text">${item.text}</div>
+            <div>
+                <span class="status-badge ${statusClass}">${statusText}</span>
+            </div>
+            <div class="actions">
+                <button class="btn" style="background:#ffb703;width:auto;padding:4px 12px" onclick="toggleTickerItem('${item.id}')">🔄 تبديل</button>
+                <button class="btn" style="background:#e17055;width:auto;padding:4px 12px" onclick="deleteTickerItem('${item.id}')">🗑️</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+// إضافة نص جديد للتيكر
+async function addTickerItem() {
+    const input = document.getElementById('tickerInput');
+    const text = input.value.trim();
+    if (!text) {
+        alert('الرجاء إدخال نص');
+        return;
+    }
+    if (!db) return;
+    try {
+        const newRef = db.ref('ticker').push();
+        await newRef.set({
+            text: text,
+            active: true,
+            order: Date.now()
+        });
+        input.value = '';
+        showToast('✅ تمت الإضافة', 'تم إضافة النص إلى التيكر', 'success');
+        await loadTicker();
+        renderTickerAdminList();
+    } catch(e) {
+        showToast('❌ خطأ', e.message);
+    }
+}
+
+// تبديل حالة النص (نشط/غير نشط)
+async function toggleTickerItem(id) {
+    if (!db) return;
+    try {
+        const item = tickerItems.find(i => i.id === id);
+        if (!item) return;
+        const newStatus = item.active === false ? true : false;
+        await db.ref('ticker/' + id).update({ active: newStatus });
+        await loadTicker();
+        renderTickerAdminList();
+        showToast('✅ تم التحديث', `النص ${newStatus ? 'نشط' : 'غير نشط'}`, 'success');
+    } catch(e) {
+        showToast('❌ خطأ', e.message);
+    }
+}
+
+// حذف نص من التيكر
+async function deleteTickerItem(id) {
+    if (!confirm('هل تريد حذف هذا النص من التيكر؟')) return;
+    if (!db) return;
+    try {
+        await db.ref('ticker/' + id).remove();
+        await loadTicker();
+        renderTickerAdminList();
+        showToast('🗑️ تم الحذف', 'تم حذف النص', 'success');
+    } catch(e) {
+        showToast('❌ خطأ', e.message);
+    }
+}
+
+// فتح مودال إدارة التيكر
+function openTickerManager() {
+    document.getElementById('tickerModal').style.display = 'block';
+    renderTickerAdminList();
+}
+
+function closeTickerManager() {
+    document.getElementById('tickerModal').style.display = 'none';
+}
+
 // ========== باقي الدوال ==========
 window.onload = () => {
     const savedUser = localStorage.getItem('userSession');
@@ -590,9 +841,11 @@ window.onload = () => {
             loadQuestions();
             loadUsers();
             startNotificationSystem();
+            loadTicker(); // تحميل التيكر
         } else {
             showScreen('studentScreen');
             startNewQuiz();
+            loadTicker(); // تحميل التيكر ليظهر أسفل
         }
     } else {
         showLanding();
@@ -610,6 +863,14 @@ function showAdminLogin() {
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
+    // إظهار/إخفاء التيكر حسب الصفحة
+    const wrapper = document.getElementById('tickerWrapper');
+    if (screenId === 'studentScreen' && currentUser && !currentUser.isAdmin) {
+        // سيتم التحكم به عبر updateTickerDisplay
+        loadTicker();
+    } else {
+        wrapper.style.display = 'none';
+    }
 }
 
 async function doLogin() {
@@ -625,6 +886,7 @@ async function doLogin() {
         loadQuestions();
         loadUsers();
         startNotificationSystem();
+        loadTicker();
         return;
     }
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
@@ -636,6 +898,7 @@ async function doLogin() {
             localStorage.setItem('userSession', JSON.stringify(currentUser));
             document.getElementById('headerLogoutBtn').style.display = 'block';
             showScreen('studentScreen');            startNewQuiz();
+            loadTicker();
         } else if (user && user.status === 'pending') {
             alert('حسابك قيد المراجعة من قبل المشرف');
         } else if (user && user.status === 'suspended') {
