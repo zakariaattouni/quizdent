@@ -10,9 +10,35 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="التشخيص السني">
 <style>
+/* ====== التيكر - تقنية Gemini ====== */
+.ticker-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
+    color: #fff;
+    padding: 10px 0;
+    overflow: hidden;
+    z-index: 9999;
+    white-space: nowrap;
+    border-top: 3px solid #2c9b7a;
+    display: none;
+}
+.ticker-text {
+    display: inline-block;
+    padding-left: 100%;
+    animation: tickerMove 75s linear infinite; /* تم تخفيض السرعة من 30s إلى 75s */
+}
+@keyframes tickerMove {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+/* =============================== */
+
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
-body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
-.container{max-width:600px;margin:0 auto;padding-bottom:70px;}
+body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-bottom:60px}
+.container{max-width:600px;margin:0 auto}
 .header{background:linear-gradient(135deg,#1e4a6e,#2c9b7a);border-radius:20px;padding:20px;text-align:center;color:#fff;margin-bottom:15px;position:relative}
 .card{background:#fff;border-radius:20px;padding:25px;box-shadow:0 10px 25px rgba(0,0,0,0.1);margin-bottom:15px}
 .btn{background:linear-gradient(135deg,#2c9b7a,#1e4a6e);color:#fff;border:none;padding:12px 20px;border-radius:40px;font-weight:bold;cursor:pointer;width:100%;margin-top:10px;font-size:16px;transition:transform .15s}
@@ -21,8 +47,7 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 .btn-admin{background:linear-gradient(135deg,#6c5ce7,#8b5cf6)}
 .btn-danger{background:linear-gradient(135deg,#e17055,#d63031)}
 .btn-header-logout{background:#d63031;color:#fff;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px;position:absolute;top:10px;left:10px;display:none}
-.option{background:#f0fdf4;border:2px solid #cce5dc;padding:12px 18px;border-radius:50px;margin:10px 0;cursor:pointer;transition:all 0.2s;font-weight:500}
-.option:hover{background:#d1fae5;transform:translateX(-5px)}
+.option{background:#f0fdf4;border:2px solid #cce5dc;padding:12px 18px;border-radius:50px;margin:10px 0;cursor:pointer;transition:all 0.2s;font-weight:500}.option:hover{background:#d1fae5;transform:translateX(-5px)}
 .option.correct{background:#00b894;color:#fff;border-color:#00b894}
 .option.wrong{background:#ff7675;color:#fff;border-color:#ff7675}
 .exp-box{background:#fef9e3;border-right:4px solid #f4b942;padding:15px;border-radius:12px;margin-top:15px;display:none}
@@ -47,7 +72,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .pending-badge{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;display:none;animation:pulse 1.5s infinite;z-index:10}
 .pending-badge:hover{background:#dc2626}
 @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(239,68,68,0.7)}50%{transform:scale(1.05);box-shadow:0 0 0 10px rgba(239,68,68,0)}}
-.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px;pointer-events:none}.toast{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:16px 20px;border-radius:16px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:12px;animation:slideIn 0.4s ease-out;pointer-events:auto;cursor:pointer}
+.toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px;pointer-events:none}
+.toast{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:16px 20px;border-radius:16px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:12px;animation:slideIn 0.4s ease-out;pointer-events:auto;cursor:pointer}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669)}
 @keyframes slideIn{from{transform:translateY(-100px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.hiding{animation:slideOut 0.3s ease-in forwards}
@@ -66,47 +92,11 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .request-item .actions{display:flex;gap:5px}
 .request-item .actions button{padding:6px 12px;font-size:12px;width:auto;margin:0}
 
-/* ====== التيكر - الاتجاه من اليسار لليمين ====== */
-.ticker-wrapper {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(135deg, #1e4a6e, #2c9b7a);
-    padding: 8px 0;
-    overflow: hidden;
-    z-index: 100;
-    box-shadow: 0 -3px 12px rgba(0,0,0,0.25);
-    display: none;
-}
-.ticker-track {
-    display: inline-flex;
-    white-space: nowrap;
-    direction: ltr;
-    will-change: transform;
-    padding: 2px 0;
-}
-.ticker-item {
-    display: inline-block;
-    padding: 0 18px;
-    font-size: 15px;
-    font-weight: 600;
-    color: #ffffff;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.4;
-    white-space: nowrap;
-}
-.ticker-item.separator {    color: rgba(255,255,255,0.55);
-    font-size: 10px;
-    padding: 0 6px;
-    vertical-align: middle;
-}
-
+/* ====== إدارة التيكر ====== */
 .ticker-admin-item {
     background: #f0f7ff;
     border-radius: 12px;
-    padding: 12px 15px;
-    margin: 8px 0;
+    padding: 12px 15px;    margin: 8px 0;
     border-right: 3px solid #2c9b7a;
     display: flex;
     justify-content: space-between;
@@ -145,7 +135,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     <div class="header">
         <button id="headerLogoutBtn" class="btn-header-logout" onclick="logout()">خروج 🚪</button>
         <div id="pendingBadge" class="pending-badge" onclick="showRequestsModal()">
-            🔔 <span id="pendingCount">0</span> طلب جديد        </div>
+            🔔 <span id="pendingCount">0</span> طلب جديد
+        </div>
         <h1>🦷 مدرب التشخيص السني</h1>
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
@@ -154,8 +145,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         📲 تثبيت التطبيق على الشاشة الرئيسية
     </div>
     <div id="toastContainer" class="toast-container"></div>
-    <div id="landingScreen" class="screen active">
-        <div class="card" style="text-align:center">
+    <div id="landingScreen" class="screen active">        <div class="card" style="text-align:center">
             <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
             <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
             <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
@@ -194,7 +184,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div id="optionsContainer"></div>
             <div id="explanation" class="exp-box"></div>
             <button id="nextBtn" class="btn" style="display:none" onclick="nextQuestion()">التالي ➡️</button>
-        </div>    </div>
+        </div>
+    </div>
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
             <h2>📊 نتيجة الاختبار</h2>
@@ -203,8 +194,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div id="wrongAnswersList"></div>
             <button class="btn" onclick="startNewQuiz()">🔄 اختبار جديد</button>
         </div>
-    </div>
-    <div id="adminScreen" class="screen">
+    </div>    <div id="adminScreen" class="screen">
         <div class="card">
             <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>
             <div id="newRequestsSection" style="display:none;margin-bottom:15px">
@@ -243,7 +233,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     <div id="requestsModal" class="requests-modal">
         <div class="requests-modal-content">
             <h3 style="color:#f59e0b;text-align:center;margin-bottom:15px">🔔 الطلبات المعلقة</h3>
-            <div id="requestsList"></div>            <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
+            <div id="requestsList"></div>
+            <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
         </div>
     </div>
     <div id="tickerModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
@@ -252,15 +243,17 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div style="margin:15px 0">
                 <input type="text" id="tickerInput" placeholder="أدخل نصاً جديداً للتيكر" style="margin-bottom:5px">
                 <button class="btn btn-admin" onclick="addTickerItem()">➕ إضافة نص</button>
-            </div>
-            <div id="tickerItemsList"></div>
+            </div>            <div id="tickerItemsList"></div>
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeTickerManager()">إغلاق</button>
         </div>
     </div>
 </div>
-<div id="tickerWrapper" class="ticker-wrapper">
-    <div id="tickerTrack" class="ticker-track"></div>
+
+<!-- التيكر - تقنية Gemini -->
+<div class="ticker-container">
+    <div id="tickerText" class="ticker-text"></div>
 </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
@@ -292,14 +285,14 @@ async function setupManifest() {
     const icon512 = await svgToPng(ICON_SVG, 512);
     const manifest = {
         id: "/dental-coach-app-v1",
-        name: "مدرب التشخيص السني - د. زكريا عطوني",        short_name: "التشخيص السني",
+        name: "مدرب التشخيص السني - د. زكريا عطوني",
+        short_name: "التشخيص السني",
         description: "تطبيق تدريبي للتشخيص السني",
         start_url: ".",
         scope: ".",
         display: "standalone",
         orientation: "portrait",
-        background_color: "#1e4a6e",
-        theme_color: "#1e4a6e",
+        background_color: "#1e4a6e",        theme_color: "#1e4a6e",
         lang: "ar",
         dir: "rtl",
         icons: [
@@ -341,14 +334,14 @@ function installApp() {
     });
 }
 // ========== Firebase Setup ==========
-const firebaseConfig = {    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
+const firebaseConfig = {
+    apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
     authDomain: "quizdental-c4d5a.firebaseapp.com",
     projectId: "quizdental-c4d5a",
     databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
     storageBucket: "quizdental-c4d5a.appspot.com",
     messagingSenderId: "750036143183",
-    appId: "1:750036143183:web:721a31ef795f973887ee3a"
-};
+    appId: "1:750036143183:web:721a31ef795f973887ee3a"};
 let db = null;
 let currentUser = null;
 let currentQuestions = [];
@@ -390,14 +383,14 @@ async function requestNotificationPermission() {
         }
     } catch(e) {
         console.error('خطأ:', e);
-    }}
+    }
+}
 function sendPushNotification(title, body, userName = null) {
     if (!pushSupported) return;
     if (notifPermission !== 'granted') return;
     try {
         const notif = new Notification(title, {
-            body: body,
-            icon: appIconUrl,
+            body: body,            icon: appIconUrl,
             badge: appIconUrl,
             tag: 'new-request-' + (userName || Date.now()),
             dir: 'rtl',
@@ -439,14 +432,14 @@ function playBeep() {
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + n.s + n.d);
             osc.start(ctx.currentTime + n.s);
             osc.stop(ctx.currentTime + n.s + n.d);
-        });    } catch(e) {}
+        });
+    } catch(e) {}
 }
 function showToast(title, message, type = 'info') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = 'toast' + (type === 'success' ? ' success' : '');
-    toast.innerHTML = `
-        <div class="toast-icon">🔔</div>
+    toast.innerHTML = `        <div class="toast-icon">🔔</div>
         <div class="toast-content">
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
@@ -488,14 +481,14 @@ function checkPendingUsers() {
                 if (badge) { badge.style.display = 'block'; countSpan.textContent = pendingCount; }
                 if (section) { section.style.display = 'block'; sectionCount.textContent = pendingCount; }
                 if (pendingCount > lastPendingCount && lastPendingCount >= 0) {
-                    const newCount = pendingCount - lastPendingCount;                    const newUsers = pendingUsers.slice(-newCount);
+                    const newCount = pendingCount - lastPendingCount;
+                    const newUsers = pendingUsers.slice(-newCount);
                     showToast('🆕 طلبات جديدة!', `${newCount} طلب اشتراك جديد`);
                     playBeep();
                     newUsers.forEach(u => {
                         sendPushNotification(
                             ' طلب اشتراك جديد!',
-                            ` ${u.name} أرسل طلب تسجيل جديد`,
-                            u.name
+                            ` ${u.name} أرسل طلب تسجيل جديد`,                            u.name
                         );
                     });
                     if (document.getElementById('adminScreen').classList.contains('active')) {
@@ -537,14 +530,14 @@ function showRequestsModal() {
                 pendingUsers.push({ key, ...user });
             }
         });
-        if (pendingUsers.length === 0) {            list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
+        if (pendingUsers.length === 0) {
+            list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
             return;
         }
         list.innerHTML = '';
         pendingUsers.forEach(user => {
             const registeredTime = user.registeredAt ? new Date(user.registeredAt).toLocaleString('ar-EG') : 'غير معروف';
-            const item = document.createElement('div');
-            item.className = 'request-item';
+            const item = document.createElement('div');            item.className = 'request-item';
             item.innerHTML = `
                 <div class="info">
                     <div class="name"> ${user.name}</div>
@@ -586,15 +579,16 @@ async function quickReject(key, name) {
         loadUsers();
         checkPendingUsers();
     } catch(e) {
-        showToast('❌ خطأ', e.message);    }
+        showToast('❌ خطأ', e.message);
+    }
 }
-// ========== دوال التيكر ==========
+// ========== التيكر - تقنية Gemini مع دعم النصوص المتعددة ==========
 let tickerItems = [];
 
-async function loadTicker() {
-    if (!db) return;
-    try {
-        const snapshot = await db.ref('ticker').once('value');
+// تهيئة التيكر - الاستماع المستمر للتغييرات
+function initTicker() {    if (!db) return;
+    
+    db.ref('ticker').on('value', (snapshot) => {
         const data = snapshot.val();
         tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
         tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
@@ -603,91 +597,32 @@ async function loadTicker() {
         if (currentUser && currentUser.isAdmin) {
             renderTickerAdminList();
         }
-    } catch(e) {
-        console.error('خطأ في تحميل التيكر:', e);
-    }
-}
-
-function measureTickerWidth(items) {
-    try {
-        const temp = document.createElement('div');
-        temp.style.cssText = 'position:absolute;left:-99999px;top:-99999px;white-space:nowrap;display:inline-flex;visibility:hidden;pointer-events:none;';
-        items.forEach(item => {
-            const span = document.createElement('span');
-            span.className = 'ticker-item';
-            span.textContent = item.text;
-            temp.appendChild(span);
-            const sep = document.createElement('span');
-            sep.className = 'ticker-item separator';
-            sep.textContent = '◆';
-            temp.appendChild(sep);
-        });
-        document.body.appendChild(temp);
-        const width = temp.scrollWidth;
-        document.body.removeChild(temp);
-        return width > 0 ? width : 1000;
-    } catch(e) {
-        return 1000;
-    }
+    });
 }
 
 function updateTickerDisplay() {
-    try {
-        const wrapper = document.getElementById('tickerWrapper');
-        const track = document.getElementById('tickerTrack');
-        const activeItems = tickerItems.filter(item => item.active !== false);
-        if (activeItems.length === 0 || (currentUser && currentUser.isAdmin)) {
-            wrapper.style.display = 'none';
-            return;
-        }
+    const container = document.querySelector('.ticker-container');
+    const tickerText = document.getElementById('tickerText');
+    const activeItems = tickerItems.filter(item => item.active !== false);
 
-        wrapper.style.display = 'block';
-        track.innerHTML = '';
-        track.style.animation = 'none';
-
-        const oneSetWidth = measureTickerWidth(activeItems);
-        if (oneSetWidth <= 0) return;
-
-        const buildSet = () => {
-            activeItems.forEach(item => {
-                const span = document.createElement('span');
-                span.className = 'ticker-item';
-                span.textContent = item.text;
-                track.appendChild(span);
-                const sep = document.createElement('span');
-                sep.className = 'ticker-item separator';
-                sep.textContent = '◆';
-                track.appendChild(sep);
-            });
-        };
-
-        buildSet();
-        buildSet();
-        buildSet();
-
-        const styleId = 'ticker-keyframes-dynamic';
-        let styleEl = document.getElementById(styleId);
-        if (!styleEl) {
-            styleEl = document.createElement('style');
-            styleEl.id = styleId;
-            document.head.appendChild(styleEl);
-        }
-        
-        styleEl.textContent = `
-            @keyframes tickerScrollPixels {
-                0%   { transform: translateX(-${oneSetWidth}px); }
-                100% { transform: translateX(0px); }
-            }
-        `;
-
-        const speed = 50;
-        let duration = oneSetWidth / speed;
-        duration = Math.max(15, Math.min(120, duration));
-
-        void track.offsetWidth;        track.style.animation = `tickerScrollPixels ${duration}s linear infinite`;
-    } catch(e) {
-        console.error('Ticker display error:', e);
+    if (activeItems.length === 0 || (currentUser && currentUser.isAdmin)) {
+        container.style.display = 'none';
+        return;
     }
+
+    container.style.display = 'block';
+    
+    // بناء النصوص مع فواصل
+    let text = '';
+    activeItems.forEach((item, index) => {
+        text += item.text;
+        if (index < activeItems.length - 1) {
+            text += ' ◆ ';
+        }
+    });
+    
+    // تكرار النص 3 مرات للاستمرارية
+    tickerText.textContent = text + ' ◆ ' + text + ' ◆ ' + text;
 }
 
 function updateTickerStatus() {
@@ -700,7 +635,6 @@ function updateTickerStatus() {
         statusDiv.innerHTML = `📢 عدد النصوص: ${total} (نشطة: ${activeCount})`;
     }
 }
-
 function renderTickerAdminList() {
     const container = document.getElementById('tickerItemsList');
     if (!container) return;
@@ -733,7 +667,8 @@ async function addTickerItem() {
     const text = input.value.trim();
     if (!text) {
         alert('الرجاء إدخال نص');
-        return;    }
+        return;
+    }
     if (!db) return;
     try {
         const newRef = db.ref('ticker').push();
@@ -744,22 +679,17 @@ async function addTickerItem() {
         });
         input.value = '';
         showToast('✅ تمت الإضافة', 'تم إضافة النص إلى التيكر', 'success');
-        await loadTicker();
-        renderTickerAdminList();
     } catch(e) {
         showToast('❌ خطأ', e.message);
     }
 }
 
-async function toggleTickerItem(id) {
-    if (!db) return;
+async function toggleTickerItem(id) {    if (!db) return;
     try {
         const item = tickerItems.find(i => i.id === id);
         if (!item) return;
         const newStatus = item.active === false ? true : false;
         await db.ref('ticker/' + id).update({ active: newStatus });
-        await loadTicker();
-        renderTickerAdminList();
         showToast('✅ تم التحديث', `النص ${newStatus ? 'نشط' : 'غير نشط'}`, 'success');
     } catch(e) {
         showToast('❌ خطأ', e.message);
@@ -771,8 +701,6 @@ async function deleteTickerItem(id) {
     if (!db) return;
     try {
         await db.ref('ticker/' + id).remove();
-        await loadTicker();
-        renderTickerAdminList();
         showToast('🗑️ تم الحذف', 'تم حذف النص', 'success');
     } catch(e) {
         showToast('❌ خطأ', e.message);
@@ -782,12 +710,16 @@ async function deleteTickerItem(id) {
 function openTickerManager() {
     document.getElementById('tickerModal').style.display = 'block';
     renderTickerAdminList();
-}function closeTickerManager() {
+}
+function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
 
 // ========== باقي الدوال ==========
 window.onload = () => {
+    // تفعيل التيكر
+    initTicker();
+    
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -797,14 +729,11 @@ window.onload = () => {
             loadQuestions();
             loadUsers();
             startNotificationSystem();
-            loadTicker();
         } else {
             showScreen('studentScreen');
             startNewQuiz();
-            loadTicker();
         }
-    } else {
-        showLanding();
+    } else {        showLanding();
     }
 };
 function showLanding() { showScreen('landingScreen'); }
@@ -818,12 +747,6 @@ function showAdminLogin() {
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    const wrapper = document.getElementById('tickerWrapper');
-    if (screenId === 'studentScreen' && currentUser && !currentUser.isAdmin) {
-        loadTicker();
-    } else {
-        wrapper.style.display = 'none';
-    }
 }
 async function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
@@ -831,12 +754,12 @@ async function doLogin() {
     if (!username || !password) { alert('الرجاء إدخال اسم المستخدم وكلمة السر'); return; }
     if (username === 'admin' && btoa(password) === 'c2FsZW0xOTU5') {
         currentUser = { isAdmin: true, name: 'admin' };
-        localStorage.setItem('userSession', JSON.stringify(currentUser));        document.getElementById('headerLogoutBtn').style.display = 'block';
+        localStorage.setItem('userSession', JSON.stringify(currentUser));
+        document.getElementById('headerLogoutBtn').style.display = 'block';
         showScreen('adminScreen');
         loadQuestions();
         loadUsers();
         startNotificationSystem();
-        loadTicker();
         return;
     }
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
@@ -849,7 +772,6 @@ async function doLogin() {
             document.getElementById('headerLogoutBtn').style.display = 'block';
             showScreen('studentScreen');
             startNewQuiz();
-            loadTicker();
         } else if (user && user.status === 'pending') {
             alert('حسابك قيد المراجعة من قبل المشرف');
         } else if (user && user.status === 'suspended') {
@@ -860,8 +782,7 @@ async function doLogin() {
     } catch(e) { alert('خطأ: ' + e.message); }
 }
 async function doRegister() {
-    const name = document.getElementById('registerName').value.trim();
-    const password = document.getElementById('registerPassword').value.trim();
+    const name = document.getElementById('registerName').value.trim();    const password = document.getElementById('registerPassword').value.trim();
     if (!name || !password) { alert('الرجاء ملء جميع الحقول'); return; }
     const userKey = btoa(unescape(encodeURIComponent(name))).replace(/[^A-Za-z0-9]/g, '');
     try {
@@ -880,7 +801,8 @@ function logout() {
     currentUser = null;
     currentQuestions = [];
     currentIndex = 0;
-    currentScore = 0;    currentWrong = [];
+    currentScore = 0;
+    currentWrong = [];
     location.reload();
 }
 async function startNewQuiz() {
@@ -909,8 +831,7 @@ function renderQuestion() {
     if (q.img && q.img.trim()) { caseImg.src = q.img; imgContainer.style.display = 'block'; }
     else { imgContainer.style.display = 'none'; }
     const options = [...q.o].sort(() => Math.random() - 0.5);
-    const optsDiv = document.getElementById('optionsContainer');
-    optsDiv.innerHTML = '';
+    const optsDiv = document.getElementById('optionsContainer');    optsDiv.innerHTML = '';
     options.forEach(opt => {
         const d = document.createElement('div');
         d.className = 'option';
@@ -929,7 +850,8 @@ function checkAnswer(selected, correct, explanation, element) {
         if (currentUser && !currentUser.isAdmin) {
             db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
         }
-    } else {        element.classList.add('wrong');
+    } else {
+        element.classList.add('wrong');
         optsDiv.querySelectorAll('.option').forEach(opt => {
             if (opt.innerHTML === correct) opt.classList.add('correct');
         });
@@ -958,8 +880,7 @@ function showResult() {
 }
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
-    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
-    try {
+    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';    try {
         const snapshot = await db.ref('questions').once('value');
         const questions = snapshot.val();
         if (!questions) { container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>'; return; }
@@ -978,7 +899,8 @@ async function loadQuestions() {
             container.appendChild(div);
         });
     } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
-}function addQuestionForm() {
+}
+function addQuestionForm() {
     editingQuestionId = null;
     document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';
     ['qText','opt1','opt2','opt3','opt4','correctOpt','questionImageUrl','explanationText'].forEach(id => document.getElementById(id).value = '');
@@ -1007,8 +929,7 @@ async function saveQuestion() {
     const imgUrl = document.getElementById('questionImageUrl').value.trim();
     const explanation = document.getElementById('explanationText').value.trim();
     if (!qText || !opt1 || !opt2 || !opt3 || !opt4 || !correct || !explanation) { alert('الرجاء ملء جميع الحقول'); return; }
-    if (![opt1, opt2, opt3, opt4].includes(correct)) { alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة'); return; }
-    const questionData = { q: qText, o: [opt1, opt2, opt3, opt4], c: correct, e: explanation, img: imgUrl };
+    if (![opt1, opt2, opt3, opt4].includes(correct)) { alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة'); return; }    const questionData = { q: qText, o: [opt1, opt2, opt3, opt4], c: correct, e: explanation, img: imgUrl };
     try {
         if (editingQuestionId) {
             await db.ref('questions/' + editingQuestionId).set(questionData);
@@ -1027,7 +948,8 @@ async function deleteQuestion(id) {
         catch(e) { alert('خطأ: ' + e.message); }
     }
 }
-async function loadUsers() {    const container = document.getElementById('usersList');
+async function loadUsers() {
+    const container = document.getElementById('usersList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     try {
         const snapshot = await db.ref('users').once('value');
@@ -1056,8 +978,7 @@ async function loadUsers() {    const container = document.getElementById('users
     } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
 }
 async function updateUserStatus(key, status) {
-    try {
-        await db.ref('users/' + key).update({ status });
+    try {        await db.ref('users/' + key).update({ status });
         alert(`تم تغيير الحالة إلى ${status === 'active' ? 'نشط' : 'موقوف'}`);
         loadUsers();
         checkPendingUsers();
