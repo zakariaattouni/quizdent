@@ -1104,31 +1104,37 @@ function openTickerManager() {
 function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
-// ========== بدء الاختبار مع التخزين المؤقت ==========
+// ========== بدء الاختبار مع التخزين المؤقت (أولوية الكاش) ==========
 async function startNewQuiz() {
-    try {
-        // محاولة التحميل من الكاش المحلي أولاً (فوري)
-        let cachedQuestions = await loadQuestionsFromCache();
+    // 1. دائماً حاول التحميل من الكاش المحلي أولاً (فوري)
+    let cachedQuestions = await loadQuestionsFromCache();
+    
+    if (cachedQuestions && cachedQuestions.length > 0) {
+        currentQuestions = cachedQuestions.sort(() => Math.random() - 0.5);
+        currentIndex = 0;
+        currentScore = 0;
+        currentWrong = [];
+        renderQuestion();
         
-        if (cachedQuestions && cachedQuestions.length > 0) {
-            currentQuestions = cachedQuestions.sort(() => Math.random() - 0.5);
-            currentIndex = 0;
-            currentScore = 0;
-            currentWrong = [];
-            renderQuestion();
-            
-            // تحديث الكاش في الخلفية (بدون انتظار)
-            if (db && isOnline) {
-                syncQuestionsInBackground();
+        // 2. في الخلفية، إذا كان هناك اتصال، حاول تحديث الكاش
+        if (db && isOnline) {
+            syncQuestionsInBackground();
+        } else {
+            // إعلام المستخدم بأنه يعمل من الكاش
+            if (!isOnline) {
+                showToast('📡 الوضع المحلي', 'الأسئلة محملة من الذاكرة المحلية', 'offline');
             }
-            return;
         }
-                // لا يوجد كاش - تحميل من Firebase
-        if (!db || !isOnline) {
-            alert('لا توجد أسئلة محفوظة محلياً ولا يوجد اتصال بالإنترنت. الرجاء الاتصال بالإنترنت لتحميل الأسئلة لأول مرة.');
-            return;
-        }
-        
+        return;
+    }
+    
+    // 3. لا يوجد كاش - نحتاج إلى اتصال للتحميل
+    if (!db || !isOnline) {
+        alert('لا توجد أسئلة محفوظة محلياً ولا يوجد اتصال بالإنترنت. الرجاء الاتصال بالإنترنت لتحميل الأسئلة لأول مرة.');
+        return;
+    }
+    
+    try {
         const snapshot = await db.ref('questions').once('value');
         const questions = snapshot.val();
         
@@ -1138,23 +1144,19 @@ async function startNewQuiz() {
         }
         
         currentQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
-        
-        // حفظ في الكاش المحلي للاستخدام المستقبلي
         saveQuestionsToCache(currentQuestions).catch(e => console.warn('Cache save failed:', e));
-                currentQuestions = currentQuestions.sort(() => Math.random() - 0.5);
+        
+        currentQuestions = currentQuestions.sort(() => Math.random() - 0.5);
         currentIndex = 0;
         currentScore = 0;
         currentWrong = [];
         renderQuestion();
-        
-        // تفعيل الاستماع للتغييرات في الأسئلة
         startQuestionsListener();
-        
     } catch(e) {
-        // Try cache as fallback
-        const cachedQuestions = await loadQuestionsFromCache();
-        if (cachedQuestions && cachedQuestions.length > 0) {
-            currentQuestions = cachedQuestions.sort(() => Math.random() - 0.5);
+        // محاولة أخيرة: الكاش (قد يكون فارغاً)
+        const cached = await loadQuestionsFromCache();
+        if (cached && cached.length > 0) {
+            currentQuestions = cached.sort(() => Math.random() - 0.5);
             currentIndex = 0;
             currentScore = 0;
             currentWrong = [];
@@ -1171,16 +1173,9 @@ function syncQuestionsInBackground() {
     db.ref('questions').once('value').then(snapshot => {
         const questions = snapshot.val();
         if (!questions) return;
-        const freshQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));        
-        // مقارنة بسيطة: إذا تغير العدد، حدّث الكاش
-        if (freshQuestions.length !== currentQuestions.length) {
-            saveQuestionsToCache(freshQuestions).then(() => {
-                showToast('🔄 تحديث', 'تم تحديث الأسئلة', 'success');
-            }).catch(() => {});
-        } else {
-            // تحديث الكاش بصمت
-            saveQuestionsToCache(freshQuestions).catch(() => {});
-        }
+        const freshQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
+        // تحديث الكاش في الخلفية
+        saveQuestionsToCache(freshQuestions).catch(() => {});
     }).catch(() => {});
 }
 // مستمع للتغييرات في الأسئلة (للمسؤول فقط)
@@ -1230,7 +1225,6 @@ async function checkAnswer(selected, correct, explanation, element) {
                 if (isOnline && db) {
                     db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
                 } else {
-                    // Queue points update
                     await addToSyncQueue({ 
                         type: 'updatePoints', 
                         key: currentUser.key, 
@@ -1281,7 +1275,6 @@ async function loadQuestions() {
         try {
             const snapshot = await db.ref('questions').once('value');
             questions = snapshot.val() || {};
-            // Cache
             const qArray = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
             saveQuestionsToCache(qArray).catch(() => {});
         } catch(e) {
@@ -1292,6 +1285,9 @@ async function loadQuestions() {
     } else {
         const cached = await loadQuestionsFromCache();
         cached.forEach(q => { questions[q.id] = q; });
+        if (Object.keys(questions).length > 0) {
+            showToast('📡 الوضع المحلي', 'تم عرض الأسئلة المخزنة محلياً', 'offline');
+        }
     }
     
     if (Object.keys(questions).length === 0) { 
@@ -1431,17 +1427,18 @@ async function loadUsers() {
         try {
             const snapshot = await db.ref('users').once('value');
             users = snapshot.val() || {};
-            // Cache
             const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
             saveUsersToCache(usersArray).catch(() => {});
         } catch(e) {
-            // Fallback to cache
             const cached = await loadUsersFromCache();
             cached.forEach(u => { users[u.key] = u; });
         }
     } else {
         const cached = await loadUsersFromCache();
         cached.forEach(u => { users[u.key] = u; });
+        if (Object.keys(users).length > 0) {
+            showToast('📡 الوضع المحلي', 'تم عرض الطلاب المخزنين محلياً', 'offline');
+        }
     }
     
     if (Object.keys(users).length === 0) { 
@@ -1548,7 +1545,10 @@ window.onload = async () => {
     
     // Update connection status
     updateConnectionStatus();
-        await initTicker();
+    
+    // Load ticker from cache
+    await initTicker();
+    
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -1559,7 +1559,7 @@ window.onload = async () => {
             startNotificationSystem();
         } else {
             showScreen('studentScreen');
-            startNewQuiz();
+            startNewQuiz(); // سيتم تحميل الأسئلة من الكاش أولاً
         }
     } else {
         showLanding();
@@ -1598,13 +1598,15 @@ async function doLogin() {
         if (isOnline && db) {
             const snapshot = await db.ref('users/' + userKey).once('value');
             user = snapshot.val();
-            // Cache user
             if (user) {
                 await idbPut('users', { key: userKey, ...user });
             }
         } else {
             // Try local cache
             user = await idbGet('users', userKey);
+            if (user) {
+                showToast('📡 الوضع المحلي', 'تم تسجيل الدخول من البيانات المحفوظة', 'offline');
+            }
         }
         
         if (user && user.password === password && user.status === 'active') {
@@ -1654,7 +1656,6 @@ async function doRegister() {
             alert('✅ تم إرسال طلب التسجيل بنجاح، سيتم تفعيل حسابك قريباً');
         } else {
             await addToSyncQueue({ type: 'setUser', key: 'users/' + userKey, data: userData });
-            // Save to local cache
             await idbPut('users', { key: userKey, ...userData });
             alert('💾 تم حفظ طلب التسجيل محلياً - سيتم إرساله عند عودة الاتصال');
         }
