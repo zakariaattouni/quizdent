@@ -47,13 +47,13 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 .tag-suspended{background:#f8d7da;color:#721c24}
 input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border-radius:12px;font-size:14px}
 .loading{display:inline-block;width:16px;height:16px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 0.8s linear infinite;margin-left:8px}
-@keyframes spin{to{transform:rotate(360deg)}}.install-banner{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:12px;border-radius:12px;text-align:center;margin-bottom:15px;cursor:pointer;font-weight:bold}
-.pending-badge{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;display:none;animation:pulse 1.5s infinite;z-index:10}
+@keyframes spin{to{transform:rotate(360deg)}}.install-banner{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:12px;border-radius:12px;text-align:center;margin-bottom:15px;cursor:pointer;font-weight:bold}.pending-badge{position:absolute;top:10px;right:10px;background:#ef4444;color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:bold;cursor:pointer;display:none;animation:pulse 1.5s infinite;z-index:10}
 .pending-badge:hover{background:#dc2626}
 @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(239,68,68,0.7)}50%{transform:scale(1.05);box-shadow:0 0 0 10px rgba(239,68,68,0)}}
 .toast-container{position:fixed;top:20px;left:50%;transform:translateX(-50%);z-index:9999;width:90%;max-width:500px;pointer-events:none}
 .toast{background:linear-gradient(135deg,#f59e0b,#ef4444);color:#fff;padding:16px 20px;border-radius:16px;margin-bottom:10px;box-shadow:0 10px 30px rgba(0,0,0,0.25);display:flex;align-items:center;gap:12px;animation:slideIn 0.4s ease-out;pointer-events:auto;cursor:pointer}
 .toast.success{background:linear-gradient(135deg,#10b981,#059669)}
+.toast.offline{background:linear-gradient(135deg,#64748b,#475569)}
 @keyframes slideIn{from{transform:translateY(-100px);opacity:0}to{transform:translateY(0);opacity:1}}
 .toast.hiding{animation:slideOut 0.3s ease-in forwards}
 @keyframes slideOut{from{transform:translateY(0);opacity:1}to{transform:translateY(-100px);opacity:0}}
@@ -76,6 +76,13 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .ticker-admin-item .status-badge{font-size:12px;padding:2px 12px;border-radius:20px}
 .ticker-admin-item .status-badge.active{background:#d4edda;color:#155724}
 .ticker-admin-item .status-badge.inactive{background:#f8d7da;color:#721c24}
+.offline-banner{background:linear-gradient(135deg,#64748b,#475569);color:#fff;padding:10px;border-radius:12px;text-align:center;margin-bottom:15px;font-weight:bold;display:none;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.online-indicator{display:inline-block;width:8px;height:8px;border-radius:50%;margin-left:5px;animation:blink 1.5s infinite}
+.online-indicator.online{background:#00b894}
+.online-indicator.offline{background:#ff7675}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
+.sync-badge{background:#3b82f6;color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;display:none;margin-right:5px}
 </style>
 </head>
 <body>
@@ -87,7 +94,13 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         </div>
         <h1>🦷 مدرب التشخيص السني</h1>
         <p>إعداد الدكتور زكريا محمد عطوني</p>
-        <div style="font-size:12px;margin-top:5px" id="connectionStatus">🟢 متصل</div>
+        <div style="font-size:12px;margin-top:5px" id="connectionStatus">
+            🟢 متصل <span class="online-indicator online" id="onlineIndicator"></span>
+            <span id="syncBadge" class="sync-badge">🔄 مزامنة...</span>        </div>
+    </div>
+    <div id="offlineBanner" class="offline-banner">
+        📡 أنت بدون اتصال — التطبيق يعمل بالوضع المحلي
+        <div style="font-size:12px;margin-top:5px;opacity:0.9" id="offlineDetails"></div>
     </div>
     <div id="installBanner" class="install-banner" onclick="installApp()" style="display:none">
         📲 تثبيت التطبيق على الشاشة الرئيسية
@@ -132,8 +145,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <div id="optionsContainer"></div>
             <div id="explanation" class="exp-box"></div>
             <button id="nextBtn" class="btn" style="display:none" onclick="nextQuestion()">التالي ➡️</button>
-        </div>
-    </div>
+        </div>    </div>
     <div id="resultScreen" class="screen">
         <div class="card" style="text-align:center">
             <h2>📊 نتيجة الاختبار</h2>
@@ -161,6 +173,10 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <h4 style="margin:15px 0 5px">📢 إدارة الشريط المتحرك (التيكر)</h4>
             <button class="btn btn-admin" onclick="openTickerManager()">⚙️ إدارة التيكر</button>
             <div id="tickerStatus" style="margin-top:8px;font-size:14px;"></div>
+            <div id="syncQueueSection" style="display:none;margin-top:15px;background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;padding:15px">
+                <h4 style="color:#1e4a6e;margin-bottom:10px">🔄 عمليات في انتظار المزامنة (<span id="syncQueueCount">0</span>)</h4>
+                <button class="btn btn-admin" onclick="forceSyncQueue()">🔄 مزامنة الآن</button>
+            </div>
         </div>
     </div>
     <div id="questionModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
@@ -178,8 +194,7 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
-    <div id="requestsModal" class="requests-modal">
-        <div class="requests-modal-content">
+    <div id="requestsModal" class="requests-modal">        <div class="requests-modal-content">
             <h3 style="color:#f59e0b;text-align:center;margin-bottom:15px">🔔 الطلبات المعلقة</h3>
             <div id="requestsList"></div>
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
@@ -196,17 +211,105 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeTickerManager()">إغلاق</button>
         </div>    </div>
 </div>
-
 <div class="ticker-container">
     <div id="tickerText" class="ticker-text"></div>
 </div>
-
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 <script>
+// ========== Service Worker Registration ==========
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        const swCode = `
+            const CACHE_NAME = 'dental-coach-v2';
+            const OFFLINE_URL = '/';
+            
+            self.addEventListener('install', (event) => {
+                self.skipWaiting();
+            });
+            
+            self.addEventListener('activate', (event) => {
+                event.waitUntil(
+                    caches.keys().then((names) => {
+                        return Promise.all(
+                            names.filter(n => n !== CACHE_NAME).map(n => caches.delete(n))
+                        );
+                    }).then(() => self.clients.claim())
+                );
+            });
+            
+            self.addEventListener('fetch', (event) => {
+                const url = new URL(event.request.url);
+                
+                // Skip Firebase API calls
+                if (url.hostname.includes('firebaseio.com') || 
+                    url.hostname.includes('firebase') ||                    url.hostname.includes('googleapis.com')) {
+                    return;
+                }
+                
+                event.respondWith(
+                    caches.match(event.request).then((cached) => {
+                        const fetchPromise = fetch(event.request).then((response) => {
+                            if (response && response.status === 200) {
+                                const clone = response.clone();
+                                caches.open(CACHE_NAME).then((cache) => {
+                                    cache.put(event.request, clone);
+                                });
+                            }
+                            return response;
+                        }).catch(() => {
+                            return cached;
+                        });
+                        return cached || fetchPromise;
+                    })
+                );
+            });
+        `;
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        const swUrl = URL.createObjectURL(blob);
+        navigator.serviceWorker.register(swUrl).catch(() => {});
+    });
+}
+
+// ========== Connection State Management ==========
+let isOnline = navigator.onLine;
+let pendingSyncQueue = [];
+const SYNC_QUEUE_KEY = 'dental_sync_queue';
+const LAST_SYNC_KEY = 'dental_last_sync';
+
+function updateConnectionStatus() {
+    isOnline = navigator.onLine;
+    const statusEl = document.getElementById('connectionStatus');
+    const indicator = document.getElementById('onlineIndicator');
+    const banner = document.getElementById('offlineBanner');
+    const details = document.getElementById('offlineDetails');
+    const syncBadge = document.getElementById('syncBadge');
+    
+    if (isOnline) {
+        statusEl.innerHTML = '🟢 متصل <span class="online-indicator online"></span>';
+        banner.style.display = 'none';
+        processSyncQueue();
+    } else {
+        const queueCount = pendingSyncQueue.length;
+        statusEl.innerHTML = '🔴 غير متصل <span class="online-indicator offline"></span>';
+        banner.style.display = 'block';        details.textContent = queueCount > 0 ? `${queueCount} عملية في انتظار المزامنة` : 'التطبيق يعمل بالبيانات المحلية';
+    }
+}
+
+window.addEventListener('online', () => {
+    updateConnectionStatus();
+    showToast('🌐 عودة الاتصال', 'جاري مزامنة البيانات...', 'success');
+    setTimeout(() => processSyncQueue(), 1000);
+});
+
+window.addEventListener('offline', () => {
+    updateConnectionStatus();
+    showToast('📡 انقطع الاتصال', 'التطبيق يعمل بالوضع المحلي', 'offline');
+});
+
 // ========== IndexedDB Cache Layer ==========
 const DB_NAME = 'DentalCoachCache';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 let localDB = null;
 
 function openLocalDB() {
@@ -225,40 +328,229 @@ function openLocalDB() {
             if (!db.objectStoreNames.contains('meta')) {
                 db.createObjectStore('meta', { keyPath: 'key' });
             }
+            if (!db.objectStoreNames.contains('users')) {
+                db.createObjectStore('users', { keyPath: 'key' });
+            }
+            if (!db.objectStoreNames.contains('ticker')) {
+                db.createObjectStore('ticker', { keyPath: 'id' });
+            }
+            if (!db.objectStoreNames.contains('syncQueue')) {
+                db.createObjectStore('syncQueue', { keyPath: 'id', autoIncrement: true });
+            }
         };
     });
 }
 
-function saveQuestionsToCache(questionsArray) {
-    return new Promise((resolve, reject) => {
+function idbPut(storeName, data) {    return new Promise((resolve, reject) => {
         if (!localDB) return resolve();
         try {
-            const tx = localDB.transaction(['questions', 'meta'], 'readwrite');
-            const qStore = tx.objectStore('questions');
-            const mStore = tx.objectStore('meta');
-            qStore.clear();
-            questionsArray.forEach(q => qStore.put(q));
-            mStore.put({ key: 'lastUpdate', value: Date.now() });
+            const tx = localDB.transaction([storeName], 'readwrite');
+            const store = tx.objectStore(storeName);
+            if (Array.isArray(data)) {
+                data.forEach(d => store.put(d));
+            } else {
+                store.put(data);
+            }
             tx.oncomplete = () => resolve();
             tx.onerror = () => reject(tx.error);
-        } catch(e) {
-            reject(e);
-        }    });
+        } catch(e) { reject(e); }
+    });
 }
 
-function loadQuestionsFromCache() {
+function idbGetAll(storeName) {
     return new Promise((resolve, reject) => {
         if (!localDB) return resolve([]);
         try {
-            const tx = localDB.transaction(['questions'], 'readonly');
-            const store = tx.objectStore('questions');
+            const tx = localDB.transaction([storeName], 'readonly');
+            const store = tx.objectStore(storeName);
             const request = store.getAll();
             request.onsuccess = () => resolve(request.result || []);
             request.onerror = () => reject(request.error);
-        } catch(e) {
-            reject(e);
-        }
+        } catch(e) { reject(e); }
     });
+}
+
+function idbClear(storeName) {
+    return new Promise((resolve, reject) => {
+        if (!localDB) return resolve();
+        try {
+            const tx = localDB.transaction([storeName], 'readwrite');
+            tx.objectStore(storeName).clear();
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        } catch(e) { reject(e); }
+    });
+}
+
+function idbDelete(storeName, key) {
+    return new Promise((resolve, reject) => {
+        if (!localDB) return resolve();
+        try {
+            const tx = localDB.transaction([storeName], 'readwrite');
+            tx.objectStore(storeName).delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+        } catch(e) { reject(e); }    });
+}
+
+function idbGet(storeName, key) {
+    return new Promise((resolve, reject) => {
+        if (!localDB) return resolve(null);
+        try {
+            const tx = localDB.transaction([storeName], 'readonly');
+            const request = tx.objectStore(storeName).get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        } catch(e) { reject(e); }
+    });
+}
+
+async function saveQuestionsToCache(questionsArray) {
+    try {
+        await idbClear('questions');
+        await idbPut('questions', questionsArray);
+        await idbPut('meta', { key: 'lastUpdate', value: Date.now() });
+    } catch(e) {
+        console.warn('Cache save failed:', e);
+    }
+}
+
+async function loadQuestionsFromCache() {
+    try {
+        return await idbGetAll('questions');
+    } catch(e) {
+        return [];
+    }
+}
+
+async function saveUsersToCache(usersArray) {
+    try {
+        await idbClear('users');
+        await idbPut('users', usersArray);
+    } catch(e) { console.warn(e); }
+}
+
+async function loadUsersFromCache() {
+    try {
+        return await idbGetAll('users');
+    } catch(e) { return []; }
+}
+
+async function saveTickerToCache(items) {
+    try {
+        await idbClear('ticker');
+        await idbPut('ticker', items);    } catch(e) { console.warn(e); }
+}
+
+async function loadTickerFromCache() {
+    try {
+        return await idbGetAll('ticker');
+    } catch(e) { return []; }
+}
+
+// ========== Sync Queue (Offline Operations) ==========
+async function addToSyncQueue(operation) {
+    const item = {
+        id: Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+        ...operation,
+        timestamp: Date.now()
+    };
+    pendingSyncQueue.push(item);
+    try {
+        await idbPut('syncQueue', item);
+    } catch(e) { console.warn(e); }
+    updateSyncQueueUI();
+    return item;
+}
+
+async function loadSyncQueueFromCache() {
+    try {
+        const items = await idbGetAll('syncQueue');
+        pendingSyncQueue = items.sort((a, b) => a.timestamp - b.timestamp);
+        updateSyncQueueUI();
+    } catch(e) { pendingSyncQueue = []; }
+}
+
+async function clearSyncQueue() {
+    pendingSyncQueue = [];
+    try {
+        await idbClear('syncQueue');
+    } catch(e) {}
+    updateSyncQueueUI();
+}
+
+function updateSyncQueueUI() {
+    const countEl = document.getElementById('syncQueueCount');
+    const section = document.getElementById('syncQueueSection');
+    const offlineDetails = document.getElementById('offlineDetails');
+    
+    if (countEl) countEl.textContent = pendingSyncQueue.length;
+    if (section) section.style.display = pendingSyncQueue.length > 0 ? 'block' : 'none';
+    if (offlineDetails && !isOnline && pendingSyncQueue.length > 0) {
+        offlineDetails.textContent = `${pendingSyncQueue.length} عملية في انتظار المزامنة`;
+    }}
+
+async function processSyncQueue() {
+    if (!isOnline || !db || pendingSyncQueue.length === 0) return;
+    
+    const syncBadge = document.getElementById('syncBadge');
+    if (syncBadge) syncBadge.style.display = 'inline-block';
+    
+    const queue = [...pendingSyncQueue];
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const op of queue) {
+        try {
+            await executeSyncOperation(op);
+            successCount++;
+        } catch(e) {
+            console.warn('Sync failed for op:', op, e);
+            failCount++;
+        }
+    }
+    
+    if (successCount > 0) {
+        await clearSyncQueue();
+        showToast('✅ تمت المزامنة', `تمت مزامنة ${successCount} عملية بنجاح`, 'success');
+    }
+    
+    if (syncBadge) syncBadge.style.display = 'none';
+}
+
+async function executeSyncOperation(op) {
+    switch(op.type) {
+        case 'setUser':
+            await db.ref('users/' + op.key).set(op.data);
+            break;
+        case 'updateUser':
+            await db.ref('users/' + op.key).update(op.data);
+            break;
+        case 'removeUser':
+            await db.ref('users/' + op.key).remove();
+            break;
+        case 'setQuestion':
+            if (op.id) {
+                await db.ref('questions/' + op.id).set(op.data);
+            } else {
+                await db.ref('questions').push(op.data);
+            }
+            break;
+        case 'removeQuestion':
+            await db.ref('questions/' + op.id).remove();            break;
+        case 'setTicker':
+            await db.ref('ticker/' + op.id).set(op.data);
+            break;
+        case 'updateTicker':
+            await db.ref('ticker/' + op.id).update(op.data);
+            break;
+        case 'removeTicker':
+            await db.ref('ticker/' + op.id).remove();
+            break;
+        case 'updatePoints':
+            await db.ref('users/' + op.key + '/totalPoints').transaction(p => (p || 0) + op.points);
+            break;
+    }
 }
 
 // ========== PWA SETUP ==========
@@ -294,8 +586,7 @@ async function setupManifest() {
         description: "تطبيق تدريبي للتشخيص السني",
         start_url: ".",        scope: ".",
         display: "standalone",
-        orientation: "portrait",
-        background_color: "#1e4a6e",
+        orientation: "portrait",        background_color: "#1e4a6e",
         theme_color: "#1e4a6e",
         lang: "ar",
         dir: "rtl",
@@ -337,7 +628,6 @@ function installApp() {
         document.getElementById('installBanner').style.display = 'none';
     });
 }
-
 // ========== Firebase Setup ==========
 const firebaseConfig = {
     apiKey: "AIzaSyDUgwNmS9l_gTJEUFfvRimTR8gDpX5QTdA",
@@ -345,8 +635,7 @@ const firebaseConfig = {
     databaseURL: "https://quizdental-c4d5a-default-rtdb.firebaseio.com/",
     storageBucket: "quizdental-c4d5a.appspot.com",
     messagingSenderId: "750036143183",
-    appId: "1:750036143183:web:721a31ef795f973887ee3a"
-};
+    appId: "1:750036143183:web:721a31ef795f973887ee3a"};
 let db = null;
 let currentUser = null;
 let currentQuestions = [];
@@ -356,10 +645,71 @@ let currentWrong = [];
 let editingQuestionId = null;
 let questionsListenerActive = false;
 
+// ========== Smart Firebase Wrapper (Offline-Safe) ==========
+function safeDbRef(path) {
+    if (!db) return null;
+    return db.ref(path);
+}
+
+async function safeDbOnce(path) {
+    if (!db) return null;
+    try {
+        return await db.ref(path).once('value');
+    } catch(e) {
+        return null;
+    }
+}
+
+async function safeDbSet(path, data) {
+    if (!db) {
+        await addToSyncQueue({ type: 'setUser', key: path, data });
+        return;
+    }
+    try {
+        await db.ref(path).set(data);
+    } catch(e) {
+        await addToSyncQueue({ type: 'setUser', key: path, data });
+    }
+}
+
+async function safeDbUpdate(path, data) {
+    if (!db) {
+        await addToSyncQueue({ type: 'updateUser', key: path, data });
+        return;
+    }
+    try {
+        await db.ref(path).update(data);
+    } catch(e) {
+        await addToSyncQueue({ type: 'updateUser', key: path, data });
+    }
+}
+
+async function safeDbRemove(path) {    if (!db) {
+        await addToSyncQueue({ type: 'removeUser', key: path });
+        return;
+    }
+    try {
+        await db.ref(path).remove();
+    } catch(e) {
+        await addToSyncQueue({ type: 'removeUser', key: path });
+    }
+}
+
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
-    document.getElementById('connectionStatus').innerHTML = '🟢 متصل';
+    document.getElementById('connectionStatus').innerHTML = '🟢 متصل <span class="online-indicator online"></span>';
+    
+    // Monitor Firebase connection state
+    db.ref('.info/connected').on('value', (snap) => {
+        const connected = snap.val() === true;
+        if (connected && !isOnline) {
+            // Firebase says connected but browser doesn't - trust browser
+        }
+        if (connected && isOnline) {
+            processSyncQueue();
+        }
+    });
 } catch(e) {
     console.error("Firebase error:", e);
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
@@ -370,6 +720,7 @@ let lastPendingCount = 0;
 let checkInterval = null;
 let notifPermission = 'default';
 let pushSupported = 'Notification' in window;
+
 async function requestNotificationPermission() {
     if (!pushSupported) return;
     try {
@@ -382,13 +733,13 @@ async function requestNotificationPermission() {
                 badge: appIconUrl,
                 tag: 'test',
                 dir: 'rtl',
-                lang: 'ar'
-            });
+                lang: 'ar'            });
         }
     } catch(e) {
         console.error('خطأ:', e);
     }
 }
+
 function sendPushNotification(title, body, userName = null) {
     if (!pushSupported) return;    if (notifPermission !== 'granted') return;
     try {
@@ -417,6 +768,7 @@ function sendPushNotification(title, body, userName = null) {
         console.error('خطأ Push:', e);
     }
 }
+
 function playBeep() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -430,8 +782,7 @@ function playBeep() {
             const gain = ctx.createGain();
             osc.connect(gain);
             gain.connect(ctx.destination);
-            osc.frequency.value = n.f;
-            osc.type = 'sine';
+            osc.frequency.value = n.f;            osc.type = 'sine';
             gain.gain.setValueAtTime(0.3, ctx.currentTime + n.s);
             gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + n.s + n.d);
             osc.start(ctx.currentTime + n.s);
@@ -439,11 +790,12 @@ function playBeep() {
         });
     } catch(e) {}
 }
+
 function showToast(title, message, type = 'info') {    const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
-    toast.className = 'toast' + (type === 'success' ? ' success' : '');
+    toast.className = 'toast' + (type === 'success' ? ' success' : type === 'offline' ? ' offline' : '');
     toast.innerHTML = `
-        <div class="toast-icon">🔔</div>
+        <div class="toast-icon">${type === 'offline' ? '📡' : '🔔'}</div>
         <div class="toast-content">
             <div class="toast-title">${title}</div>
             <div class="toast-message">${message}</div>
@@ -464,19 +816,13 @@ function showToast(title, message, type = 'info') {    const container = documen
         }
     }, 8000);
 }
-function checkPendingUsers() {
-    if (!db || !currentUser || !currentUser.isAdmin) return;
-    try {
-        db.ref('users').once('value').then(snapshot => {
-            const users = snapshot.val() || {};
-            let pendingCount = 0;
-            const pendingUsers = [];
-            Object.entries(users).forEach(([key, user]) => {
-                if (user.status === 'pending') {
-                    pendingCount++;
-                    pendingUsers.push({ key, ...user });
-                }
-            });
+
+async function checkPendingUsers() {
+    if (!db || !currentUser || !currentUser.isAdmin || !isOnline) {
+        // Use local cache for pending count when offline
+        if (!isOnline && currentUser && currentUser.isAdmin) {
+            const cachedUsers = await loadUsersFromCache();
+            const pendingCount = cachedUsers.filter(u => u.status === 'pending').length;
             const badge = document.getElementById('pendingBadge');
             const countSpan = document.getElementById('pendingCount');
             const section = document.getElementById('newRequestsSection');
@@ -484,11 +830,40 @@ function checkPendingUsers() {
             if (pendingCount > 0) {
                 if (badge) { badge.style.display = 'block'; countSpan.textContent = pendingCount; }
                 if (section) { section.style.display = 'block'; sectionCount.textContent = pendingCount; }
-                if (pendingCount > lastPendingCount && lastPendingCount >= 0) {
-                    const newCount = pendingCount - lastPendingCount;
-                    const newUsers = pendingUsers.slice(-newCount);
-                    showToast('🆕 طلبات جديدة!', `${newCount} طلب اشتراك جديد`);
-                    playBeep();                    newUsers.forEach(u => {
+            } else {
+                if (badge) badge.style.display = 'none';                if (section) section.style.display = 'none';
+            }
+        }
+        return;
+    }
+    try {
+        const snapshot = await db.ref('users').once('value');
+        const users = snapshot.val() || {};
+        let pendingCount = 0;
+        const pendingUsers = [];
+        Object.entries(users).forEach(([key, user]) => {
+            if (user.status === 'pending') {
+                pendingCount++;
+                pendingUsers.push({ key, ...user });
+            }
+        });
+        
+        // Cache users for offline use
+        const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
+        saveUsersToCache(usersArray).catch(() => {});
+        
+        const badge = document.getElementById('pendingBadge');
+        const countSpan = document.getElementById('pendingCount');
+        const section = document.getElementById('newRequestsSection');
+        const sectionCount = document.getElementById('newRequestsCount');
+        if (pendingCount > 0) {
+            if (badge) { badge.style.display = 'block'; countSpan.textContent = pendingCount; }
+            if (section) { section.style.display = 'block'; sectionCount.textContent = pendingCount; }
+            if (pendingCount > lastPendingCount && lastPendingCount >= 0) {
+                const newCount = pendingCount - lastPendingCount;
+                const newUsers = pendingUsers.slice(-newCount);
+                showToast('🆕 طلبات جديدة!', `${newCount} طلب اشتراك جديد`);
+                playBeep();                    newUsers.forEach(u => {
                         sendPushNotification(
                             ' طلب اشتراك جديد!',
                             ` ${u.name} أرسل طلب تسجيل جديد`,
@@ -499,18 +874,15 @@ function checkPendingUsers() {
                         loadUsers();
                     }
                 }
-            } else {
-                if (badge) badge.style.display = 'none';
-                if (section) section.style.display = 'none';
-            }
-            lastPendingCount = pendingCount;
-        }).catch(err => {
-            console.error('Error:', err);
-        });
+        } else {
+            if (badge) badge.style.display = 'none';
+            if (section) section.style.display = 'none';
+        }
+        lastPendingCount = pendingCount;
     } catch(e) {
-        console.error('Error:', e);
-    }
+        console.error('Error:', e);    }
 }
+
 function startNotificationSystem() {
     if (!currentUser || !currentUser.isAdmin) return;
     if (pushSupported && notifPermission === 'default') {
@@ -520,51 +892,79 @@ function startNotificationSystem() {
     if (checkInterval) clearInterval(checkInterval);
     checkInterval = setInterval(checkPendingUsers, 10000);
 }
-function showRequestsModal() {
-    if (!db) return;
+
+async function showRequestsModal() {
     const modal = document.getElementById('requestsModal');
     const list = document.getElementById('requestsList');
     list.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
     modal.style.display = 'block';
-    db.ref('users').once('value').then(snapshot => {
-        const users = snapshot.val() || {};
-        const pendingUsers = [];
-        Object.entries(users).forEach(([key, user]) => {
-            if (user.status === 'pending') {
-                pendingUsers.push({ key, ...user });
-            }
-        });
-        if (pendingUsers.length === 0) {
-            list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
-            return;
-        }        list.innerHTML = '';
-        pendingUsers.forEach(user => {
-            const registeredTime = user.registeredAt ? new Date(user.registeredAt).toLocaleString('ar-EG') : 'غير معروف';
-            const item = document.createElement('div');
-            item.className = 'request-item';
-            item.innerHTML = `
-                <div class="info">
-                    <div class="name"> ${user.name}</div>
-                    <div class="time">📅 ${registeredTime}</div>
-                </div>
-                <div class="actions">
-                    <button class="btn" style="background:#00b894" onclick="quickApprove('${user.key}', '${user.name.replace(/'/g, "\\'")}')">✅ تفعيل</button>
-                    <button class="btn" style="background:#e17055" onclick="quickReject('${user.key}', '${user.name.replace(/'/g, "\\'")}')">🗑️ حذف</button>
-                </div>
-            `;
-            list.appendChild(item);
-        });
-    }).catch(err => {
-        list.innerHTML = '<p style="color:red;text-align:center">خطأ في التحميل</p>';
+    
+    let users = {};
+    
+    if (isOnline && db) {
+        try {
+            const snapshot = await db.ref('users').once('value');
+            users = snapshot.val() || {};
+            // Cache
+            const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
+            saveUsersToCache(usersArray).catch(() => {});
+        } catch(e) {
+            // Fallback to cache
+            const cached = await loadUsersFromCache();
+            cached.forEach(u => { users[u.key] = u; });
+        }
+    } else {
+        const cached = await loadUsersFromCache();
+        cached.forEach(u => { users[u.key] = u; });
+    }
+    
+    const pendingUsers = [];
+    Object.entries(users).forEach(([key, user]) => {
+        if (user.status === 'pending') {
+            pendingUsers.push({ key, ...user });
+        }
+    });
+    
+    if (pendingUsers.length === 0) {
+        list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
+        return;
+    }
+        list.innerHTML = '';
+    pendingUsers.forEach(user => {
+        const registeredTime = user.registeredAt ? new Date(user.registeredAt).toLocaleString('ar-EG') : 'غير معروف';
+        const item = document.createElement('div');
+        item.className = 'request-item';
+        item.innerHTML = `
+            <div class="info">
+                <div class="name"> ${user.name}</div>
+                <div class="time">📅 ${registeredTime}</div>
+            </div>
+            <div class="actions">
+                <button class="btn" style="background:#00b894" onclick="quickApprove('${user.key}', '${user.name.replace(/'/g, "\\'")}')">✅ تفعيل</button>
+                <button class="btn" style="background:#e17055" onclick="quickReject('${user.key}', '${user.name.replace(/'/g, "\\'")}')">🗑️ حذف</button>
+            </div>
+        `;
+        list.appendChild(item);
     });
 }
+
 function closeRequestsModal() {
     document.getElementById('requestsModal').style.display = 'none';
 }
+
 async function quickApprove(key, name) {
-    if (!db) return;
     try {
-        await db.ref('users/' + key).update({ status: 'active' });
+        if (isOnline && db) {
+            await db.ref('users/' + key).update({ status: 'active' });
+        } else {
+            await addToSyncQueue({ type: 'updateUser', key: 'users/' + key, data: { status: 'active' } });
+        }
+        
+        // Update local cache
+        const cached = await loadUsersFromCache();
+        const updated = cached.map(u => u.key === key ? { ...u, status: 'active' } : u);
+        await saveUsersToCache(updated);
+        
         showToast('✅ تم التفعيل', `تم تفعيل حساب ${name}`, 'success');
         showRequestsModal();
         loadUsers();
@@ -573,11 +973,20 @@ async function quickApprove(key, name) {
         showToast('❌ خطأ', e.message);
     }
 }
+
 async function quickReject(key, name) {
     if (!confirm(`هل تريد حذف طلب "${name}"؟`)) return;
-    if (!db) return;
     try {
-        await db.ref('users/' + key).remove();
+        if (isOnline && db) {
+            await db.ref('users/' + key).remove();        } else {
+            await addToSyncQueue({ type: 'removeUser', key: 'users/' + key });
+        }
+        
+        // Update local cache
+        const cached = await loadUsersFromCache();
+        const updated = cached.filter(u => u.key !== key);
+        await saveUsersToCache(updated);
+        
         showToast('🗑️ تم الحذف', `تم حذف طلب ${name}`);
         showRequestsModal();
         loadUsers();
@@ -586,20 +995,37 @@ async function quickReject(key, name) {
         showToast('❌ خطأ', e.message);
     }
 }
+
 // ========== التيكر ==========
 let tickerItems = [];
-function initTicker() {
-    if (!db) return;
-    db.ref('ticker').on('value', (snapshot) => {
-        const data = snapshot.val();
-        tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
-        tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
+
+async function initTicker() {
+    // Load from cache first
+    const cached = await loadTickerFromCache();
+    if (cached && cached.length > 0) {
+        tickerItems = cached.sort((a,b) => (a.order || 0) - (b.order || 0));
         updateTickerDisplay();
         updateTickerStatus();
-        if (currentUser && currentUser.isAdmin) {
-            renderTickerAdminList();
-        }
-    });
+    }
+    
+    if (!db || !isOnline) return;
+    
+    try {
+        db.ref('ticker').on('value', (snapshot) => {
+            const data = snapshot.val();
+            tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
+            tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
+            // Cache
+            saveTickerToCache(tickerItems).catch(() => {});
+            updateTickerDisplay();
+            updateTickerStatus();
+            if (currentUser && currentUser.isAdmin) {
+                renderTickerAdminList();
+            }
+        });
+    } catch(e) {
+        console.warn('Ticker listener error:', e);
+    }
 }
 function updateTickerDisplay() {
     const container = document.querySelector('.ticker-container');
@@ -617,6 +1043,7 @@ function updateTickerDisplay() {
     });
     tickerText.textContent = text + ' ◆ ' + text + ' ◆ ' + text;
 }
+
 function updateTickerStatus() {
     const statusDiv = document.getElementById('tickerStatus');
     const activeCount = tickerItems.filter(item => item.active !== false).length;
@@ -627,6 +1054,7 @@ function updateTickerStatus() {
         statusDiv.innerHTML = `📢 عدد النصوص: ${total} (نشطة: ${activeCount})`;
     }
 }
+
 function renderTickerAdminList() {
     const container = document.getElementById('tickerItemsList');
     if (!container) return;
@@ -648,49 +1076,81 @@ function renderTickerAdminList() {
             </div>
         `;
         fragment.appendChild(div);
-    });
-    container.innerHTML = '';
+    });    container.innerHTML = '';
     container.appendChild(fragment);
 }
+
 async function addTickerItem() {
     const input = document.getElementById('tickerInput');
     const text = input.value.trim();
     if (!text) { alert('الرجاء إدخال نص'); return; }
-    if (!db) return;
+    
+    const newItem = { text: text, active: true, order: Date.now() };
+    
     try {
-        const newRef = db.ref('ticker').push();
-        await newRef.set({ text: text, active: true, order: Date.now() });
-        input.value = '';
-        showToast('✅ تمت الإضافة', 'تم إضافة النص إلى التيكر', 'success');
+        if (isOnline && db) {
+            const newRef = db.ref('ticker').push();
+            await newRef.set(newItem);
+            input.value = '';
+            showToast('✅ تمت الإضافة', 'تم إضافة النص إلى التيكر', 'success');
+        } else {
+            const tempId = 'local_' + Date.now();
+            await addToSyncQueue({ type: 'setTicker', id: tempId, data: newItem });
+            // Add to local display
+            tickerItems.push({ id: tempId, ...newItem });
+            renderTickerAdminList();
+            input.value = '';
+            showToast('💾 تم الحفظ محلياً', 'سيتم المزامنة عند عودة الاتصال', 'offline');
+        }
     } catch(e) {
-        showToast('❌ خطأ', e.message);
+        const tempId = 'local_' + Date.now();
+        await addToSyncQueue({ type: 'setTicker', id: tempId, data: newItem });
+        tickerItems.push({ id: tempId, ...newItem });
+        renderTickerAdminList();
+        input.value = '';
+        showToast('💾 تم الحفظ محلياً', 'سيتم المزامنة عند عودة الاتصال', 'offline');
     }
 }
+
 async function toggleTickerItem(id) {
-    if (!db) return;
     try {
         const item = tickerItems.find(i => i.id === id);
         if (!item) return;
         const newStatus = item.active === false ? true : false;
-        await db.ref('ticker/' + id).update({ active: newStatus });
-        showToast('✅ تم التحديث', `النص ${newStatus ? 'نشط' : 'غير نشط'}`, 'success');
+        
+        if (isOnline && db) {
+            await db.ref('ticker/' + id).update({ active: newStatus });
+        } else {
+            await addToSyncQueue({ type: 'updateTicker', id: id, data: { active: newStatus } });
+            item.active = newStatus;
+            renderTickerAdminList();
+        }
+        showToast('✅ تم التحديث', `النص ${newStatus ? 'نشط' : 'غير نشط'}`, 'success');    } catch(e) {
+        showToast('❌ خطأ', e.message);
+    }
+}
+
+async function deleteTickerItem(id) {
+    if (!confirm('هل تريد حذف هذا النص من التيكر؟')) return;
+    try {
+        if (isOnline && db) {
+            await db.ref('ticker/' + id).remove();
+        } else {
+            await addToSyncQueue({ type: 'removeTicker', id: id });
+            tickerItems = tickerItems.filter(i => i.id !== id);
+            renderTickerAdminList();
+        }
+        showToast('🗑️ تم الحذف', 'تم حذف النص', 'success');
     } catch(e) {
         showToast('❌ خطأ', e.message);
     }
 }
-async function deleteTickerItem(id) {
-    if (!confirm('هل تريد حذف هذا النص من التيكر؟')) return;
-    if (!db) return;
-    try {
-        await db.ref('ticker/' + id).remove();
-        showToast('🗑️ تم الحذف', 'تم حذف النص', 'success');
-    } catch(e) {        showToast('❌ خطأ', e.message);
-    }
-}
+
 function openTickerManager() {
     document.getElementById('tickerModal').style.display = 'block';
     renderTickerAdminList();
 }
+
 function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
@@ -709,15 +1169,14 @@ async function startNewQuiz() {
             renderQuestion();
             
             // تحديث الكاش في الخلفية (بدون انتظار)
-            if (db) {
+            if (db && isOnline) {
                 syncQuestionsInBackground();
             }
             return;
         }
-        
-        // لا يوجد كاش - تحميل من Firebase
-        if (!db) {
-            alert('لا يوجد اتصال بقاعدة البيانات');
+                // لا يوجد كاش - تحميل من Firebase
+        if (!db || !isOnline) {
+            alert('لا توجد أسئلة محفوظة محلياً ولا يوجد اتصال بالإنترنت. الرجاء الاتصال بالإنترنت لتحميل الأسئلة لأول مرة.');
             return;
         }
         
@@ -743,18 +1202,28 @@ async function startNewQuiz() {
         startQuestionsListener();
         
     } catch(e) {
-        alert('خطأ في تحميل الأسئلة: ' + e.message);
+        // Try cache as fallback
+        const cachedQuestions = await loadQuestionsFromCache();
+        if (cachedQuestions && cachedQuestions.length > 0) {
+            currentQuestions = cachedQuestions.sort(() => Math.random() - 0.5);
+            currentIndex = 0;
+            currentScore = 0;
+            currentWrong = [];
+            renderQuestion();
+            showToast('📡 الوضع المحلي', 'تم تحميل الأسئلة من الذاكرة المحلية', 'offline');
+        } else {
+            alert('خطأ في تحميل الأسئلة: ' + e.message);
+        }
     }
 }
 
 // تحديث الأسئلة في الخلفية دون إزعاج المستخدم
 function syncQuestionsInBackground() {
-    if (!db) return;
+    if (!db || !isOnline) return;
     db.ref('questions').once('value').then(snapshot => {
         const questions = snapshot.val();
         if (!questions) return;
-        const freshQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
-        
+        const freshQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));        
         // مقارنة بسيطة: إذا تغير العدد، حدّث الكاش
         if (freshQuestions.length !== currentQuestions.length) {
             saveQuestionsToCache(freshQuestions).then(() => {
@@ -769,7 +1238,7 @@ function syncQuestionsInBackground() {
 
 // مستمع للتغييرات في الأسئلة (للمسؤول فقط)
 function startQuestionsListener() {
-    if (!db || questionsListenerActive) return;
+    if (!db || questionsListenerActive || !isOnline) return;
     questionsListenerActive = true;
     db.ref('questions').on('value', (snapshot) => {
         const questions = snapshot.val();
@@ -803,7 +1272,7 @@ function renderQuestion() {
     });
     optsDiv.appendChild(fragment);
 }
-function checkAnswer(selected, correct, explanation, element) {
+async function checkAnswer(selected, correct, explanation, element) {
     const optsDiv = document.getElementById('optionsContainer');
     optsDiv.querySelectorAll('.option').forEach(opt => opt.style.pointerEvents = 'none');
     if (selected === correct) {
@@ -811,7 +1280,24 @@ function checkAnswer(selected, correct, explanation, element) {
         currentScore += 10;
         document.getElementById('scoreDisplay').innerHTML = `⭐ ${currentScore} نقطة`;
         if (currentUser && !currentUser.isAdmin) {
-            db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
+            try {
+                if (isOnline && db) {
+                    db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
+                } else {
+                    // Queue points update
+                    await addToSyncQueue({ 
+                        type: 'updatePoints', 
+                        key: currentUser.key, 
+                        points: 10 
+                    });
+                }
+            } catch(e) {
+                await addToSyncQueue({ 
+                    type: 'updatePoints', 
+                    key: currentUser.key, 
+                    points: 10 
+                });
+            }
         }
     } else {
         element.classList.add('wrong');
@@ -824,7 +1310,9 @@ function checkAnswer(selected, correct, explanation, element) {
     document.getElementById('explanation').style.display = 'block';
     document.getElementById('nextBtn').style.display = 'block';
 }
+
 function nextQuestion() { currentIndex++; renderQuestion(); }
+
 function showResult() {
     const total = currentQuestions.length * 10;
     const percentage = Math.round((currentScore / total) * 100);
@@ -833,44 +1321,65 @@ function showResult() {
     const wrongDiv = document.getElementById('wrongAnswersList');
     if (currentWrong.length === 0) {        wrongDiv.innerHTML = '<p style="color:#00b894;text-align:center">🎉 ممتاز! لا توجد إجابات خاطئة 🎉</p>';
     } else {
-        wrongDiv.innerHTML = '<h4 style="margin:15px 0 10px">📝 أسئلة تحتاج مراجعة:</h4>';
-        currentWrong.forEach((item, i) => {
+        wrongDiv.innerHTML = '<h4 style="margin:15px 0 10px">📝 أسئلة تحتاج مراجعة:</h4>';        currentWrong.forEach((item, i) => {
             wrongDiv.innerHTML += `<div class="wrong-item"><strong>${i+1}.</strong> ${item.question}<br>✅ الإجابة الصحيحة: ${item.correct}<br>📖 ${item.explanation}</div>`;
         });
     }
     showScreen('resultScreen');
 }
+
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
-    try {
-        const snapshot = await db.ref('questions').once('value');
-        const questions = snapshot.val();
-        if (!questions) { container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>'; return; }
-        const fragment = document.createDocumentFragment();
-        Object.entries(questions).forEach(([id, q]) => {
-            const div = document.createElement('div');
-            div.className = 'q-item';
-            div.innerHTML = `
-                <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
-                <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
-                <div class="row" style="margin-top:10px">
-                    <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick='editQuestion("${id}", ${JSON.stringify(q).replace(/'/g, "\\'")})'>✏️ تعديل</button>
-                    <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">️ حذف</button>
-                </div>
-            `;
-            fragment.appendChild(div);
-        });
-        container.innerHTML = '';
-        container.appendChild(fragment);
-    } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
+    
+    let questions = {};
+    
+    if (isOnline && db) {
+        try {
+            const snapshot = await db.ref('questions').once('value');
+            questions = snapshot.val() || {};
+            // Cache
+            const qArray = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
+            saveQuestionsToCache(qArray).catch(() => {});
+        } catch(e) {
+            // Fallback to cache
+            const cached = await loadQuestionsFromCache();
+            cached.forEach(q => { questions[q.id] = q; });
+        }
+    } else {
+        const cached = await loadQuestionsFromCache();
+        cached.forEach(q => { questions[q.id] = q; });
+    }
+    
+    if (Object.keys(questions).length === 0) { 
+        container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>'; 
+        return; 
+    }
+    
+    const fragment = document.createDocumentFragment();
+    Object.entries(questions).forEach(([id, q]) => {
+        const div = document.createElement('div');
+        div.className = 'q-item';
+        div.innerHTML = `
+            <div><strong>${q.q.substring(0, 100)}${q.q.length > 100 ? '...' : ''}</strong></div>
+            <div style="color:#00b894;font-size:13px;margin:5px 0">✅ ${q.c}</div>
+            <div class="row" style="margin-top:10px">
+                <button class="btn" style="background:#ffb703;width:auto;padding:5px 15px" onclick='editQuestion("${id}", ${JSON.stringify(q).replace(/'/g, "\\'")})'>✏️ تعديل</button>
+                <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteQuestion('${id}')">️ حذف</button>
+            </div>
+        `;
+        fragment.appendChild(div);
+    });
+    container.innerHTML = '';    container.appendChild(fragment);
 }
+
 function addQuestionForm() {
     editingQuestionId = null;
     document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';
     ['qText','opt1','opt2','opt3','opt4','correctOpt','questionImageUrl','explanationText'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('questionModal').style.display = 'flex';
 }
+
 function editQuestion(id, q) {
     editingQuestionId = id;
     document.getElementById('modalTitle').innerHTML = '✏️ تعديل السؤال';
@@ -883,6 +1392,7 @@ function editQuestion(id, q) {
     document.getElementById('questionImageUrl').value = q.img || '';    document.getElementById('explanationText').value = q.e || '';
     document.getElementById('questionModal').style.display = 'flex';
 }
+
 async function saveQuestion() {
     const qText = document.getElementById('qText').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
@@ -895,68 +1405,197 @@ async function saveQuestion() {
     if (!qText || !opt1 || !opt2 || !opt3 || !opt4 || !correct || !explanation) { alert('الرجاء ملء جميع الحقول'); return; }
     if (![opt1, opt2, opt3, opt4].includes(correct)) { alert('الخيار الصحيح يجب أن يطابق أحد الخيارات المدخلة'); return; }
     const questionData = { q: qText, o: [opt1, opt2, opt3, opt4], c: correct, e: explanation, img: imgUrl };
+    
     try {
-        if (editingQuestionId) {
-            await db.ref('questions/' + editingQuestionId).set(questionData);
-            alert('تم تعديل السؤال بنجاح');
+        if (isOnline && db) {
+            if (editingQuestionId) {
+                await db.ref('questions/' + editingQuestionId).set(questionData);
+                alert('تم تعديل السؤال بنجاح');
+            } else {
+                await db.ref('questions').push(questionData);
+                alert('تم إضافة السؤال بنجاح');
+            }
         } else {
-            await db.ref('questions').push(questionData);
-            alert('تم إضافة السؤال بنجاح');
+            // Offline: queue and update local cache
+            if (editingQuestionId) {
+                await addToSyncQueue({ type: 'setQuestion', id: editingQuestionId, data: questionData });
+            } else {                const tempId = 'local_' + Date.now();
+                await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
+            }
+            
+            // Update local cache
+            const cached = await loadQuestionsFromCache();
+            if (editingQuestionId) {
+                const updated = cached.map(q => q.id === editingQuestionId ? { id: editingQuestionId, ...questionData } : q);
+                await saveQuestionsToCache(updated);
+            } else {
+                const newId = 'local_' + Date.now();
+                cached.push({ id: newId, ...questionData });
+                await saveQuestionsToCache(cached);
+            }
+            
+            alert('💾 تم الحفظ محلياً - سيتم المزامنة عند عودة الاتصال');
         }
         closeModal();
         loadQuestions();
-    } catch(e) { alert('خطأ: ' + e.message); }
-}
-async function deleteQuestion(id) {
-    if (confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
-        try { await db.ref('questions/' + id).remove(); alert('تم حذف السؤال'); loadQuestions(); }
-        catch(e) { alert('خطأ: ' + e.message); }
+    } catch(e) {
+        // Fallback to offline mode
+        if (editingQuestionId) {
+            await addToSyncQueue({ type: 'setQuestion', id: editingQuestionId, data: questionData });
+        } else {
+            const tempId = 'local_' + Date.now();
+            await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
+        }
+        const cached = await loadQuestionsFromCache();
+        if (editingQuestionId) {
+            const updated = cached.map(q => q.id === editingQuestionId ? { id: editingQuestionId, ...questionData } : q);
+            await saveQuestionsToCache(updated);
+        } else {
+            cached.push({ id: 'local_' + Date.now(), ...questionData });
+            await saveQuestionsToCache(cached);
+        }
+        alert('💾 تم الحفظ محلياً - سيتم المزامنة عند عودة الاتصال');
+        closeModal();
+        loadQuestions();
     }
 }
+
+async function deleteQuestion(id) {
+    if (!confirm('هل أنت متأكد من حذف هذا السؤال؟')) return;
+    try {
+        if (isOnline && db) {
+            await db.ref('questions/' + id).remove();
+            alert('تم حذف السؤال');
+        } else {
+            await addToSyncQueue({ type: 'removeQuestion', id: id });
+            const cached = await loadQuestionsFromCache();            const updated = cached.filter(q => q.id !== id);
+            await saveQuestionsToCache(updated);
+            alert('💾 تم الحذف محلياً - سيتم المزامنة عند عودة الاتصال');
+        }
+        loadQuestions();
+    } catch(e) {
+        await addToSyncQueue({ type: 'removeQuestion', id: id });
+        const cached = await loadQuestionsFromCache();
+        const updated = cached.filter(q => q.id !== id);
+        await saveQuestionsToCache(updated);
+        alert('💾 تم الحذف محلياً');
+        loadQuestions();
+    }
+}
+
 async function loadUsers() {
     const container = document.getElementById('usersList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
-    try {
-        const snapshot = await db.ref('users').once('value');
-        const users = snapshot.val();
-        if (!users) { container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>'; return; }
-        const fragment = document.createDocumentFragment();
-        Object.entries(users).forEach(([key, user]) => {
-            let statusClass = '', statusText = '';
-            if (user.status === 'active') { statusClass = 'tag-active'; statusText = 'نشط'; }
-            else if (user.status === 'pending') { statusClass = 'tag-pending'; statusText = 'قيد المراجعة'; }
-            else { statusClass = 'tag-suspended'; statusText = 'موقوف'; }
-            const div = document.createElement('div');
-            div.className = 'user-item';
-            div.innerHTML = `
-                <div><strong>${user.name}</strong> <span class="tag ${statusClass}">${statusText}</span></div>                <div style="font-size:13px;color:#666">🏆 النقاط: ${user.totalPoints || 0}</div>
-                <div style="font-size:12px;color:#888">🔑 ${user.password}</div>
-                <div class="row" style="margin-top:10px">
-                    ${user.status !== 'active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'active')">✅ تفعيل</button>` : ''}
-                    ${user.status !== 'suspended' ? `<button class="btn" style="background:#fdcb6e;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'suspended')">⛔ إيقاف</button>` : ''}
-                    <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteUser('${key}', '${user.name}')">🗑️ حذف</button>
-                </div>
-            `;
-            fragment.appendChild(div);
-        });
-        container.innerHTML = '';
-        container.appendChild(fragment);
-    } catch(e) { container.innerHTML = '<p style="color:red">خطأ في التحميل</p>'; }
+    
+    let users = {};
+    
+    if (isOnline && db) {
+        try {
+            const snapshot = await db.ref('users').once('value');
+            users = snapshot.val() || {};
+            // Cache
+            const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
+            saveUsersToCache(usersArray).catch(() => {});
+        } catch(e) {
+            // Fallback to cache
+            const cached = await loadUsersFromCache();
+            cached.forEach(u => { users[u.key] = u; });
+        }
+    } else {
+        const cached = await loadUsersFromCache();
+        cached.forEach(u => { users[u.key] = u; });
+    }
+    
+    if (Object.keys(users).length === 0) { 
+        container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>'; 
+        return; 
+    }
+    
+    const fragment = document.createDocumentFragment();
+    Object.entries(users).forEach(([key, user]) => {
+        let statusClass = '', statusText = '';
+        if (user.status === 'active') { statusClass = 'tag-active'; statusText = 'نشط'; }
+        else if (user.status === 'pending') { statusClass = 'tag-pending'; statusText = 'قيد المراجعة'; }
+        else { statusClass = 'tag-suspended'; statusText = 'موقوف'; }
+        const div = document.createElement('div');        div.className = 'user-item';
+        div.innerHTML = `
+            <div><strong>${user.name}</strong> <span class="tag ${statusClass}">${statusText}</span></div>                <div style="font-size:13px;color:#666">🏆 النقاط: ${user.totalPoints || 0}</div>
+            <div style="font-size:12px;color:#888">🔑 ${user.password}</div>
+            <div class="row" style="margin-top:10px">
+                ${user.status !== 'active' ? `<button class="btn" style="background:#00b894;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'active')">✅ تفعيل</button>` : ''}
+                ${user.status !== 'suspended' ? `<button class="btn" style="background:#fdcb6e;width:auto;padding:5px 15px" onclick="updateUserStatus('${key}', 'suspended')">⛔ إيقاف</button>` : ''}
+                <button class="btn" style="background:#e17055;width:auto;padding:5px 15px" onclick="deleteUser('${key}', '${user.name}')">🗑️ حذف</button>
+            </div>
+        `;
+        fragment.appendChild(div);
+    });
+    container.innerHTML = '';
+    container.appendChild(fragment);
 }
+
 async function updateUserStatus(key, status) {
     try {
-        await db.ref('users/' + key).update({ status });
-        alert(`تم تغيير الحالة إلى ${status === 'active' ? 'نشط' : 'موقوف'}`);
+        if (isOnline && db) {
+            await db.ref('users/' + key).update({ status });
+            alert(`تم تغيير الحالة إلى ${status === 'active' ? 'نشط' : 'موقوف'}`);
+        } else {
+            await addToSyncQueue({ type: 'updateUser', key: 'users/' + key, data: { status } });
+            alert(`💾 تم الحفظ محلياً - سيتم المزامنة عند عودة الاتصال`);
+        }
+        
+        // Update local cache
+        const cached = await loadUsersFromCache();
+        const updated = cached.map(u => u.key === key ? { ...u, status } : u);
+        await saveUsersToCache(updated);
+        
         loadUsers();
         checkPendingUsers();
-    } catch(e) { alert('خطأ: ' + e.message); }
-}
-async function deleteUser(key, name) {
-    if (confirm(`هل أنت متأكد من حذف الطالب "${name}" نهائياً؟`)) {
-        try { await db.ref('users/' + key).remove(); alert('تم حذف الطالب'); loadUsers(); checkPendingUsers(); }
-        catch(e) { alert('خطأ: ' + e.message); }
+    } catch(e) {
+        await addToSyncQueue({ type: 'updateUser', key: 'users/' + key, data: { status } });
+        const cached = await loadUsersFromCache();
+        const updated = cached.map(u => u.key === key ? { ...u, status } : u);
+        await saveUsersToCache(updated);
+        alert(`💾 تم الحفظ محلياً`);
+        loadUsers();
+        checkPendingUsers();
     }
 }
+
+async function deleteUser(key, name) {
+    if (!confirm(`هل أنت متأكد من حذف الطالب "${name}" نهائياً؟`)) return;
+    try {
+        if (isOnline && db) {
+            await db.ref('users/' + key).remove();
+            alert('تم حذف الطالب');        } else {
+            await addToSyncQueue({ type: 'removeUser', key: 'users/' + key });
+            alert('💾 تم الحذف محلياً - سيتم المزامنة عند عودة الاتصال');
+        }
+        
+        const cached = await loadUsersFromCache();
+        const updated = cached.filter(u => u.key !== key);
+        await saveUsersToCache(updated);
+        
+        loadUsers();
+        checkPendingUsers();
+    } catch(e) {
+        await addToSyncQueue({ type: 'removeUser', key: 'users/' + key });
+        const cached = await loadUsersFromCache();
+        const updated = cached.filter(u => u.key !== key);
+        await saveUsersToCache(updated);
+        alert('💾 تم الحذف محلياً');
+        loadUsers();
+        checkPendingUsers();
+    }
+}
+
+async function forceSyncQueue() {
+    if (!isOnline) {
+        alert('لا يوجد اتصال بالإنترنت');
+        return;
+    }
+    await processSyncQueue();
+}
+
 function closeModal() {
     document.getElementById('questionModal').style.display = 'none';
     editingQuestionId = null;
@@ -971,7 +1610,12 @@ window.onload = async () => {
         console.warn('IndexedDB not available:', e);
     }
     
-    initTicker();
+    // Load sync queue from cache
+    await loadSyncQueueFromCache();
+    
+    // Update connection status
+    updateConnectionStatus();
+        await initTicker();
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -988,18 +1632,22 @@ window.onload = async () => {
         showLanding();
     }
 };
+
 function showLanding() { showScreen('landingScreen'); }
 function showLogin() { showScreen('loginScreen'); }
 function showRegister() { showScreen('registerScreen'); }
+
 function showAdminLogin() {
     showScreen('loginScreen');
     document.getElementById('loginUsername').value = 'admin';
     document.getElementById('loginPassword').focus();
 }
+
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
 }
+
 async function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -1015,9 +1663,21 @@ async function doLogin() {
         return;
     }
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
-    try {
-        const snapshot = await db.ref('users/' + userKey).once('value');
-        const user = snapshot.val();
+    
+    try {        let user = null;
+        
+        if (isOnline && db) {
+            const snapshot = await db.ref('users/' + userKey).once('value');
+            user = snapshot.val();
+            // Cache user
+            if (user) {
+                await idbPut('users', { key: userKey, ...user });
+            }
+        } else {
+            // Try local cache
+            user = await idbGet('users', userKey);
+        }
+        
         if (user && user.password === password && user.status === 'active') {
             currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
             localStorage.setItem('userSession', JSON.stringify(currentUser));
@@ -1027,25 +1687,58 @@ async function doLogin() {
         } else if (user && user.status === 'pending') {
             alert('حسابك قيد المراجعة من قبل المشرف');
         } else if (user && user.status === 'suspended') {
-            alert('تم إيقاف حسابك');        } else {
+            alert('تم إيقاف حسابك');
+        } else {
             alert('اسم المستخدم أو كلمة السر غير صحيحة');
         }
-    } catch(e) { alert('خطأ: ' + e.message); }
+    } catch(e) {
+        // Try local cache as fallback
+        try {
+            const user = await idbGet('users', userKey);
+            if (user && user.password === password && user.status === 'active') {
+                currentUser = { isAdmin: false, name: username, key: userKey, points: user.totalPoints || 0 };
+                localStorage.setItem('userSession', JSON.stringify(currentUser));
+                document.getElementById('headerLogoutBtn').style.display = 'block';
+                showScreen('studentScreen');
+                startNewQuiz();
+                showToast('📡 الوضع المحلي', 'تم تسجيل الدخول من البيانات المحفوظة', 'offline');
+            } else {
+                alert('لا يوجد اتصال ولا توجد بيانات محفوظة لهذا المستخدم');
+            }
+        } catch(e2) {
+            alert('خطأ: ' + e.message);
+        }
+    }
 }
+
 async function doRegister() {
     const name = document.getElementById('registerName').value.trim();
-    const password = document.getElementById('registerPassword').value.trim();
-    if (!name || !password) { alert('الرجاء ملء جميع الحقول'); return; }
+    const password = document.getElementById('registerPassword').value.trim();    if (!name || !password) { alert('الرجاء ملء جميع الحقول'); return; }
     const userKey = btoa(unescape(encodeURIComponent(name))).replace(/[^A-Za-z0-9]/g, '');
+    const userData = {
+        name, password, status: 'pending', totalPoints: 0,
+        streak: 0, lastLoginDate: "", registeredAt: Date.now()
+    };
+    
     try {
-        await db.ref('users/' + userKey).set({
-            name, password, status: 'pending', totalPoints: 0,
-            streak: 0, lastLoginDate: "", registeredAt: Date.now()
-        });
-        alert('✅ تم إرسال طلب التسجيل بنجاح، سيتم تفعيل حسابك قريباً');
+        if (isOnline && db) {
+            await db.ref('users/' + userKey).set(userData);
+            alert('✅ تم إرسال طلب التسجيل بنجاح، سيتم تفعيل حسابك قريباً');
+        } else {
+            await addToSyncQueue({ type: 'setUser', key: 'users/' + userKey, data: userData });
+            // Save to local cache
+            await idbPut('users', { key: userKey, ...userData });
+            alert('💾 تم حفظ طلب التسجيل محلياً - سيتم إرساله عند عودة الاتصال');
+        }
         showLanding();
-    } catch(e) { alert('خطأ: ' + e.message); }
+    } catch(e) {
+        await addToSyncQueue({ type: 'setUser', key: 'users/' + userKey, data: userData });
+        await idbPut('users', { key: userKey, ...userData });
+        alert('💾 تم حفظ طلب التسجيل محلياً - سيتم إرساله عند عودة الاتصال');
+        showLanding();
+    }
 }
+
 function logout() {
     if (checkInterval) { clearInterval(checkInterval); checkInterval = null; }
     localStorage.removeItem('userSession');
