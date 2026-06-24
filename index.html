@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://quizdental-c4d5a-default-rtdb.firebaseio.com" crossorigin>
 <style>
 .ticker-container{position:fixed;bottom:0;left:0;width:100%;background:linear-gradient(135deg,#1e4a6e,#2c9b7a);color:#fff;padding:10px 0;overflow:hidden;z-index:9999;white-space:nowrap;border-top:3px solid #2c9b7a;display:none;will-change:transform}
-.ticker-text{display:inline-block;padding-left:100%;animation:tickerMove 75s linear infinite;will-change:transform}
+.ticker-text{display:inline-block;padding-left:100%;animation:tickerMove 120s linear infinite;will-change:transform}
 @keyframes tickerMove{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
 *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif}
 body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding:20px;padding-bottom:60px}
@@ -270,13 +270,11 @@ if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register(swUrl).catch(() => {});
     });
 }
-
 // ========== Connection State Management ==========
 let isOnline = navigator.onLine;
 let pendingSyncQueue = [];
 const SYNC_QUEUE_KEY = 'dental_sync_queue';
 const LAST_SYNC_KEY = 'dental_last_sync';
-
 function updateConnectionStatus() {
     isOnline = navigator.onLine;
     const statusEl = document.getElementById('connectionStatus');
@@ -295,23 +293,19 @@ function updateConnectionStatus() {
         banner.style.display = 'block';        details.textContent = queueCount > 0 ? `${queueCount} عملية في انتظار المزامنة` : 'التطبيق يعمل بالبيانات المحلية';
     }
 }
-
 window.addEventListener('online', () => {
     updateConnectionStatus();
     showToast('🌐 عودة الاتصال', 'جاري مزامنة البيانات...', 'success');
     setTimeout(() => processSyncQueue(), 1000);
 });
-
 window.addEventListener('offline', () => {
     updateConnectionStatus();
     showToast('📡 انقطع الاتصال', 'التطبيق يعمل بالوضع المحلي', 'offline');
 });
-
 // ========== IndexedDB Cache Layer ==========
 const DB_NAME = 'DentalCoachCache';
 const DB_VERSION = 2;
 let localDB = null;
-
 function openLocalDB() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -340,7 +334,6 @@ function openLocalDB() {
         };
     });
 }
-
 function idbPut(storeName, data) {    return new Promise((resolve, reject) => {
         if (!localDB) return resolve();
         try {
@@ -356,7 +349,6 @@ function idbPut(storeName, data) {    return new Promise((resolve, reject) => {
         } catch(e) { reject(e); }
     });
 }
-
 function idbGetAll(storeName) {
     return new Promise((resolve, reject) => {
         if (!localDB) return resolve([]);
@@ -369,7 +361,6 @@ function idbGetAll(storeName) {
         } catch(e) { reject(e); }
     });
 }
-
 function idbClear(storeName) {
     return new Promise((resolve, reject) => {
         if (!localDB) return resolve();
@@ -381,7 +372,6 @@ function idbClear(storeName) {
         } catch(e) { reject(e); }
     });
 }
-
 function idbDelete(storeName, key) {
     return new Promise((resolve, reject) => {
         if (!localDB) return resolve();
@@ -392,7 +382,6 @@ function idbDelete(storeName, key) {
             tx.onerror = () => reject(tx.error);
         } catch(e) { reject(e); }    });
 }
-
 function idbGet(storeName, key) {
     return new Promise((resolve, reject) => {
         if (!localDB) return resolve(null);
@@ -404,7 +393,6 @@ function idbGet(storeName, key) {
         } catch(e) { reject(e); }
     });
 }
-
 async function saveQuestionsToCache(questionsArray) {
     try {
         await idbClear('questions');
@@ -414,7 +402,6 @@ async function saveQuestionsToCache(questionsArray) {
         console.warn('Cache save failed:', e);
     }
 }
-
 async function loadQuestionsFromCache() {
     try {
         return await idbGetAll('questions');
@@ -422,32 +409,27 @@ async function loadQuestionsFromCache() {
         return [];
     }
 }
-
 async function saveUsersToCache(usersArray) {
     try {
         await idbClear('users');
         await idbPut('users', usersArray);
     } catch(e) { console.warn(e); }
 }
-
 async function loadUsersFromCache() {
     try {
         return await idbGetAll('users');
     } catch(e) { return []; }
 }
-
 async function saveTickerToCache(items) {
     try {
         await idbClear('ticker');
         await idbPut('ticker', items);    } catch(e) { console.warn(e); }
 }
-
 async function loadTickerFromCache() {
     try {
         return await idbGetAll('ticker');
     } catch(e) { return []; }
 }
-
 // ========== Sync Queue (Offline Operations) ==========
 async function addToSyncQueue(operation) {
     const item = {
@@ -462,7 +444,6 @@ async function addToSyncQueue(operation) {
     updateSyncQueueUI();
     return item;
 }
-
 async function loadSyncQueueFromCache() {
     try {
         const items = await idbGetAll('syncQueue');
@@ -470,7 +451,6 @@ async function loadSyncQueueFromCache() {
         updateSyncQueueUI();
     } catch(e) { pendingSyncQueue = []; }
 }
-
 async function clearSyncQueue() {
     pendingSyncQueue = [];
     try {
@@ -478,7 +458,6 @@ async function clearSyncQueue() {
     } catch(e) {}
     updateSyncQueueUI();
 }
-
 function updateSyncQueueUI() {
     const countEl = document.getElementById('syncQueueCount');
     const section = document.getElementById('syncQueueSection');
@@ -489,7 +468,6 @@ function updateSyncQueueUI() {
     if (offlineDetails && !isOnline && pendingSyncQueue.length > 0) {
         offlineDetails.textContent = `${pendingSyncQueue.length} عملية في انتظار المزامنة`;
     }}
-
 async function processSyncQueue() {
     if (!isOnline || !db || pendingSyncQueue.length === 0) return;
     
@@ -517,7 +495,6 @@ async function processSyncQueue() {
     
     if (syncBadge) syncBadge.style.display = 'none';
 }
-
 async function executeSyncOperation(op) {
     switch(op.type) {
         case 'setUser':
@@ -552,7 +529,6 @@ async function executeSyncOperation(op) {
             break;
     }
 }
-
 // ========== PWA SETUP ==========
 const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#2c9b7a"/><stop offset="100%" stop-color="#1e4a6e"/></linearGradient></defs><rect width="512" height="512" rx="96" fill="url(#g)"/><path fill="#fff" d="M340 90c-40 0-60 20-84 20s-44-20-84-20c-50 0-90 42-90 94 0 52 20 120 44 168 18 36 34 70 58 70 22 0 28-26 48-70 12-26 22-44 32-44s20 18 32 44c20 44 26 70 48 70 24 0 40-34 58-70 24-48 44-116 44-168 0-52-40-94-90-94z"/><text x="256" y="470" font-family="Arial" font-size="36" font-weight="bold" text-anchor="middle" fill="#fff">د. ز. عطوني</text></svg>`;
 let appIconUrl = null;
@@ -644,13 +620,11 @@ let currentScore = 0;
 let currentWrong = [];
 let editingQuestionId = null;
 let questionsListenerActive = false;
-
 // ========== Smart Firebase Wrapper (Offline-Safe) ==========
 function safeDbRef(path) {
     if (!db) return null;
     return db.ref(path);
 }
-
 async function safeDbOnce(path) {
     if (!db) return null;
     try {
@@ -659,7 +633,6 @@ async function safeDbOnce(path) {
         return null;
     }
 }
-
 async function safeDbSet(path, data) {
     if (!db) {
         await addToSyncQueue({ type: 'setUser', key: path, data });
@@ -671,7 +644,6 @@ async function safeDbSet(path, data) {
         await addToSyncQueue({ type: 'setUser', key: path, data });
     }
 }
-
 async function safeDbUpdate(path, data) {
     if (!db) {
         await addToSyncQueue({ type: 'updateUser', key: path, data });
@@ -683,7 +655,6 @@ async function safeDbUpdate(path, data) {
         await addToSyncQueue({ type: 'updateUser', key: path, data });
     }
 }
-
 async function safeDbRemove(path) {    if (!db) {
         await addToSyncQueue({ type: 'removeUser', key: path });
         return;
@@ -694,7 +665,6 @@ async function safeDbRemove(path) {    if (!db) {
         await addToSyncQueue({ type: 'removeUser', key: path });
     }
 }
-
 try {
     firebase.initializeApp(firebaseConfig);
     db = firebase.database();
@@ -714,13 +684,11 @@ try {
     console.error("Firebase error:", e);
     document.getElementById('connectionStatus').innerHTML = '🔴 خطأ في الاتصال';
 }
-
 // ========== نظام الإشعارات ==========
 let lastPendingCount = 0;
 let checkInterval = null;
 let notifPermission = 'default';
 let pushSupported = 'Notification' in window;
-
 async function requestNotificationPermission() {
     if (!pushSupported) return;
     try {
@@ -739,7 +707,6 @@ async function requestNotificationPermission() {
         console.error('خطأ:', e);
     }
 }
-
 function sendPushNotification(title, body, userName = null) {
     if (!pushSupported) return;    if (notifPermission !== 'granted') return;
     try {
@@ -768,7 +735,6 @@ function sendPushNotification(title, body, userName = null) {
         console.error('خطأ Push:', e);
     }
 }
-
 function playBeep() {
     try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -790,7 +756,6 @@ function playBeep() {
         });
     } catch(e) {}
 }
-
 function showToast(title, message, type = 'info') {    const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
     toast.className = 'toast' + (type === 'success' ? ' success' : type === 'offline' ? ' offline' : '');
@@ -816,7 +781,6 @@ function showToast(title, message, type = 'info') {    const container = documen
         }
     }, 8000);
 }
-
 async function checkPendingUsers() {
     if (!db || !currentUser || !currentUser.isAdmin || !isOnline) {
         // Use local cache for pending count when offline
@@ -882,7 +846,6 @@ async function checkPendingUsers() {
     } catch(e) {
         console.error('Error:', e);    }
 }
-
 function startNotificationSystem() {
     if (!currentUser || !currentUser.isAdmin) return;
     if (pushSupported && notifPermission === 'default') {
@@ -892,7 +855,6 @@ function startNotificationSystem() {
     if (checkInterval) clearInterval(checkInterval);
     checkInterval = setInterval(checkPendingUsers, 10000);
 }
-
 async function showRequestsModal() {
     const modal = document.getElementById('requestsModal');
     const list = document.getElementById('requestsList');
@@ -947,11 +909,9 @@ async function showRequestsModal() {
         list.appendChild(item);
     });
 }
-
 function closeRequestsModal() {
     document.getElementById('requestsModal').style.display = 'none';
 }
-
 async function quickApprove(key, name) {
     try {
         if (isOnline && db) {
@@ -973,7 +933,6 @@ async function quickApprove(key, name) {
         showToast('❌ خطأ', e.message);
     }
 }
-
 async function quickReject(key, name) {
     if (!confirm(`هل تريد حذف طلب "${name}"؟`)) return;
     try {
@@ -995,10 +954,8 @@ async function quickReject(key, name) {
         showToast('❌ خطأ', e.message);
     }
 }
-
 // ========== التيكر ==========
 let tickerItems = [];
-
 async function initTicker() {
     // Load from cache first
     const cached = await loadTickerFromCache();
@@ -1043,7 +1000,6 @@ function updateTickerDisplay() {
     });
     tickerText.textContent = text + ' ◆ ' + text + ' ◆ ' + text;
 }
-
 function updateTickerStatus() {
     const statusDiv = document.getElementById('tickerStatus');
     const activeCount = tickerItems.filter(item => item.active !== false).length;
@@ -1054,7 +1010,6 @@ function updateTickerStatus() {
         statusDiv.innerHTML = `📢 عدد النصوص: ${total} (نشطة: ${activeCount})`;
     }
 }
-
 function renderTickerAdminList() {
     const container = document.getElementById('tickerItemsList');
     if (!container) return;
@@ -1079,7 +1034,6 @@ function renderTickerAdminList() {
     });    container.innerHTML = '';
     container.appendChild(fragment);
 }
-
 async function addTickerItem() {
     const input = document.getElementById('tickerInput');
     const text = input.value.trim();
@@ -1111,7 +1065,6 @@ async function addTickerItem() {
         showToast('💾 تم الحفظ محلياً', 'سيتم المزامنة عند عودة الاتصال', 'offline');
     }
 }
-
 async function toggleTickerItem(id) {
     try {
         const item = tickerItems.find(i => i.id === id);
@@ -1129,7 +1082,6 @@ async function toggleTickerItem(id) {
         showToast('❌ خطأ', e.message);
     }
 }
-
 async function deleteTickerItem(id) {
     if (!confirm('هل تريد حذف هذا النص من التيكر؟')) return;
     try {
@@ -1145,16 +1097,13 @@ async function deleteTickerItem(id) {
         showToast('❌ خطأ', e.message);
     }
 }
-
 function openTickerManager() {
     document.getElementById('tickerModal').style.display = 'block';
     renderTickerAdminList();
 }
-
 function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
-
 // ========== بدء الاختبار مع التخزين المؤقت ==========
 async function startNewQuiz() {
     try {
@@ -1216,7 +1165,6 @@ async function startNewQuiz() {
         }
     }
 }
-
 // تحديث الأسئلة في الخلفية دون إزعاج المستخدم
 function syncQuestionsInBackground() {
     if (!db || !isOnline) return;
@@ -1235,7 +1183,6 @@ function syncQuestionsInBackground() {
         }
     }).catch(() => {});
 }
-
 // مستمع للتغييرات في الأسئلة (للمسؤول فقط)
 function startQuestionsListener() {
     if (!db || questionsListenerActive || !isOnline) return;
@@ -1247,7 +1194,6 @@ function startQuestionsListener() {
         saveQuestionsToCache(freshQuestions).catch(() => {});
     });
 }
-
 function renderQuestion() {
     if (currentIndex >= currentQuestions.length) { showResult(); return; }
     const q = currentQuestions[currentIndex];
@@ -1310,9 +1256,7 @@ async function checkAnswer(selected, correct, explanation, element) {
     document.getElementById('explanation').style.display = 'block';
     document.getElementById('nextBtn').style.display = 'block';
 }
-
 function nextQuestion() { currentIndex++; renderQuestion(); }
-
 function showResult() {
     const total = currentQuestions.length * 10;
     const percentage = Math.round((currentScore / total) * 100);
@@ -1327,7 +1271,6 @@ function showResult() {
     }
     showScreen('resultScreen');
 }
-
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
@@ -1372,14 +1315,12 @@ async function loadQuestions() {
     });
     container.innerHTML = '';    container.appendChild(fragment);
 }
-
 function addQuestionForm() {
     editingQuestionId = null;
     document.getElementById('modalTitle').innerHTML = '➕ إضافة سؤال جديد';
     ['qText','opt1','opt2','opt3','opt4','correctOpt','questionImageUrl','explanationText'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('questionModal').style.display = 'flex';
 }
-
 function editQuestion(id, q) {
     editingQuestionId = id;
     document.getElementById('modalTitle').innerHTML = '✏️ تعديل السؤال';
@@ -1392,7 +1333,6 @@ function editQuestion(id, q) {
     document.getElementById('questionImageUrl').value = q.img || '';    document.getElementById('explanationText').value = q.e || '';
     document.getElementById('questionModal').style.display = 'flex';
 }
-
 async function saveQuestion() {
     const qText = document.getElementById('qText').value.trim();
     const opt1 = document.getElementById('opt1').value.trim();
@@ -1459,7 +1399,6 @@ async function saveQuestion() {
         loadQuestions();
     }
 }
-
 async function deleteQuestion(id) {
     if (!confirm('هل أنت متأكد من حذف هذا السؤال؟')) return;
     try {
@@ -1482,7 +1421,6 @@ async function deleteQuestion(id) {
         loadQuestions();
     }
 }
-
 async function loadUsers() {
     const container = document.getElementById('usersList');
     container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
@@ -1532,7 +1470,6 @@ async function loadUsers() {
     container.innerHTML = '';
     container.appendChild(fragment);
 }
-
 async function updateUserStatus(key, status) {
     try {
         if (isOnline && db) {
@@ -1560,7 +1497,6 @@ async function updateUserStatus(key, status) {
         checkPendingUsers();
     }
 }
-
 async function deleteUser(key, name) {
     if (!confirm(`هل أنت متأكد من حذف الطالب "${name}" نهائياً؟`)) return;
     try {
@@ -1587,7 +1523,6 @@ async function deleteUser(key, name) {
         checkPendingUsers();
     }
 }
-
 async function forceSyncQueue() {
     if (!isOnline) {
         alert('لا يوجد اتصال بالإنترنت');
@@ -1595,12 +1530,10 @@ async function forceSyncQueue() {
     }
     await processSyncQueue();
 }
-
 function closeModal() {
     document.getElementById('questionModal').style.display = 'none';
     editingQuestionId = null;
 }
-
 // ========== باقي الدوال ==========
 window.onload = async () => {
     // تهيئة قاعدة البيانات المحلية أولاً
@@ -1632,22 +1565,18 @@ window.onload = async () => {
         showLanding();
     }
 };
-
 function showLanding() { showScreen('landingScreen'); }
 function showLogin() { showScreen('loginScreen'); }
 function showRegister() { showScreen('registerScreen'); }
-
 function showAdminLogin() {
     showScreen('loginScreen');
     document.getElementById('loginUsername').value = 'admin';
     document.getElementById('loginPassword').focus();
 }
-
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
 }
-
 async function doLogin() {
     const username = document.getElementById('loginUsername').value.trim();
     const password = document.getElementById('loginPassword').value.trim();
@@ -1710,7 +1639,6 @@ async function doLogin() {
         }
     }
 }
-
 async function doRegister() {
     const name = document.getElementById('registerName').value.trim();
     const password = document.getElementById('registerPassword').value.trim();    if (!name || !password) { alert('الرجاء ملء جميع الحقول'); return; }
@@ -1738,7 +1666,6 @@ async function doRegister() {
         showLanding();
     }
 }
-
 function logout() {
     if (checkInterval) { clearInterval(checkInterval); checkInterval = null; }
     localStorage.removeItem('userSession');
