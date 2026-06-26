@@ -12,6 +12,9 @@
 <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://quizdental-c4d5a-default-rtdb.firebaseio.com" crossorigin>
 <style>
+/* ===== إصلاح الوميض: إضافة min-height للقوائم ===== */
+#usersList, #questionsList, #tickerItemsList { min-height: 60px; }
+
 .ticker-container{position:fixed;bottom:0;left:0;width:100%;background:linear-gradient(135deg,#1e4a6e,#2c9b7a);color:#fff;padding:10px 0;overflow:hidden;z-index:9999;white-space:nowrap;border-top:3px solid #2c9b7a;display:none;will-change:transform}
 .ticker-text{display:inline-block;padding-left:100%;animation:tickerMove 120s linear infinite;will-change:transform}
 @keyframes tickerMove{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
@@ -24,7 +27,6 @@ body{background:linear-gradient(135deg,#e0f2fe,#f0f9ff);min-height:100vh;padding
 .btn:active{transform:scale(.97)}
 .btn-install{background:linear-gradient(135deg,#f59e0b,#ef4444);display:none;margin-top:10px}
 .btn-admin{background:linear-gradient(135deg,#6c5ce7,#8b5cf6)}
-.btn-success{background:linear-gradient(135deg,#10b981,#059669)}
 .btn-danger{background:linear-gradient(135deg,#e17055,#d63031)}
 .btn-header-logout{background:#d63031;color:#fff;border:none;padding:5px 12px;border-radius:20px;cursor:pointer;font-size:12px;position:absolute;top:10px;left:10px;display:none}
 .option{background:#f0fdf4;border:2px solid #cce5dc;padding:12px 18px;border-radius:50px;margin:10px 0;cursor:pointer;transition:all 0.2s;font-weight:500}
@@ -84,6 +86,49 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
 .online-indicator.offline{background:#ff7675}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.4}}
 .sync-badge{background:#3b82f6;color:#fff;padding:3px 10px;border-radius:12px;font-size:11px;display:none;margin-right:5px}
+/* نافذة رفع JSON */
+#jsonUploadModal textarea { height: 150px; font-family: monospace; }
+.json-upload-area { border: 2px dashed #ccc; padding: 20px; border-radius: 12px; text-align: center; margin: 10px 0; }
+.json-upload-area input[type="file"] { display: none; }
+
+/* ===== قسم الطلاب القابل للطي ===== */
+.collapsible-header {
+    background: linear-gradient(135deg, #6c5ce7, #8b5cf6);
+    color: #fff;
+    padding: 12px 18px;
+    border-radius: 40px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 15px 0 5px 0;
+    font-weight: bold;
+    user-select: none;
+    transition: all 0.3s;
+}
+.collapsible-header:hover {
+    opacity: 0.9;
+    transform: scale(1.01);
+}
+.collapsible-header .arrow {
+    transition: transform 0.3s;
+    font-size: 18px;
+}
+.collapsible-header .arrow.open {
+    transform: rotate(180deg);
+}
+.collapsible-body {
+    overflow: hidden;
+    transition: max-height 0.4s ease-out;
+    max-height: 0;
+}
+.collapsible-body.open {
+    max-height: 2000px;
+    transition: max-height 0.6s ease-in;
+}
+.collapsible-body .btn {
+    margin-top: 5px;
+}
 </style>
 </head>
 <body>
@@ -97,7 +142,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
         <p>إعداد الدكتور زكريا محمد عطوني</p>
         <div style="font-size:12px;margin-top:5px" id="connectionStatus">
             🟢 متصل <span class="online-indicator online" id="onlineIndicator"></span>
-            <span id="syncBadge" class="sync-badge">🔄 مزامنة...</span>        </div>
+            <span id="syncBadge" class="sync-badge">🔄 مزامنة...</span>
+        </div>
     </div>
     <div id="offlineBanner" class="offline-banner">
         📡 أنت بدون اتصال — التطبيق يعمل بالوضع المحلي
@@ -110,7 +156,8 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     <div id="landingScreen" class="screen active">
         <div class="card" style="text-align:center">
             <h2 style="color:#1e4a6e;margin-bottom:20px">مرحباً بك</h2>
-            <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>            <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
+            <button class="btn" onclick="showLogin()">👨‍⚕️ دخول</button>
+            <button class="btn" style="margin-top:10px" onclick="showRegister()">📝 تسجيل جديد</button>
             <button class="btn btn-admin" style="margin-top:10px" onclick="showAdminLogin()">🛡️ إدارة</button>
             <button class="btn btn-install" id="installBtn" onclick="installApp()">📲 تثبيت التطبيق</button>
         </div>
@@ -158,25 +205,36 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
     </div>
     <div id="adminScreen" class="screen">
         <div class="card">
-            <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>            <div id="newRequestsSection" style="display:none;margin-bottom:15px">
+            <h3 style="color:#6c5ce7;text-align:center">✨ لوحة التحكم ✨</h3>
+            <div id="newRequestsSection" style="display:none;margin-bottom:15px">
                 <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);padding:15px;border-radius:12px;border:2px solid #f59e0b">
                     <h4 style="color:#92400e;margin-bottom:10px"> طلبات اشتراك جديدة (<span id="newRequestsCount">0</span>)</h4>
                     <button class="btn" style="background:linear-gradient(135deg,#f59e0b,#ef4444)" onclick="showRequestsModal()">📋 عرض الطلبات</button>
                 </div>
             </div>
-            <h4 style="margin:15px 0 5px">👥 الطلاب</h4>
-            <button class="btn btn-admin" onclick="loadUsers()">📋 عرض الطلاب</button>
-            <div id="usersList"></div>
+            
+            <!-- ===== قسم الطلاب القابل للطي ===== -->
+            <div class="collapsible-header" onclick="toggleUsersCollapse()">
+                <span>👥 الطلاب</span>
+                <span class="arrow" id="usersArrow">▼</span>
+            </div>
+            <div class="collapsible-body" id="usersCollapsible">
+                <button class="btn btn-admin" onclick="loadUsers()">📋 عرض الطلاب</button>
+                <div id="usersList"></div>
+            </div>
+            
             <h4 style="margin:15px 0 5px">📚 الأسئلة</h4>
-            <div style="display:flex; gap:10px;">
-                <button class="btn btn-admin" style="flex:1" onclick="addQuestionForm()">➕ إضافة سؤال</button>
-                <button class="btn btn-success" style="flex:1; margin-top:10px;" onclick="openJsonImportModal()">📥 استيراد جماعي (JSON)</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn btn-admin" style="flex:1; min-width:120px;" onclick="addQuestionForm()">➕ إضافة سؤال</button>
+                <button class="btn btn-admin" style="flex:1; min-width:120px; background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="openJsonUpload()">📤 رفع JSON</button>
             </div>
             <button class="btn btn-admin" style="margin-top:5px" onclick="loadQuestions()"> عرض الأسئلة</button>
             <div id="questionsList"></div>
+            
             <h4 style="margin:15px 0 5px">📢 إدارة الشريط المتحرك (التيكر)</h4>
             <button class="btn btn-admin" onclick="openTickerManager()">⚙️ إدارة التيكر</button>
             <div id="tickerStatus" style="margin-top:8px;font-size:14px;"></div>
+            
             <div id="syncQueueSection" style="display:none;margin-top:15px;background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;padding:15px">
                 <h4 style="color:#1e4a6e;margin-bottom:10px">🔄 عمليات في انتظار المزامنة (<span id="syncQueueCount">0</span>)</h4>
                 <button class="btn btn-admin" onclick="forceSyncQueue()">🔄 مزامنة الآن</button>
@@ -198,19 +256,26 @@ input,textarea{width:100%;padding:12px;margin:8px 0;border:1px solid #ddd;border
             <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeModal()">إلغاء</button>
         </div>
     </div>
-    <div id="jsonImportModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;padding:20px;overflow:auto">
-        <div class="card" style="max-width:500px;margin:50px auto; width:100%">
-            <h3 style="color:#10b981; text-align:center; margin-bottom:10px;">📥 استيراد الأسئلة بصيغة JSON</h3>
-            <p style="font-size:12px; color:#555; margin-bottom:10px; line-height:1.4;">
-                الصيغة المدعومة: مصفوفة كائنات تحتوي على الحقول التالية لكل سؤال:<br>
-                <code>[{"q":"السؤال","o":["خيار1","خيار2","خيار3","خيار4"],"c":"الخيار الصحيح تطابق تام","e":"الشرح","img":"رابط الصورة اختياري"}]</code>
-            </p>
-            <textarea id="jsonImportInput" rows="10" placeholder="قم بلصق كود الـ JSON هنا للرفع الفوري..." style="font-family:monospace; font-size:13px; direction:ltr; text-align:left;"></textarea>
-            <button class="btn btn-success" onclick="importJsonQuestions()">🚀 بدء الاستيراد والرفع</button>
-            <button class="btn" style="background:#ccc;color:#333;margin-top:5px" onclick="closeJsonImportModal()">إلغاء</button>
+    <!-- ===== نافذة رفع JSON الجماعي ===== -->
+    <div id="jsonUploadModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);z-index:1001;padding:20px;overflow:auto">
+        <div class="card" style="max-width:500px;margin:50px auto">
+            <h3 style="color:#d97706;text-align:center">📤 رفع أسئلة بصيغة JSON</h3>
+            <p style="font-size:13px;color:#666;margin-bottom:10px;">الصيغة المدعومة: <code>[{"q":"السؤال", "o":["خ1","خ2","خ3","خ4"], "c":"الصحيح", "e":"الشرح", "img":"رابط_صورة"}]</code></p>
+            <div class="json-upload-area">
+                <label for="jsonFileInput" style="cursor:pointer;color:#6c5ce7;font-weight:bold;">📂 اختر ملف JSON</label>
+                <input type="file" id="jsonFileInput" accept=".json,application/json" onchange="handleJsonFileUpload(event)">
+                <p style="font-size:12px;color:#888;margin:5px 0;">أو الصق النص في الحقل أدناه</p>
+            </div>
+            <textarea id="jsonTextInput" placeholder="أو الصق JSON هنا..."></textarea>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button class="btn" style="flex:1;background:linear-gradient(135deg,#f59e0b,#d97706);" onclick="processJsonUpload()">🚀 رفع الأسئلة</button>
+                <button class="btn" style="flex:1;background:#ccc;color:#333;margin-top:10px;" onclick="closeJsonUpload()">إلغاء</button>
+            </div>
+            <div id="jsonUploadStatus" style="margin-top:10px;font-size:14px;"></div>
         </div>
     </div>
-    <div id="requestsModal" class="requests-modal">        <div class="requests-modal-content">
+    <div id="requestsModal" class="requests-modal">
+        <div class="requests-modal-content">
             <h3 style="color:#f59e0b;text-align:center;margin-bottom:15px">🔔 الطلبات المعلقة</h3>
             <div id="requestsList"></div>
             <button class="btn" style="background:#ccc;color:#333;margin-top:10px" onclick="closeRequestsModal()">إغلاق</button>
@@ -257,6 +322,7 @@ if ('serviceWorker' in navigator) {
             self.addEventListener('fetch', (event) => {
                 const url = new URL(event.request.url);
                 
+                // Skip Firebase API calls
                 if (url.hostname.includes('firebaseio.com') || 
                     url.hostname.includes('firebase') ||                    url.hostname.includes('googleapis.com')) {
                     return;
@@ -522,7 +588,7 @@ async function executeSyncOperation(op) {
             await db.ref('users/' + op.key).remove();
             break;
         case 'setQuestion':
-            if (op.id && !op.id.startsWith('local_')) {
+            if (op.id) {
                 await db.ref('questions/' + op.id).set(op.data);
             } else {
                 await db.ref('questions').push(op.data);
@@ -531,11 +597,7 @@ async function executeSyncOperation(op) {
         case 'removeQuestion':
             await db.ref('questions/' + op.id).remove();            break;
         case 'setTicker':
-            if (op.id && !op.id.startsWith('local_')) {
-                await db.ref('ticker/' + op.id).set(op.data);
-            } else {
-                await db.ref('ticker').push(op.data);
-            }
+            await db.ref('ticker/' + op.id).set(op.data);
             break;
         case 'updateTicker':
             await db.ref('ticker/' + op.id).update(op.data);
@@ -612,7 +674,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 function installApp() {
     if (!deferredPrompt) {
-        alert('ل للتثبيت: اضغط على ⋮ في أعلى المتصفح ثم "إضافة إلى الشاشة الرئيسية"');
+        alert('للتثبيت: اضغط على ⋮ في أعلى المتصفح ثم "إضافة إلى الشاشة الرئيسية"');
         return;
     }
     deferredPrompt.prompt();
@@ -689,8 +751,12 @@ try {
     db = firebase.database();
     document.getElementById('connectionStatus').innerHTML = '🟢 متصل <span class="online-indicator online"></span>';
     
+    // Monitor Firebase connection state
     db.ref('.info/connected').on('value', (snap) => {
         const connected = snap.val() === true;
+        if (connected && !isOnline) {
+            // Firebase says connected but browser doesn't - trust browser
+        }
         if (connected && isOnline) {
             processSyncQueue();
         }
@@ -798,6 +864,7 @@ function showToast(title, message, type = 'info') {    const container = documen
 }
 async function checkPendingUsers() {
     if (!db || !currentUser || !currentUser.isAdmin || !isOnline) {
+        // Use local cache for pending count when offline
         if (!isOnline && currentUser && currentUser.isAdmin) {
             const cachedUsers = await loadUsersFromCache();
             const pendingCount = cachedUsers.filter(u => u.status === 'pending').length;
@@ -826,6 +893,7 @@ async function checkPendingUsers() {
             }
         });
         
+        // Cache users for offline use
         const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
         saveUsersToCache(usersArray).catch(() => {});
         
@@ -880,9 +948,11 @@ async function showRequestsModal() {
         try {
             const snapshot = await db.ref('users').once('value');
             users = snapshot.val() || {};
+            // Cache
             const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
             saveUsersToCache(usersArray).catch(() => {});
         } catch(e) {
+            // Fallback to cache
             const cached = await loadUsersFromCache();
             cached.forEach(u => { users[u.key] = u; });
         }
@@ -902,7 +972,7 @@ async function showRequestsModal() {
         list.innerHTML = '<p style="text-align:center;color:#888;padding:20px">✅ لا توجد طلبات معلقة</p>';
         return;
     }
-    list.innerHTML = '';
+        list.innerHTML = '';
     pendingUsers.forEach(user => {
         const registeredTime = user.registeredAt ? new Date(user.registeredAt).toLocaleString('ar-EG') : 'غير معروف';
         const item = document.createElement('div');
@@ -931,6 +1001,7 @@ async function quickApprove(key, name) {
             await addToSyncQueue({ type: 'updateUser', key: 'users/' + key, data: { status: 'active' } });
         }
         
+        // Update local cache
         const cached = await loadUsersFromCache();
         const updated = cached.map(u => u.key === key ? { ...u, status: 'active' } : u);
         await saveUsersToCache(updated);
@@ -951,6 +1022,7 @@ async function quickReject(key, name) {
             await addToSyncQueue({ type: 'removeUser', key: 'users/' + key });
         }
         
+        // Update local cache
         const cached = await loadUsersFromCache();
         const updated = cached.filter(u => u.key !== key);
         await saveUsersToCache(updated);
@@ -966,6 +1038,7 @@ async function quickReject(key, name) {
 // ========== التيكر ==========
 let tickerItems = [];
 async function initTicker() {
+    // Load from cache first
     const cached = await loadTickerFromCache();
     if (cached && cached.length > 0) {
         tickerItems = cached.sort((a,b) => (a.order || 0) - (b.order || 0));
@@ -980,6 +1053,7 @@ async function initTicker() {
             const data = snapshot.val();
             tickerItems = data ? Object.entries(data).map(([id, item]) => ({ id, ...item })) : [];
             tickerItems.sort((a,b) => (a.order || 0) - (b.order || 0));
+            // Cache
             saveTickerToCache(tickerItems).catch(() => {});
             updateTickerDisplay();
             updateTickerStatus();
@@ -1057,6 +1131,7 @@ async function addTickerItem() {
         } else {
             const tempId = 'local_' + Date.now();
             await addToSyncQueue({ type: 'setTicker', id: tempId, data: newItem });
+            // Add to local display
             tickerItems.push({ id: tempId, ...newItem });
             renderTickerAdminList();
             input.value = '';
@@ -1110,67 +1185,10 @@ function openTickerManager() {
 function closeTickerManager() {
     document.getElementById('tickerModal').style.display = 'none';
 }
-// ========== دالات إدارة استيراد JSON الجماعي ==========
-function openJsonImportModal() {
-    document.getElementById('jsonImportInput').value = '';
-    document.getElementById('jsonImportModal').style.display = 'flex';
-}
-function closeJsonImportModal() {
-    document.getElementById('jsonImportModal').style.display = 'none';
-}
-async function importJsonQuestions() {
-    const jsonText = document.getElementById('jsonImportInput').value.trim();
-    if (!jsonText) { alert('الرجاء لصق نص JSON أولاً'); return; }
-    try {
-        const data = JSON.parse(jsonText);
-        const questionsArray = Array.isArray(data) ? data : [data];
-        
-        if (questionsArray.length === 0) { alert('مصفوفة الأسئلة فارغة'); return; }
-        
-        let successCount = 0;
-        const cached = await loadQuestionsFromCache();
-        
-        for (const item of questionsArray) {
-            if (!item.q || !item.o || !Array.isArray(item.o) || item.o.length < 2 || !item.c || !item.e) {
-                console.warn('تم تخطي سؤال لعدم اكتمال أركانه الأساسية الأساسية:', item);
-                continue;
-            }
-            
-            const questionData = {
-                q: item.q.trim(),
-                o: item.o.map(opt => opt.trim()),
-                c: item.c.trim(),
-                e: item.e.trim(),
-                img: (item.img || '').trim()
-            };
-            
-            if (isOnline && db) {
-                await db.ref('questions').push(questionData);
-            } else {
-                const tempId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
-                await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
-                cached.push({ id: tempId, ...questionData });
-            }
-            successCount++;
-        }
-        
-        if (!isOnline || !db) {
-            await saveQuestionsToCache(cached);
-            alert(`💾 تم حفظ ${successCount} سؤال محلياً بنجاح وسوف تتم مزامنتها بمجرد الاتصال بالشبكة.`);
-        } else {
-            syncQuestionsInBackground();
-            alert(`✅ تم استيراد ورفع ${successCount} سؤال بنجاح إلى السيرفر الخاص بمدرب التشخيص السني.`);
-        }
-        
-        closeJsonImportModal();
-        loadQuestions();
-    } catch(e) {
-        alert('❌ خطأ في صياغة أو تركيب الـ JSON:\n' + e.message + '\n\nتأكد من إغلاق الأقواس والرموز والفاصلة بشكل دقيق.');
-    }
-}
 // ========== بدء الاختبار مع التخزين المؤقت ==========
 async function startNewQuiz() {
     try {
+        // محاولة التحميل من الكاش المحلي أولاً (فوري)
         let cachedQuestions = await loadQuestionsFromCache();
         
         if (cachedQuestions && cachedQuestions.length > 0) {
@@ -1180,11 +1198,13 @@ async function startNewQuiz() {
             currentWrong = [];
             renderQuestion();
             
+            // تحديث الكاش في الخلفية (بدون انتظار)
             if (db && isOnline) {
                 syncQuestionsInBackground();
             }
             return;
         }
+                // لا يوجد كاش - تحميل من Firebase
         if (!db || !isOnline) {
             alert('لا توجد أسئلة محفوظة محلياً ولا يوجد اتصال بالإنترنت. الرجاء الاتصال بالإنترنت لتحميل الأسئلة لأول مرة.');
             return;
@@ -1199,16 +1219,20 @@ async function startNewQuiz() {
         }
         
         currentQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
+        
+        // حفظ في الكاش المحلي للاستخدام المستقبلي
         saveQuestionsToCache(currentQuestions).catch(e => console.warn('Cache save failed:', e));
-        currentQuestions = currentQuestions.sort(() => Math.random() - 0.5);
+                currentQuestions = currentQuestions.sort(() => Math.random() - 0.5);
         currentIndex = 0;
         currentScore = 0;
         currentWrong = [];
         renderQuestion();
         
+        // تفعيل الاستماع للتغييرات في الأسئلة
         startQuestionsListener();
         
     } catch(e) {
+        // Try cache as fallback
         const cachedQuestions = await loadQuestionsFromCache();
         if (cachedQuestions && cachedQuestions.length > 0) {
             currentQuestions = cachedQuestions.sort(() => Math.random() - 0.5);
@@ -1222,21 +1246,25 @@ async function startNewQuiz() {
         }
     }
 }
+// تحديث الأسئلة في الخلفية دون إزعاج المستخدم
 function syncQuestionsInBackground() {
     if (!db || !isOnline) return;
     db.ref('questions').once('value').then(snapshot => {
         const questions = snapshot.val();
         if (!questions) return;
         const freshQuestions = Object.entries(questions).map(([id, q]) => ({ id, ...q }));        
+        // مقارنة بسيطة: إذا تغير العدد، حدّث الكاش
         if (freshQuestions.length !== currentQuestions.length) {
             saveQuestionsToCache(freshQuestions).then(() => {
-                showToast('🔄 تحديث', 'تم تحديث الأسئلة بصمت', 'success');
+                showToast('🔄 تحديث', 'تم تحديث الأسئلة', 'success');
             }).catch(() => {});
         } else {
+            // تحديث الكاش بصمت
             saveQuestionsToCache(freshQuestions).catch(() => {});
         }
     }).catch(() => {});
 }
+// مستمع للتغييرات في الأسئلة (للمسؤول فقط)
 function startQuestionsListener() {
     if (!db || questionsListenerActive || !isOnline) return;
     questionsListenerActive = true;
@@ -1283,6 +1311,7 @@ async function checkAnswer(selected, correct, explanation, element) {
                 if (isOnline && db) {
                     db.ref('users/' + currentUser.key + '/totalPoints').transaction(p => (p || 0) + 10);
                 } else {
+                    // Queue points update
                     await addToSyncQueue({ 
                         type: 'updatePoints', 
                         key: currentUser.key, 
@@ -1325,7 +1354,8 @@ function showResult() {
 }
 async function loadQuestions() {
     const container = document.getElementById('questionsList');
-    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
+    // تعيين نص مؤقت مع الحفاظ على الحد الأدنى للارتفاع لتجنب الوميض
+    container.innerHTML = '<p style="text-align:center;color:#888;">⏳ جاري التحميل...</p>';
     
     let questions = {};
     
@@ -1333,9 +1363,11 @@ async function loadQuestions() {
         try {
             const snapshot = await db.ref('questions').once('value');
             questions = snapshot.val() || {};
+            // Cache
             const qArray = Object.entries(questions).map(([id, q]) => ({ id, ...q }));
             saveQuestionsToCache(qArray).catch(() => {});
         } catch(e) {
+            // Fallback to cache
             const cached = await loadQuestionsFromCache();
             cached.forEach(q => { questions[q.id] = q; });
         }
@@ -1345,7 +1377,7 @@ async function loadQuestions() {
     }
     
     if (Object.keys(questions).length === 0) { 
-        container.innerHTML = '<p style="text-align:center;color:#888">لا توجد أسئلة</p>'; 
+        container.innerHTML = '<p style="text-align:center;color:#888;">📭 لا توجد أسئلة</p>'; 
         return; 
     }
     
@@ -1363,7 +1395,9 @@ async function loadQuestions() {
         `;
         fragment.appendChild(div);
     });
-    container.innerHTML = '';    container.appendChild(fragment);
+    // إعادة تعيين المحتوى مرة واحدة فقط لتقليل الوميض
+    container.innerHTML = '';
+    container.appendChild(fragment);
 }
 function addQuestionForm() {
     editingQuestionId = null;
@@ -1406,13 +1440,14 @@ async function saveQuestion() {
                 alert('تم إضافة السؤال بنجاح');
             }
         } else {
+            // Offline: queue and update local cache
             if (editingQuestionId) {
                 await addToSyncQueue({ type: 'setQuestion', id: editingQuestionId, data: questionData });
-            } else {                
-                const tempId = 'local_' + Date.now();
+            } else {                const tempId = 'local_' + Date.now();
                 await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
             }
             
+            // Update local cache
             const cached = await loadQuestionsFromCache();
             if (editingQuestionId) {
                 const updated = cached.map(q => q.id === editingQuestionId ? { id: editingQuestionId, ...questionData } : q);
@@ -1428,6 +1463,7 @@ async function saveQuestion() {
         closeModal();
         loadQuestions();
     } catch(e) {
+        // Fallback to offline mode
         if (editingQuestionId) {
             await addToSyncQueue({ type: 'setQuestion', id: editingQuestionId, data: questionData });
         } else {
@@ -1469,9 +1505,28 @@ async function deleteQuestion(id) {
         loadQuestions();
     }
 }
+// ===== دالة طي/فتح قسم الطلاب =====
+let usersCollapseOpen = false;
+function toggleUsersCollapse() {
+    usersCollapseOpen = !usersCollapseOpen;
+    const body = document.getElementById('usersCollapsible');
+    const arrow = document.getElementById('usersArrow');
+    if (usersCollapseOpen) {
+        body.classList.add('open');
+        arrow.classList.add('open');
+        arrow.textContent = '▲';
+        // تحميل الطلاب تلقائياً عند الفتح
+        loadUsers();
+    } else {
+        body.classList.remove('open');
+        arrow.classList.remove('open');
+        arrow.textContent = '▼';
+    }
+}
+
 async function loadUsers() {
     const container = document.getElementById('usersList');
-    container.innerHTML = '<p style="text-align:center">⏳ جاري التحميل...</p>';
+    container.innerHTML = '<p style="text-align:center;color:#888;">⏳ جاري التحميل...</p>';
     
     let users = {};
     
@@ -1479,9 +1534,11 @@ async function loadUsers() {
         try {
             const snapshot = await db.ref('users').once('value');
             users = snapshot.val() || {};
+            // Cache
             const usersArray = Object.entries(users).map(([key, user]) => ({ key, ...user }));
             saveUsersToCache(usersArray).catch(() => {});
         } catch(e) {
+            // Fallback to cache
             const cached = await loadUsersFromCache();
             cached.forEach(u => { users[u.key] = u; });
         }
@@ -1491,7 +1548,7 @@ async function loadUsers() {
     }
     
     if (Object.keys(users).length === 0) { 
-        container.innerHTML = '<p style="text-align:center;color:#888">لا يوجد طلاب مسجلين</p>'; 
+        container.innerHTML = '<p style="text-align:center;color:#888;">👥 لا يوجد طلاب مسجلين</p>'; 
         return; 
     }
     
@@ -1526,6 +1583,7 @@ async function updateUserStatus(key, status) {
             alert(`💾 تم الحفظ محلياً - سيتم المزامنة عند عودة الاتصال`);
         }
         
+        // Update local cache
         const cached = await loadUsersFromCache();
         const updated = cached.map(u => u.key === key ? { ...u, status } : u);
         await saveUsersToCache(updated);
@@ -1579,18 +1637,164 @@ function closeModal() {
     document.getElementById('questionModal').style.display = 'none';
     editingQuestionId = null;
 }
-// ========== باقي الدوال الآمنة للمنصة ==========
+// ============================================================
+// ===== دوال رفع JSON الجماعي =====
+// ============================================================
+function openJsonUpload() {
+    document.getElementById('jsonUploadModal').style.display = 'block';
+    document.getElementById('jsonTextInput').value = '';
+    document.getElementById('jsonUploadStatus').innerHTML = '';
+    document.getElementById('jsonFileInput').value = '';
+}
+
+function closeJsonUpload() {
+    document.getElementById('jsonUploadModal').style.display = 'none';
+}
+
+function handleJsonFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        document.getElementById('jsonTextInput').value = e.target.result;
+    };
+    reader.readAsText(file);
+}
+
+async function processJsonUpload() {
+    const statusDiv = document.getElementById('jsonUploadStatus');
+    const rawText = document.getElementById('jsonTextInput').value.trim();
+    
+    if (!rawText) {
+        statusDiv.innerHTML = '<span style="color:#e17055;">❌ الرجاء لصق JSON أو تحميل ملف.</span>';
+        return;
+    }
+    
+    let parsed;
+    try {
+        parsed = JSON.parse(rawText);
+    } catch(e) {
+        statusDiv.innerHTML = `<span style="color:#e17055;">❌ خطأ في صيغة JSON: ${e.message}</span>`;
+        return;
+    }
+    
+    // تحويل إلى مصفوفة إذا كان كائنًا
+    let questionsArray = [];
+    if (Array.isArray(parsed)) {
+        questionsArray = parsed;
+    } else if (typeof parsed === 'object' && parsed !== null) {
+        // محاولة استخراج المصفوفة إذا كانت ضمن مفتاح "questions" أو مشابه
+        if (parsed.questions && Array.isArray(parsed.questions)) {
+            questionsArray = parsed.questions;
+        } else {
+            // محاولة تحويل قيم الكائن إلى مصفوفة
+            questionsArray = Object.values(parsed);
+        }
+    }
+    
+    if (questionsArray.length === 0) {
+        statusDiv.innerHTML = '<span style="color:#e17055;">❌ لم يتم العثور على أسئلة في JSON.</span>';
+        return;
+    }
+    
+    // التحقق من صحة البيانات
+    let validCount = 0;
+    let errorCount = 0;
+    let errors = [];
+    
+    for (let i = 0; i < questionsArray.length; i++) {
+        const q = questionsArray[i];
+        // توقع الحقول: q, o (array), c, e (اختياري), img (اختياري)
+        if (!q.q || !q.o || !Array.isArray(q.o) || q.o.length < 2 || !q.c) {
+            errors.push(`السؤال رقم ${i+1} غير مكتمل (يحتاج: q, o[], c)`);
+            errorCount++;
+            continue;
+        }
+        if (!q.e) q.e = "لا يوجد شرح";
+        if (!q.img) q.img = "";
+        validCount++;
+    }
+    
+    if (validCount === 0) {
+        statusDiv.innerHTML = `<span style="color:#e17055;">❌ لا توجد أسئلة صالحة. تأكد من الحقول: q, o (مصفوفة), c. ${errors.join('; ')}</span>`;
+        return;
+    }
+    
+    statusDiv.innerHTML = `🔄 جاري رفع ${validCount} سؤال...`;
+    
+    let saved = 0;
+    let failed = 0;
+    
+    for (const q of questionsArray) {
+        if (!q.q || !q.o || !Array.isArray(q.o) || q.o.length < 2 || !q.c) continue;
+        
+        const questionData = {
+            q: q.q,
+            o: q.o.slice(0, 4), // نأخذ أول 4 خيارات
+            c: q.c,
+            e: q.e || "لا يوجد شرح",
+            img: q.img || ""
+        };
+        
+        try {
+            if (isOnline && db) {
+                await db.ref('questions').push(questionData);
+                saved++;
+            } else {
+                const tempId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
+                // تحديث الكاش المحلي
+                const cached = await loadQuestionsFromCache();
+                cached.push({ id: tempId, ...questionData });
+                await saveQuestionsToCache(cached);
+                saved++;
+            }
+        } catch(e) {
+            // محاولة الحفظ محلياً
+            try {
+                const tempId = 'local_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5);
+                await addToSyncQueue({ type: 'setQuestion', id: tempId, data: questionData });
+                const cached = await loadQuestionsFromCache();
+                cached.push({ id: tempId, ...questionData });
+                await saveQuestionsToCache(cached);
+                saved++;
+            } catch(e2) {
+                failed++;
+            }
+        }
+    }
+    
+    let msg = `✅ تم رفع ${saved} سؤال بنجاح`;
+    if (failed > 0) msg += `، فشل ${failed} سؤال`;
+    if (!isOnline) msg += ' (وضع غير متصل - سيتم المزامنة لاحقاً)';
+    
+    statusDiv.innerHTML = `<span style="color:${failed > 0 ? '#e17055' : '#00b894'};">${msg}</span>`;
+    
+    // إعادة تحميل قائمة الأسئلة بعد الرفع
+    setTimeout(() => loadQuestions(), 1000);
+    
+    if (saved > 0 && failed === 0) {
+        // إغلاق النافذة بعد 3 ثواني إذا كان كل شيء ناجحاً
+        setTimeout(() => closeJsonUpload(), 3000);
+    }
+}
+// ============================================================
+// ===== باقي الدوال =====
+// ============================================================
 window.onload = async () => {
+    // تهيئة قاعدة البيانات المحلية أولاً
     try {
         await openLocalDB();
     } catch(e) {
         console.warn('IndexedDB not available:', e);
     }
     
+    // Load sync queue from cache
     await loadSyncQueueFromCache();
-    updateConnectionStatus();
-    await initTicker();
     
+    // Update connection status
+    updateConnectionStatus();
+        await initTicker();
     const savedUser = localStorage.getItem('userSession');
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
@@ -1598,7 +1802,10 @@ window.onload = async () => {
         if (currentUser.isAdmin) {
             showScreen('adminScreen');
             loadQuestions();            
-            loadUsers();
+            // تحميل الطلاب فقط إذا كان القسم مفتوحاً
+            if (usersCollapseOpen) {
+                loadUsers();
+            }
             startNotificationSystem();
         } else {
             showScreen('studentScreen');
@@ -1630,21 +1837,26 @@ async function doLogin() {
         document.getElementById('headerLogoutBtn').style.display = 'block';
         showScreen('adminScreen');
         loadQuestions();
-        loadUsers();
+        // تحميل الطلاب فقط إذا كان القسم مفتوحاً
+        if (usersCollapseOpen) {
+            loadUsers();
+        }
         startNotificationSystem();
         return;
     }
     const userKey = btoa(unescape(encodeURIComponent(username))).replace(/[^A-Za-z0-9]/g, '');
     
-    try {        
-        let user = null;
+    try {        let user = null;
+        
         if (isOnline && db) {
             const snapshot = await db.ref('users/' + userKey).once('value');
             user = snapshot.val();
+            // Cache user
             if (user) {
                 await idbPut('users', { key: userKey, ...user });
             }
         } else {
+            // Try local cache
             user = await idbGet('users', userKey);
         }
         
@@ -1662,6 +1874,7 @@ async function doLogin() {
             alert('اسم المستخدم أو كلمة السر غير صحيحة');
         }
     } catch(e) {
+        // Try local cache as fallback
         try {
             const user = await idbGet('users', userKey);
             if (user && user.password === password && user.status === 'active') {
@@ -1694,6 +1907,7 @@ async function doRegister() {
             alert('✅ تم إرسال طلب التسجيل بنجاح، سيتم تفعيل حسابك قريباً');
         } else {
             await addToSyncQueue({ type: 'setUser', key: 'users/' + userKey, data: userData });
+            // Save to local cache
             await idbPut('users', { key: userKey, ...userData });
             alert('💾 تم حفظ طلب التسجيل محلياً - سيتم إرساله عند عودة الاتصال');
         }
